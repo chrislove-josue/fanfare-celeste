@@ -17,8 +17,8 @@
                                 <i class="fas fa-whatsapp text-success" style="font-size: 1.6rem;"></i>
                                 <div class="ms-3">
                                     <div class="fw-semibold">WhatsApp</div>
-                                    <div class="text-muted">+229 97 00 00 00</div>
-                                    <a class="btn btn-success btn-sm mt-2" href="https://wa.me/22997000000" target="_blank" rel="noopener">
+                                    <div class="text-muted">+2290198123353</div>
+                                    <a class="btn btn-success btn-sm mt-2" href="https://wa.me/22998123353" target="_blank" rel="noopener">
                                         <i class="fab fa-whatsapp me-2"></i>Nous écrire
                                     </a>
                                 </div>
@@ -86,7 +86,7 @@
                         <span class="input-group-text" style="background: rgba(25,135,84,.08); border-color: rgba(25,135,84,.2);">
                             <i class="fas fa-phone"></i>
                         </span>
-                        <input id="phone" name="phone" type="text" class="form-control" value="{{ old('phone') }}" placeholder="Ex: +229 97 00 00 00">
+                        <input id="phone" name="phone" type="text" class="form-control" value="{{ old('phone') }}" placeholder="Ex: +2290198123353">
                     </div>
                 </div>
 
@@ -96,11 +96,11 @@
                             <i class="fab fa-whatsapp text-success" style="font-size: 1.2rem;"></i>
                             <div class="ms-2">
                                 <div class="fw-semibold">WhatsApp de la Fanfare</div>
-                                <div class="text-muted">+229 97 00 00 00</div>
+                                <div class="text-muted">+2290198123353</div>
                             </div>
                         </div>
                         <div class="mt-2">
-                            <a class="btn btn-success btn-sm w-100" href="https://wa.me/22997000000" target="_blank" rel="noopener">
+                            <a class="btn btn-success btn-sm w-100" href="https://wa.me/22998123353" target="_blank" rel="noopener">
                                 <i class="fab fa-whatsapp me-2"></i>Contact rapide
                             </a>
                         </div>
