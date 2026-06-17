@@ -130,11 +130,13 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('events.index') }}"><i class="fas fa-calendar-alt"></i> Événements</a>
+                        <a class="nav-link" href="{{ url('/events') }}"><i class="fas fa-calendar-alt"></i> Événements</a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('gallery.index') }}"><i class="fas fa-images"></i> Galerie</a>
+                        <a class="nav-link" href="{{ url('/admin/gallery') }}"><i class="fas fa-images"></i> Galerie</a>
                     </li>
+
                     @auth
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">

@@ -12,7 +12,8 @@
                 <p class="lead mb-4">Une fanfare au service de Dieu, animée par la passion de la musique et l'excellence.</p>
                 <div class="d-flex gap-3">
                     <a href="{{ route('membership.apply') }}" class="btn btn-light btn-lg">Adhérer maintenant</a>
-                    <a href="{{ route('events.index') }}" class="btn btn-outline-light btn-lg">Nos événements</a>
+                    <a href="{{ url('/admin/events') }}" class="btn btn-outline-light btn-lg">Nos événements</a>
+
                 </div>
             </div>
             <div class="col-lg-6 text-center" data-aos="fade-left">
@@ -141,7 +142,8 @@
             @endforeach
         </div>
         <div class="text-center mt-4">
-            <a href="{{ route('gallery.index') }}" class="btn btn-primary">Voir toute la galerie</a>
+            <a href="{{ url('/admin/gallery') }}" class="btn btn-primary">Voir toute la galerie</a>
+
         </div>
     </div>
 </section>

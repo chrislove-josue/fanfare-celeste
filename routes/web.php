@@ -6,6 +6,7 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\FinancialController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\PublicGalleryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\CommitteeController;
@@ -13,28 +14,37 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
-// Routes publiques
+// Routes publiques (vitrine)
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Événements publics (vitrine)
+Route::get('/events', [\App\Http\Controllers\PublicEventController::class, 'index'])->name('public.events.index');
+Route::get('/events/{event}', [\App\Http\Controllers\PublicEventController::class, 'show'])->name('public.events.show');
+
+// Galerie publique (vitrine)
+Route::get('/gallery', [PublicGalleryController::class, 'index'])->name('public.gallery.index');
+
 Route::get('/about/history', [HomeController::class, 'history'])->name('about.history');
 Route::get('/about/mission', [HomeController::class, 'mission'])->name('about.mission');
 Route::get('/about/vision', [HomeController::class, 'vision'])->name('about.vision');
 Route::get('/about/committee', [HomeController::class, 'committee'])->name('about.committee');
 Route::get('/about/sections', [HomeController::class, 'sections'])->name('about.sections');
-Route::get('/events', [EventController::class, 'index'])->name('events.index');
-Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
-Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
+
+
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 Route::post('/contact/send', [HomeController::class, 'sendContact'])->name('contact.send');
 Route::post('/newsletter/subscribe', [HomeController::class, 'newsletterSubscribe'])->name('newsletter.subscribe');
+
 
 // Candidature d'adhésion
 Route::get('/membership/apply', [MembershipController::class, 'applyForm'])->name('membership.apply');
 Route::post('/membership/apply', [MembershipController::class, 'submitApplication'])->name('membership.submit');
 
-// Routes protégées
-Route::middleware(['auth'])->group(function () {
+// Routes Admin
+Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
     
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
