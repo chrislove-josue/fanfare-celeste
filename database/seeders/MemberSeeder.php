@@ -9,6 +9,24 @@ use Illuminate\Support\Facades\Hash;
 
 class MemberSeeder extends Seeder
 {
+    private function columnExistsOnUsers(string $column): bool
+    {
+        // Vérifie si la colonne existe sur la table users.
+        // Compatible MySQL.
+        try {
+            $result = 
+                \DB::table('information_schema.columns')
+                    ->where('table_schema', env('DB_DATABASE'))
+                    ->where('table_name', 'users')
+                    ->where('column_name', $column)
+                    ->exists();
+
+            return $result;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
     public function run(): void
     {
         // Membres du bureau
@@ -48,26 +66,40 @@ class MemberSeeder extends Seeder
         ];
 
         foreach ($committeeMembers as $data) {
-            $member = Member::create([
-                'member_number' => Member::generateMemberNumber(),
-                'first_name' => $data['first_name'],
-                'last_name' => $data['last_name'],
-                'email' => $data['email'],
-                'phone' => $data['phone'],
-                'address' => 'Cotonou, Bénin',
-                'birth_date' => '1980-01-01',
-                'instrument' => $data['instrument'],
-                'entry_date' => '2010-01-01',
-                'section' => $data['instrument'] === 'Percussion' ? 'Percussions' : 'Cuivres',
-                'status' => 'active',
-            ]);
+            // Évite les doublons si on relance des seeders.
+            $member = Member::firstOrCreate(
+                ['email' => $data['email']],
+                [
+                    'member_number' => Member::generateMemberNumber(),
+                    'first_name' => $data['first_name'],
+                    'last_name' => $data['last_name'],
+                    'phone' => $data['phone'],
+                    'address' => 'Cotonou, Bénin',
+                    'birth_date' => '1980-01-01',
+                    'instrument' => $data['instrument'],
+                    'entry_date' => '2010-01-01',
+                    'section' => $data['instrument'] === 'Percussion' ? 'Percussions' : 'Cuivres',
+                    'status' => 'active',
+                ]
+            );
 
-            User::create([
+            // Certaines bases n'ont pas la colonne member_id sur users.
+            // On la renseigne uniquement si elle existe.
+            $userPayload = [
                 'name' => $member->full_name,
-                'email' => $member->email,
                 'password' => Hash::make('password123'),
-                'member_id' => $member->id,
-            ]);
+            ];
+
+            // La colonne member_id n'existe pas toujours dans users.
+            // Dans ce projet, si elle n'existe pas, on ne l'injecte pas.
+            if ($this->columnExistsOnUsers('member_id')) {
+                $userPayload['member_id'] = $member->id;
+            }
+
+            User::firstOrCreate(
+                ['email' => $member->email],
+                $userPayload
+            );
         }
 
         // Membres normaux
@@ -82,31 +114,46 @@ class MemberSeeder extends Seeder
             $section = $sections[array_rand($sections)];
             $instrument = $instruments[array_rand($instruments)];
             
-            $member = Member::create([
-                'member_number' => Member::generateMemberNumber(),
-                'first_name' => $firstName,
-                'last_name' => $lastName,
-                'email' => strtolower($firstName . '.' . $lastName . '@example.com'),
-                'phone' => '+229' . rand(90000000, 99999999),
-                'address' => 'Cotonou, Bénin',
-                'birth_date' => fake()->dateTimeBetween('1980-01-01', '2000-12-31')->format('Y-m-d'),
-                'instrument' => $instrument,
-                'instrument_level' => fake()->randomElement(['debutant', 'intermediaire', 'avance', 'expert']),
-                'entry_date' => fake()->dateTimeBetween('2015-01-01', '2024-12-31')->format('Y-m-d'),
-                'section' => $section,
-                'status' => fake()->randomElement(['active', 'active', 'active', 'active', 'training']),
-                'emergency_contact_name' => 'Contact Urgence',
-                'emergency_contact_phone' => '+229' . rand(90000000, 99999999),
-            ]);
+            $memberNumber = Member::generateMemberNumber();
+            $email = strtolower($firstName . '.' . $lastName . '@example.com');
+
+            $member = Member::firstOrCreate(
+                ['member_number' => $memberNumber],
+                [
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'email' => $email,
+                    'phone' => '+229' . rand(90000000, 99999999),
+                    'address' => 'Cotonou, Bénin',
+                    'birth_date' => fake()->dateTimeBetween('1980-01-01', '2000-12-31')->format('Y-m-d'),
+                    'instrument' => $instrument,
+                    'instrument_level' => fake()->randomElement(['debutant', 'intermediaire', 'avance', 'expert']),
+                    'entry_date' => fake()->dateTimeBetween('2015-01-01', '2024-12-31')->format('Y-m-d'),
+                    'section' => $section,
+                    'status' => fake()->randomElement(['active', 'active', 'active', 'active', 'training']),
+                    'emergency_contact_name' => 'Contact Urgence',
+                    'emergency_contact_phone' => '+229' . rand(90000000, 99999999),
+                ]
+            );
+
 
             if ($member->status === 'active') {
-                User::create([
+                $userPayload = [
                     'name' => $member->full_name,
                     'email' => $member->email,
                     'password' => Hash::make('password123'),
-                    'member_id' => $member->id,
-                ]);
+                ];
+
+                if ($this->columnExistsOnUsers('member_id')) {
+                    $userPayload['member_id'] = $member->id;
+                }
+
+                User::firstOrCreate(
+                    ['email' => $member->email],
+                    $userPayload
+                );
             }
+
         }
     }
 }
