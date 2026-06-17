@@ -134,8 +134,9 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/admin/gallery') }}"><i class="fas fa-images"></i> Galerie</a>
+                        <a class="nav-link" href="{{ url('/gallery') }}"><i class="fas fa-images"></i> Galerie</a>
                     </li>
+
 
                     @auth
                         <li class="nav-item dropdown">
