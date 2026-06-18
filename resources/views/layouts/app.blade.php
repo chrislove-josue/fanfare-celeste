@@ -149,8 +149,9 @@
                                 <li><a class="dropdown-item" href="{{ route('members.index') }}"><i class="fas fa-users"></i> Gestion membres</a></li>
                                 @endcan
                                 @can('manage finances')
-                                <li><a class="dropdown-item" href="{{ route('financial.dashboard') }}"><i class="fas fa-chart-line"></i> Finances</a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.financial.dashboard') }}"><i class="fas fa-chart-line"></i> Finances</a></li>
                                 @endcan
+
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">

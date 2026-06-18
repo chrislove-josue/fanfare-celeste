@@ -7,6 +7,7 @@ use App\Http\Controllers\FinancialController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\PublicGalleryController;
+use App\Http\Controllers\PublicEventController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\CommitteeController;
@@ -17,11 +18,11 @@ use Illuminate\Support\Facades\Route;
 // Routes publiques (vitrine)
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Événements publics (vitrine)
-Route::get('/events', [\App\Http\Controllers\PublicEventController::class, 'index'])->name('public.events.index');
-Route::get('/events/{event}', [\App\Http\Controllers\PublicEventController::class, 'show'])->name('public.events.show');
+// Événements publics
+Route::get('/events', [PublicEventController::class, 'index'])->name('public.events.index');
+Route::get('/events/{event}', [PublicEventController::class, 'show'])->name('public.events.show');
 
-// Galerie publique (vitrine)
+// Galerie publique
 Route::get('/gallery', [PublicGalleryController::class, 'index'])->name('public.gallery.index');
 
 Route::get('/about/history', [HomeController::class, 'history'])->name('about.history');
@@ -30,25 +31,24 @@ Route::get('/about/vision', [HomeController::class, 'vision'])->name('about.visi
 Route::get('/about/committee', [HomeController::class, 'committee'])->name('about.committee');
 Route::get('/about/sections', [HomeController::class, 'sections'])->name('about.sections');
 
-
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 Route::post('/contact/send', [HomeController::class, 'sendContact'])->name('contact.send');
 Route::post('/newsletter/subscribe', [HomeController::class, 'newsletterSubscribe'])->name('newsletter.subscribe');
 
-
 // Candidature d'adhésion
 Route::get('/membership/apply', [MembershipController::class, 'applyForm'])->name('membership.apply');
 Route::post('/membership/apply', [MembershipController::class, 'submitApplication'])->name('membership.submit');
+Route::get('/membership/thankyou', [MembershipController::class, 'thankYou'])->name('membership.thankyou');
 
 // Routes Admin
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
     // Gestion des membres
@@ -86,6 +86,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     
     // Documents
     Route::resource('documents', DocumentController::class);
+    Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
     
     // Bureau exécutif
     Route::resource('committee', CommitteeController::class);

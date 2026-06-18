@@ -2,59 +2,71 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Affiche le formulaire d'édition du profil
      */
-    public function edit(Request $request): View
+    public function edit()
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        return view('profile.edit', ['user' => auth()->user()]);
     }
 
     /**
-     * Update the user's profile information.
+     * Met à jour le profil
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request)
     {
-        $request->user()->fill($request->validated());
+        $user = auth()->user();
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
+        ]);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
+        $user->update($validated);
 
-        $request->user()->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return redirect()->route('admin.profile.edit')
+            ->with('success', 'Profil mis à jour avec succès');
     }
 
     /**
-     * Delete the user's account.
+     * Met à jour le mot de passe
      */
-    public function destroy(Request $request): RedirectResponse
+    public function updatePassword(Request $request)
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
+        $validated = $request->validate([
+            'current_password' => 'required|current_password',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = $request->user();
+        auth()->user()->update([
+            'password' => Hash::make($validated['password']),
+        ]);
 
-        Auth::logout();
+        return redirect()->route('admin.profile.edit')
+            ->with('success', 'Mot de passe mis à jour avec succès');
+    }
 
+    /**
+     * Supprime le compte utilisateur
+     */
+    public function destroy(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|current_password',
+        ]);
+
+        $user = auth()->user();
+        auth()->logout();
         $user->delete();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        return redirect()->route('home')
+            ->with('success', 'Compte supprimé avec succès');
     }
 }
