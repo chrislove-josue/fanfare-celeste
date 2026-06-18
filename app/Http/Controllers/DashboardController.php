@@ -59,6 +59,14 @@ class DashboardController extends Controller
             ->groupBy('section')
             ->get();
 
+        // Eviter l'appel à Gate/HasPermissions de Spatie si les tables Spatie n'existent pas.
+        // Si permissions/roles sont absentes, on coupe les checks.
+        $hasSpatie = $this->hasSpatieTables();
+
+        if (! $hasSpatie) {
+            \Illuminate\Support\Facades\Gate::forget('view events');
+        }
+
         return view('dashboard', compact(
             'totalMembers',
             'activeMembers',
@@ -73,6 +81,7 @@ class DashboardController extends Controller
             'monthlyEvolution',
             'membersBySection'
         ));
+
     }
 }
 
