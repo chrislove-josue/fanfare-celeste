@@ -9,6 +9,23 @@ use Illuminate\Support\Facades\Hash;
 
 class MemberSeeder extends Seeder
 {
+    private function generateUniqueMemberNumber(): string
+    {
+        $tries = 50;
+        while ($tries-- > 0) {
+            $candidate = Member::generateMemberNumber();
+            $exists = Member::where('member_number', $candidate)->exists();
+            if (! $exists) {
+                return $candidate;
+            }
+        }
+
+        // En dernier recours (cas très improbable), fallback sur un suffixe aléatoire.
+        $year = date('Y');
+        $random = str_pad((string) random_int(1, 9999), 4, '0', STR_PAD_LEFT);
+        return 'FC-' . $year . '-' . $random;
+    }
+
     private function columnExistsOnUsers(string $column): bool
     {
         // Vérifie si la colonne existe sur la table users.
@@ -67,10 +84,14 @@ class MemberSeeder extends Seeder
 
         foreach ($committeeMembers as $data) {
             // Évite les doublons si on relance des seeders.
-            $member = Member::firstOrCreate(
+            $member = Member::updateOrCreate(
                 ['email' => $data['email']],
                 [
-                    'member_number' => Member::generateMemberNumber(),
+                    // Génération automatique et unique du member_number
+                    // (utilisée si l'email n'existe pas encore)
+                    'member_number' => Member::where('email', $data['email'])->exists()
+                        ? (string) Member::where('email', $data['email'])->value('member_number')
+                        : $this->generateUniqueMemberNumber(),
                     'first_name' => $data['first_name'],
                     'last_name' => $data['last_name'],
                     'phone' => $data['phone'],
@@ -114,12 +135,16 @@ class MemberSeeder extends Seeder
             $section = $sections[array_rand($sections)];
             $instrument = $instruments[array_rand($instruments)];
             
-            $memberNumber = Member::generateMemberNumber();
             $email = strtolower($firstName . '.' . $lastName . '@example.com');
 
-            $member = Member::firstOrCreate(
-                ['member_number' => $memberNumber],
+            // Clé d'idempotence: email unique sur members.
+            // member_number sera généré uniquement si le membre n'existe pas encore.
+            $existingMemberNumber = Member::where('email', $email)->value('member_number');
+
+            $member = Member::updateOrCreate(
+                ['email' => $email],
                 [
+                    'member_number' => $existingMemberNumber ?: $this->generateUniqueMemberNumber(),
                     'first_name' => $firstName,
                     'last_name' => $lastName,
                     'email' => $email,

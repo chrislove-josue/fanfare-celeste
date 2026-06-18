@@ -7,10 +7,10 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Gestion des membres</h1>
         <div>
-            <a href="{{ route('members.export') }}" class="btn btn-secondary me-2">
+            <a href="{{ route('admin.members.export') }}" class="btn btn-secondary me-2">
                 <i class="fas fa-download"></i> Exporter PDF
             </a>
-            <a href="{{ route('members.create') }}" class="btn btn-primary">
+            <a href="{{ route('admin.members.create') }}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Nouveau membre
             </a>
         </div>
@@ -19,7 +19,7 @@
     <!-- Filtres -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('members.index') }}" class="row g-3">
+            <form method="GET" action="{{ route('admin.members.index') }}" class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Recherche</label>
                     <input type="text" name="search" class="form-control" value="{{ request('search') }}" placeholder="Nom, prénom, email...">
@@ -113,17 +113,17 @@
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm">
-                                    <a href="{{ route('members.show', $member) }}" class="btn btn-info">
+                                    <a href="{{ route('admin.members.show', $member) }}" class="btn btn-info">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('members.edit', $member) }}" class="btn btn-warning">
+                                    <a href="{{ route('admin.members.edit', $member) }}" class="btn btn-warning">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="{{ route('members.card', $member) }}" class="btn btn-primary">
+                                    <a href="{{ route('admin.members.card', $member) }}" class="btn btn-primary">
                                         <i class="fas fa-id-card"></i>
                                     </a>
                                     @if($member->status == 'pending')
-                                    <form action="{{ route('members.approve', $member) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('admin.members.approve', $member) }}" method="POST" class="d-inline">
                                         @csrf
                                         <button type="submit" class="btn btn-success" onclick="return confirm('Approuver ce membre ?')">
                                             <i class="fas fa-check"></i>

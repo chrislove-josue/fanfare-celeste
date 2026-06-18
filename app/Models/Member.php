@@ -95,7 +95,8 @@ class Member extends Model
             'section' => $this->section,
             'instrument' => $this->instrument
         ]);
-        return base64_encode(QrCode::format('png')->size(300)->generate($data));
+        // Use SVG backend to avoid requiring PHP imagick (GD/SVG works without imagick on most setups)
+        return base64_encode(QrCode::format('svg')->size(300)->generate($data));
     }
 
     // Scopes

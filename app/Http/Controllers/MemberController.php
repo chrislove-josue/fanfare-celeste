@@ -55,7 +55,7 @@ class MemberController extends Controller
         $instruments = Member::select('instrument')->distinct()->whereNotNull('instrument')->pluck('instrument');
         $statuses = ['pending', 'active', 'suspended', 'withdrawn', 'deceased', 'training'];
         
-        return view('members.index', compact('members', 'sections', 'instruments', 'statuses'));
+        return view('admin.members.index', compact('members', 'sections', 'instruments', 'statuses'));
     }
 
     public function create()
@@ -63,7 +63,7 @@ class MemberController extends Controller
         $sections = ['Trompettes', 'Trombones', 'Saxophones', 'Percussions', 'Clairons', 'Batterie'];
         $instruments = ['Trompette', 'Trombone', 'Saxophone Alto', 'Saxophone Ténor', 'Saxophone Baryton', 'Batterie', 'Caisse Claire', 'Grosse Caisse', 'Cymbales'];
         
-        return view('members.create', compact('sections', 'instruments'));
+        return view('admin.members.create', compact('sections', 'instruments'));
     }
 
     public function store(Request $request)
@@ -116,7 +116,7 @@ class MemberController extends Controller
 
             DB::commit();
             
-            return redirect()->route('members.show', $member)
+            return redirect()->route('admin.members.show', $member)
                 ->with('success', 'Membre ajouté avec succès. Numéro: ' . $member->member_number);
                 
         } catch (\Exception $e) {
@@ -132,7 +132,7 @@ class MemberController extends Controller
         $transactions = $member->transactions()->latest()->take(6)->get();
         $committeePosition = $member->currentCommitteePosition;
         
-        return view('members.show', compact('member', 'contributions', 'events', 'transactions', 'committeePosition'));
+        return view('admin.members.show', compact('member', 'contributions', 'events', 'transactions', 'committeePosition'));
     }
 
     public function edit(Member $member)
@@ -142,7 +142,7 @@ class MemberController extends Controller
         $statuses = ['pending', 'active', 'suspended', 'withdrawn', 'deceased', 'training'];
         $instrumentLevels = ['debutant', 'intermediaire', 'avance', 'expert'];
         
-        return view('members.edit', compact('member', 'sections', 'instruments', 'statuses', 'instrumentLevels'));
+        return view('admin.members.edit', compact('member', 'sections', 'instruments', 'statuses', 'instrumentLevels'));
     }
 
     public function update(Request $request, Member $member)
@@ -173,7 +173,7 @@ class MemberController extends Controller
 
         $member->update($validated);
 
-        return redirect()->route('members.show', $member)
+        return redirect()->route('admin.members.show', $member)
             ->with('success', 'Membre mis à jour avec succès');
     }
 
@@ -194,7 +194,7 @@ class MemberController extends Controller
         
         $member->delete();
 
-        return redirect()->route('members.index')
+        return redirect()->route('admin.members.index')
             ->with('success', 'Membre supprimé avec succès');
     }
 
@@ -205,7 +205,7 @@ class MemberController extends Controller
         // Envoyer un email de bienvenue (à implémenter)
         // Mail::to($member->email)->send(new WelcomeMemberMail($member));
         
-        return redirect()->route('members.show', $member)
+        return redirect()->route('admin.members.show', $member)
             ->with('success', 'Membre approuvé avec succès');
     }
 
@@ -213,7 +213,7 @@ class MemberController extends Controller
     {
         $member->update(['status' => 'withdrawn']);
         
-        return redirect()->route('members.show', $member)
+        return redirect()->route('admin.members.show', $member)
             ->with('warning', 'Membre rejeté');
     }
 
@@ -221,7 +221,7 @@ class MemberController extends Controller
     {
         $qrCode = $member->memberCardQrCode;
         
-        $pdf = PDF::loadView('members.card', compact('member', 'qrCode'));
+        $pdf = PDF::loadView('admin.members.card', compact('member', 'qrCode'));
         $pdf->setPaper('a6', 'landscape');
         
         return $pdf->download('carte_membre_' . $member->member_number . '.pdf');
@@ -230,7 +230,7 @@ class MemberController extends Controller
     public function export()
     {
         $members = Member::all();
-        $pdf = PDF::loadView('members.export', compact('members'));
+        $pdf = PDF::loadView('admin.members.export', compact('members'));
         $pdf->setPaper('a4', 'landscape');
         
         return $pdf->download('liste_membres_' . date('Y-m-d') . '.pdf');
