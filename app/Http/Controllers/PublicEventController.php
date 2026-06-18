@@ -21,7 +21,7 @@ class PublicEventController extends Controller
     {
         // On récupère aussi la liste des participants si nécessaire pour la lecture.
         $participants = $event->participants()
-            ->orderBy('members.name')
+            ->orderByRaw("CONCAT(members.first_name, ' ', members.last_name) ASC")
             ->get();
 
         return view('events.public.show', compact('event', 'participants'));

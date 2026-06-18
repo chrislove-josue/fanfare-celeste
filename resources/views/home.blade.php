@@ -76,7 +76,7 @@
                         <div class="event-location mb-2">
                             <i class="fas fa-map-marker-alt"></i> {{ $event->location }}
                         </div>
-                        <a href="{{ route('events.show', $event) }}" class="btn btn-primary">En savoir plus</a>
+                        <a href="{{ route('public.events.show', $event) }}" class="btn btn-primary">En savoir plus</a>
                     </div>
                 </div>
             </div>

@@ -144,7 +144,7 @@
                                 <i class="fas fa-user"></i> {{ Auth::user()->name }}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ route('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
                                 @can('manage members')
                                 <li><a class="dropdown-item" href="{{ route('members.index') }}"><i class="fas fa-users"></i> Gestion membres</a></li>
                                 @endcan

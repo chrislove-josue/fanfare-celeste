@@ -28,7 +28,9 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Les routes admin sont préfixées avec name: 'admin.' dans routes/web.php
+        return redirect()->intended(route('admin.dashboard', absolute: false));
+
     }
 
     /**
