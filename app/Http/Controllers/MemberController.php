@@ -132,7 +132,7 @@ class MemberController extends Controller
         $transactions = $member->transactions()->latest()->take(6)->get();
         $committeePosition = $member->currentCommitteePosition;
         
-        return view('admin.members.show', compact('member', 'contributions', 'events', 'transactions', 'committeePosition'));
+        return view('members.show', compact('member', 'contributions', 'events', 'transactions', 'committeePosition'));
     }
 
     public function edit(Member $member)
@@ -205,7 +205,7 @@ class MemberController extends Controller
         // Envoyer un email de bienvenue (à implémenter)
         // Mail::to($member->email)->send(new WelcomeMemberMail($member));
         
-        return redirect()->route('admin.members.show', $member)
+        return redirect()->route('members.show', $member)
             ->with('success', 'Membre approuvé avec succès');
     }
 

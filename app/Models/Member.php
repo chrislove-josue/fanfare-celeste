@@ -82,10 +82,56 @@ class Member extends Model
         return $this->birth_date->age;
     }
 
-    public function getPhotoUrlAttribute(): string
-    {
-        return $this->photo ? Storage::url($this->photo) : asset('images/default-avatar.png');
+   public function getPhotoUrlAttribute(): ?string
+{
+    if (!$this->photo) return null;
+
+    $path = storage_path('app/public/' . $this->photo);
+
+    if (!file_exists($path)) return null;
+
+    // Recadrage carré centré avec GD (pas besoin d'Imagick)
+    $mime = mime_content_type($path);
+
+    $src = match($mime) {
+        'image/jpeg', 'image/jpg' => imagecreatefromjpeg($path),
+        'image/png'               => imagecreatefrompng($path),
+        'image/webp'              => imagecreatefromwebp($path),
+        default                   => null,
+    };
+
+    if (!$src) {
+        // Fallback sans recadrage
+        return 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($path));
     }
+
+    $sw = imagesx($src);
+    $sh = imagesy($src);
+    $size = min($sw, $sh);
+    $ox = intval(($sw - $size) / 2);
+    $oy = intval(($sh - $size) / 2);
+
+    $dst = imagecreatetruecolor(68, 68);
+
+    // Fond transparent pour PNG
+    if ($mime === 'image/png') {
+        imagealphablending($dst, false);
+        imagesavealpha($dst, true);
+        $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+        imagefill($dst, 0, 0, $transparent);
+    }
+
+    imagecopyresampled($dst, $src, 0, 0, $ox, $oy, 68, 68, $size, $size);
+
+    ob_start();
+    imagejpeg($dst, null, 90);
+    $data = ob_get_clean();
+
+    imagedestroy($src);
+    imagedestroy($dst);
+
+    return 'data:image/jpeg;base64,' . base64_encode($data);
+}
 
     public function getMemberCardQrCodeAttribute(): string
     {

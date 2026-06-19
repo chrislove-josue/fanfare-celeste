@@ -32,7 +32,7 @@ class EventController extends Controller
         
         $ongoingEvents = Event::ongoing()->get();
         
-        return view('events.index', compact('upcomingEvents', 'pastEvents', 'ongoingEvents'));
+        return view('admin.events.index', compact('upcomingEvents', 'pastEvents', 'ongoingEvents'));
     }
 
     public function create()
@@ -40,7 +40,7 @@ class EventController extends Controller
         $users = \App\Models\User::role(['president', 'conductor', 'super-admin'])->get();
         $types = Event::getTypes();
         
-        return view('events.create', compact('users', 'types'));
+        return view('admin.events.create', compact('users', 'types'));
     }
 
     public function store(Request $request)
@@ -130,7 +130,7 @@ class EventController extends Controller
         
         $event->delete();
 
-        return redirect()->route('events.index')
+        return redirect()->route('admin.events.index')
             ->with('success', 'Événement supprimé');
     }
 
@@ -190,7 +190,7 @@ class EventController extends Controller
             $eventsByDate[$date][] = $event;
         }
         
-        return view('events.calendar', compact('eventsByDate'));
+        return view('admin.events.calendar', compact('eventsByDate'));
     }
 
     public function report(Event $event)
