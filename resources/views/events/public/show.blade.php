@@ -55,9 +55,13 @@
                         @endif
 
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                            <a href="{{ route('public.events.index') }}" class="btn btn-primary">
+                            <a href="{{ route('public.events.participate.form', ['event' => $event->id]) }}" class="btn btn-primary me-2">
+    <i class="fas fa-user-plus"></i> S’inscrire à l’événement
+</a>
+                            <a href="{{ route('public.events.index') }}" class="btn btn-outline-primary">
                                 <i class="fas fa-calendar-alt"></i> Tous les événements
                             </a>
+
                             <div class="text-muted">
                                 <small>
                                     <i class="fas fa-user-friends me-1"></i>
@@ -113,6 +117,11 @@
                                 <div class="text-muted mt-2"><small>+ {{ $participants->count() - 8 }} autres</small></div>
                             @endif
                         @endif
+
+                        <div class="alert alert-info mt-4 mb-0">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Pour participer, cliquez sur « S’inscrire à l’événement ».
+                        </div>
                     </div>
                 </div>
             </div>

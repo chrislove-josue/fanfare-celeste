@@ -45,7 +45,14 @@
                                         {{ $event->location }}
                                     </small>
                                 </div>
-<a href="{{ route('public.events.show', $event) }}" class="stretched-link" style="text-decoration:none;">Lire l’article</a>
+<div class="d-flex gap-2 mt-2">
+                                    <a href="{{ route('public.events.show', $event) }}" class="btn btn-sm btn-outline-secondary stretched-link" style="text-decoration:none;">
+                                        <i class="fas fa-book-open me-1"></i> Lire l’article
+                                    </a>
+                                    <a href="{{ route(auth()->check() ? 'public.events.participate' : 'public.events.participate.form', $event) }}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-user-plus me-1"></i> S’inscrire
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>

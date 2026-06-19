@@ -21,6 +21,15 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Événements publics
 Route::get('/events', [PublicEventController::class, 'index'])->name('public.events.index');
 Route::get('/events/{event}', [PublicEventController::class, 'show'])->name('public.events.show');
+Route::get('/events/{event}/participate', [PublicEventController::class, 'participateForm'])->name('public.events.participate');
+Route::post('/events/{event}/participate', [PublicEventController::class, 'participate'])->name('public.events.participate.submit');
+Route::get('/events/{event}/participate-form', [PublicEventController::class, 'participateForm'])->name('public.events.participate.form');
+
+Route::get('/events/{event}/participate-form', [PublicEventController::class, 'participateForm'])
+    ->name('public.events.participate.form');
+
+Route::post('/events/{event}/participate', [PublicEventController::class, 'participate'])
+    ->name('public.events.participate.submit');
 
 // Galerie publique
 Route::get('/gallery', [PublicGalleryController::class, 'index'])->name('public.gallery.index');
