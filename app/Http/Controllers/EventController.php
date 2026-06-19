@@ -67,7 +67,7 @@ class EventController extends Controller
 
         Event::create($validated);
 
-        return redirect()->route('events.index')
+        return redirect()->route('admin.events.index')
             ->with('success', 'Événement créé avec succès');
     }
 
@@ -80,7 +80,7 @@ class EventController extends Controller
         $absentCount = $participants->where('attendance_status', 'absent')->count();
         $lateCount = $participants->where('attendance_status', 'late')->count();
         
-        return view('events.show', compact('event', 'participants', 'availableMembers', 'presentCount', 'absentCount', 'lateCount'));
+        return view('admin.events.show', compact('event', 'participants', 'availableMembers', 'presentCount', 'absentCount', 'lateCount'));
     }
 
     public function edit(Event $event)
@@ -89,7 +89,7 @@ class EventController extends Controller
         $types = Event::getTypes();
         $statuses = Event::getStatuses();
         
-        return view('events.edit', compact('event', 'users', 'types', 'statuses'));
+        return view('admin.events.edit', compact('event', 'users', 'types', 'statuses'));
     }
 
     public function update(Request $request, Event $event)
@@ -118,7 +118,7 @@ class EventController extends Controller
 
         $event->update($validated);
 
-        return redirect()->route('events.show', $event)
+        return redirect()->route('admin.events.show', $event)
             ->with('success', 'Événement mis à jour');
     }
 
@@ -154,7 +154,7 @@ class EventController extends Controller
             'attendance_status' => 'confirmed'
         ]);
 
-        return redirect()->route('events.show', $event)
+        return redirect()->route('admin.events.show', $event)
             ->with('success', 'Participant ajouté avec succès');
     }
 
@@ -171,7 +171,7 @@ class EventController extends Controller
             'arrival_time' => $request->attendance_status == 'present' ? now() : $participation->arrival_time
         ]);
 
-        return redirect()->route('events.show', $event)
+        return redirect()->route('admin.events.show', $event)
             ->with('success', 'Statut de participation mis à jour');
     }
 
@@ -209,6 +209,6 @@ class EventController extends Controller
             ? round(($statistics['present'] / $statistics['total']) * 100, 2) 
             : 0;
         
-        return view('events.report', compact('event', 'participations', 'statistics'));
+        return view('admin.events.report', compact('event', 'participations', 'statistics'));
     }
 }

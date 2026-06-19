@@ -45,7 +45,7 @@
                     <hr>
 
                     <h6 class="mb-2">Ajouter un participant</h6>
-                    <form method="POST" action="{{ route('events.add-participant', $event) }}">
+                    <form method="POST" action="{{ route('admin.events.add-participant', $event) }}">
                         @csrf
                         <select name="member_id" class="form-select mb-2" required>
                             @foreach($availableMembers as $member)
