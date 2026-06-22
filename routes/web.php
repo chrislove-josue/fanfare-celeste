@@ -51,8 +51,18 @@ Route::get('/membership/apply', [MembershipController::class, 'applyForm'])->nam
 Route::post('/membership/apply', [MembershipController::class, 'submitApplication'])->name('membership.submit');
 Route::get('/membership/thankyou', [MembershipController::class, 'thankYou'])->name('membership.thankyou');
 
+// Espace personnel (utilisateur connecté)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/my/profile', [\App\Http\Controllers\MyProfileController::class, 'profile'])->name('my.profile');
+    Route::get('/my/contributions', [\App\Http\Controllers\MyProfileController::class, 'contributions'])->name('my.contributions');
+    Route::get('/my/transactions', [\App\Http\Controllers\MyProfileController::class, 'transactions'])->name('my.transactions');
+    Route::get('/my/events', [\App\Http\Controllers\MyProfileController::class, 'events'])->name('my.events');
+});
+
+
 // Routes Admin
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
