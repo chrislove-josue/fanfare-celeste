@@ -79,17 +79,6 @@
                                     <label class="form-label">Téléphone</label>
                                     <input type="text" name="phone" class="form-control" value="{{ old('phone', $profile->phone ?? '') }}" required>
                                 </div>
-
-                                <div class="col-12">
-                                    <label class="form-label">Quartier</label>
-                                    <input type="text" name="address" class="form-control" value="{{ old('address', $profile->address ?? '') }}" required>
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label">Message (optionnel)</label>
-                                    <textarea name="message" class="form-control" rows="3" placeholder="Ex: Je souhaite participer...">{{ old('message') }}</textarea>
-                                </div>
-
                                 <div class="col-12 d-flex justify-content-end mt-2">
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-paper-plane me-1"></i> Envoyer ma demande

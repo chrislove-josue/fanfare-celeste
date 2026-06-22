@@ -6,6 +6,10 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>{{ $event->title }}</h1>
+        <div class="text-muted small mt-1">
+            <i class="fas fa-users me-1"></i>
+            Nombre de participants (membres du club + inscriptions publiques) : {{ $totalParticipants ?? 0 }}
+        </div>
         <div>
             <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-warning me-2">
                 <i class="fas fa-edit"></i> Modifier

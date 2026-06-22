@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Member;
-use App\Models\EventParticipation;
+use App\Models\EventPublicRegistration;
 use Illuminate\Http\Request;
 
 class PublicEventController extends Controller
@@ -31,38 +31,18 @@ class PublicEventController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email',
             'phone' => 'required|string|max:30',
-            'address' => 'required|string|max:255',
-            'message' => 'nullable|string',
         ]);
 
-        // Ici : créer/mettre à jour une demande de participation.
-        // Comme ton modèle exact n’existe pas clairement côté public,
-        // on enregistre au minimum une participation « confirmed » si possible.
-        $member = null;
-        if (class_exists(\App\Models\Member::class)) {
-            $member = \App\Models\Member::firstOrCreate(
-                ['email' => $validated['email']],
-                [
-                    'first_name' => $validated['first_name'],
-                    'last_name' => $validated['last_name'],
-                    'phone' => $validated['phone'],
-                    'address' => $validated['address'],
-                    'status' => 'pending',
-                ]
-            );
-        }
-
-        if ($member) {
-            \App\Models\EventParticipation::updateOrCreate(
-                ['event_id' => $event->id, 'member_id' => $member->id],
-                [
-                    'attendance_status' => 'confirmed',
-                    'notes' => $validated['message'] ?? null,
-                ]
-            );
-        }
+        // Une soumission = une nouvelle inscription publique (auto-incrément id)
+        \App\Models\EventPublicRegistration::create([
+            'event_id' => $event->id,
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
+            'whatsapp_number' => $validated['phone'],
+            'phone' => $validated['phone'],
+            'status' => 'confirmed',
+        ]);
 
         return redirect()->route('public.events.show', $event)
             ->with('success', 'Votre demande d’inscription a été envoyée. Merci !');
@@ -80,12 +60,22 @@ class PublicEventController extends Controller
 
     public function show(Event $event)
     {
-        // On récupère aussi la liste des participants si nécessaire pour la lecture.
+        // Tous les membres du club sont considérés comme participants
+        // (inscriptions internes gérées par admin + membres du club)
+        $membersTotal = \App\Models\Member::query()->count();
+
+        // Liste des participants internes (ceux ajoutés par admin)
         $participants = $event->participants()
             ->orderByRaw("CONCAT(members.first_name, ' ', members.last_name) ASC")
             ->get();
 
-        return view('events.public.show', compact('event', 'participants'));
+        $publicRegistrationsCount = \App\Models\EventPublicRegistration::query()
+            ->where('event_id', $event->id)
+            ->count();
+
+        $totalParticipants = $membersTotal + $publicRegistrationsCount;
+
+        return view('events.public.show', compact('event', 'participants', 'publicRegistrationsCount', 'totalParticipants', 'membersTotal'));
     }
 }
 

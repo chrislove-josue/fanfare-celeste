@@ -55,7 +55,8 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <strong>Participants</strong>
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <span class="badge bg-primary">Total : {{ $totalParticipants ?? 0 }}</span>
                             <span class="badge bg-success">Présents : {{ $presentCount }}</span>
                             <span class="badge bg-danger">Absents : {{ $absentCount }}</span>
                             <span class="badge bg-warning">Retard : {{ $lateCount }}</span>

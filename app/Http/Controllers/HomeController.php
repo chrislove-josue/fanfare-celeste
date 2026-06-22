@@ -20,6 +20,20 @@ class HomeController extends Controller
     public function index()
     {
         $upcomingEvents = Event::upcoming()->take(3)->get();
+
+        // Pour afficher le nombre de participants sur la home pour chaque événement
+        $membersTotal = Member::query()->count();
+        $publicRegistrations = \App\Models\EventPublicRegistration::query()
+            ->whereIn('event_id', $upcomingEvents->pluck('id'))
+            ->selectRaw('event_id, COUNT(*) as total')
+            ->groupBy('event_id')
+            ->pluck('total', 'event_id');
+
+        $upcomingEvents->transform(function (Event $event) use ($membersTotal, $publicRegistrations) {
+            $event->publicRegistrationsCount = (int) ($publicRegistrations[$event->id] ?? 0);
+            $event->totalParticipants = $membersTotal + $event->publicRegistrationsCount;
+            return $event;
+        });
         $latestNews = News::where('status', 'published')
             ->where('published_at', '<=', now())
             ->latest('published_at')

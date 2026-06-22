@@ -34,6 +34,8 @@ Route::post('/events/{event}/participate', [PublicEventController::class, 'parti
 // Galerie publique
 Route::get('/gallery', [PublicGalleryController::class, 'index'])->name('public.gallery.index');
 
+// About (pages distinctes)
+Route::get('/about', [HomeController::class, 'history'])->name('about');
 Route::get('/about/history', [HomeController::class, 'history'])->name('about.history');
 Route::get('/about/mission', [HomeController::class, 'mission'])->name('about.mission');
 Route::get('/about/vision', [HomeController::class, 'vision'])->name('about.vision');
@@ -59,14 +61,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    
+
     // Gestion des membres
     Route::resource('members', MemberController::class);
     Route::post('/members/{member}/approve', [MemberController::class, 'approve'])->name('members.approve');
     Route::post('/members/{member}/reject', [MemberController::class, 'reject'])->name('members.reject');
     Route::get('/members/{member}/card', [MemberController::class, 'generateCard'])->name('members.card');
     Route::get('/members/export/all', [MemberController::class, 'export'])->name('members.export');
-    
+
     // Gestion financière
     Route::prefix('financial')->name('financial.')->group(function () {
         Route::get('/dashboard', [FinancialController::class, 'dashboard'])->name('dashboard');
@@ -81,26 +83,26 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::get('/contributions', [FinancialController::class, 'contributions'])->name('contributions');
         Route::post('/contributions/record', [FinancialController::class, 'recordContribution'])->name('contributions.record');
     });
-    
+
     // Gestion des événements
     Route::resource('events', EventController::class);
     Route::post('/events/{event}/add-participant', [EventController::class, 'addParticipant'])->name('events.add-participant');
     Route::post('/events/{event}/update-participation', [EventController::class, 'updateParticipation'])->name('events.update-participation');
     Route::get('/events/calendar/view', [EventController::class, 'calendar'])->name('events.calendar');
     Route::get('/events/{event}/report', [EventController::class, 'report'])->name('events.report');
-    
+
     // Galerie
     Route::resource('gallery', GalleryController::class);
     Route::post('/gallery/{gallery}/like', [GalleryController::class, 'like'])->name('gallery.like');
-    
+
     // Documents
     Route::resource('documents', DocumentController::class);
     Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
-    
+
     // Bureau exécutif
     Route::resource('committee', CommitteeController::class);
     Route::post('/committee/{committee}/end', [CommitteeController::class, 'endMandate'])->name('committee.end');
-    
+
     // Rapports
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/members', [ReportController::class, 'members'])->name('members');
@@ -111,3 +113,4 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 });
 
 require __DIR__.'/auth.php';
+

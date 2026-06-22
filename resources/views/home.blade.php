@@ -12,12 +12,12 @@
                 <p class="lead mb-4">Une fanfare au service de Dieu, animée par la passion de la musique et l'excellence.</p>
                 <div class="d-flex gap-3">
                     <a href="{{ route('membership.apply') }}" class="btn btn-light btn-lg">Adhérer maintenant</a>
-                    <a href="{{ url('/admin/events') }}" class="btn btn-outline-light btn-lg">Nos événements</a>
+                    <a href="{{ url('/events') }}" class="btn btn-outline-light btn-lg">Nos événements</a>
 
                 </div>
             </div>
             <div class="col-lg-6 text-center" data-aos="fade-left">
-                <img src="{{ asset('images/logo.png') }}" alt="Fanfare Céleste" class="img-fluid" style="max-height: 400px;">
+                <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" class="img-fluid" style="max-height: 400px;">
             </div>
         </div>
     </div>
@@ -75,6 +75,10 @@
                         <p class="card-text">{{ Str::limit($event->description, 100) }}</p>
                         <div class="event-location mb-2">
                             <i class="fas fa-map-marker-alt"></i> {{ $event->location }}
+                        </div>
+                        <div class="event-participants text-muted mb-3">
+                            <i class="fas fa-users me-1"></i>
+                            Participants : {{ $event->totalParticipants ?? ($event->members_total ?? 0) }}
                         </div>
                         <a href="{{ route('public.events.show', $event) }}" class="btn btn-primary">En savoir plus</a>
                     </div>

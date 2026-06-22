@@ -75,12 +75,22 @@ class EventController extends Controller
     {
         $participants = $event->participations()->with('member')->get();
         $availableMembers = Member::where('status', 'active')->get();
-        
+
+        // Tous les membres du club sont considérés comme participants
+        // => Total participants = membres du club + inscriptions publiques
+        $membersTotal = Member::query()->count();
+
+        $publicRegistrationsCount = \App\Models\EventPublicRegistration::query()
+            ->where('event_id', $event->id)
+            ->count();
+
+        $totalParticipants = $membersTotal + $publicRegistrationsCount;
+
         $presentCount = $participants->where('attendance_status', 'present')->count();
         $absentCount = $participants->where('attendance_status', 'absent')->count();
         $lateCount = $participants->where('attendance_status', 'late')->count();
-        
-        return view('admin.events.show', compact('event', 'participants', 'availableMembers', 'presentCount', 'absentCount', 'lateCount'));
+
+        return view('admin.events.show', compact('event', 'participants', 'availableMembers', 'totalParticipants', 'presentCount', 'absentCount', 'lateCount'));
     }
 
     public function edit(Event $event)
