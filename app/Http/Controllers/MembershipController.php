@@ -104,8 +104,39 @@ class MembershipController extends Controller
 
         $member = Member::create($validated);
 
+        // Envoyer les données du nouveau membre via WhatsApp (webhook/URL externe)
+        // IMPORTANT: on ne place pas de logique réseau bloquante dans la requête.
+        // Si vous n'avez pas encore configuré le service WhatsApp côté serveur,
+        // ce code peut être désactivé via env(WA_NEW_MEMBER_URL).
+        try {
+            $waUrl = config('services.wa_new_member.url');
+            if ($waUrl) {
+                $payload = [
+                    'event' => 'new_member',
+                    'member_number' => $member->member_number,
+                    'name' => $member->full_name,
+                    'email' => $member->email,
+                    'phone' => $member->phone,
+                    'whatsapp' => $member->whatsapp,
+                    'section' => $member->section,
+                    'instrument' => $member->instrument,
+                    'instrument_level' => $member->instrument_level,
+                    'address' => $member->address,
+                    'birth_date' => optional($member->birth_date)->format('Y-m-d'),
+                    'birth_place' => $member->birth_place,
+                ];
+
+                // HTTP client léger: Laravel utilise Http facade (si dispo)
+                if (class_exists(\Illuminate\Support\Facades\Http::class)) {
+                    \Illuminate\Support\Facades\Http::post($waUrl, $payload)->timeout(5);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('WhatsApp new member send failed: ' . $e->getMessage());
+        }
 
         // Créer un compte utilisateur
+
         // La table users ne contient pas forcément member_id (selon la migration actuelle)
         // donc on ne l’insère que si la colonne existe.
         $userData = [

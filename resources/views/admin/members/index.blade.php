@@ -129,6 +129,16 @@
                                             </button>
                                         </form>
                                     @endif
+
+                                    {{-- Suppression définitive --}}
+                                    <form action="{{ route('admin.members.destroy', $member) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger" onclick="return confirm('Supprimer définitivement ce membre ? Cette action est irréversible.')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+
                                 </div>
                             </td>
                         </tr>

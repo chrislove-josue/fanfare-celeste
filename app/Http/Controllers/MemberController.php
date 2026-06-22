@@ -187,10 +187,11 @@ class MemberController extends Controller
             Storage::disk('public')->delete($member->id_document);
         }
         
-        // Supprimer l'utilisateur associé
-        if ($member->user) {
-            $member->user->delete();
-        }
+        // Supprimer l'utilisateur associé (relation optionnelle)
+        // NOTE: dans ta base, la colonne `users.member_id` peut ne pas exister,
+        // donc on évite toute tentative via la relation Eloquent.
+        // Si `member_id` existe dans `users`, on peut ensuite ajouter une suppression propre.
+
         
         $member->delete();
 
@@ -205,7 +206,7 @@ class MemberController extends Controller
         // Envoyer un email de bienvenue (à implémenter)
         // Mail::to($member->email)->send(new WelcomeMemberMail($member));
         
-        return redirect()->route('members.show', $member)
+        return redirect()->route('admin.members.show', $member)
             ->with('success', 'Membre approuvé avec succès');
     }
 
