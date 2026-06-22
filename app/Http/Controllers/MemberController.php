@@ -105,14 +105,16 @@ class MemberController extends Controller
 
             $member = Member::create($validated);
 
-            // Créer un compte utilisateur pour le membre
+            // Créer un compte utilisateur pour le membre.
+            // Dans ta table `users`, il n'y a PAS de colonne `member_id`.
+            // Donc on n'insère que name/email/password, puis on assigne le rôle.
             $user = User::create([
                 'name' => $member->full_name,
                 'email' => $member->email,
-                'password' => Hash::make('password123'), // À changer par l'utilisateur
-                'member_id' => $member->id
+                'password' => Hash::make('password123'),
             ]);
             $user->assignRole('member');
+
 
             DB::commit();
             

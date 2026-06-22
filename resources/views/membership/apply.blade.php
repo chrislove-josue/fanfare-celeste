@@ -31,7 +31,7 @@
                             </div>
                         @endif
 
-<form method="POST" action="{{ route('membership.submit') }}" class="mt-2">
+<form method="POST" action="{{ route('membership.submit') }}" class="mt-2" enctype="multipart/form-data">
                             @csrf
 
                             <div class="row g-3">
