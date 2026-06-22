@@ -38,9 +38,12 @@ class MembershipController extends Controller
 
         // On mappe d’abord le champ 'name' du formulaire vers first_name/last_name
         // (le formulaire actuel n’envoie pas explicitement ces champs).
+        // Le formulaire fournit `name` (Nom complet). Si l’utilisateur n’entre pas
+        // clairement un nom/patronyme séparés, on évite d’envoyer NULL vers `members.last_name`.
         $parts = preg_split('/\s+/', trim($validated['name']));
-        $validated['first_name'] = $parts[0] ?? null;
-        $validated['last_name'] = $parts[1] ?? (count($parts) > 1 ? end($parts) : null);
+        $validated['first_name'] = $parts[0] ?? '';
+        $validated['last_name'] = (count($parts) > 1) ? end($parts) : ($parts[0] ?? '');
+
 
         // Champs optionnels (si des anciens formulaires les fournissent)
         $validated['whatsapp'] = $request->input('whatsapp');
@@ -85,6 +88,12 @@ class MembershipController extends Controller
         // Supprimer les clés non attendues par la table
         unset($validated['name'], $validated['message']);
 
+        // Normaliser les champs obligatoires afin d’éviter des NULL (DB)
+        // si le formulaire ne les fournit pas.
+        $validated['first_name'] = (string) ($validated['first_name'] ?? '');
+        $validated['last_name'] = (string) ($validated['last_name'] ?? '');
+        $validated['medical_notes'] = $validated['medical_notes'] ?? null;
+
         if ($request->hasFile('photo')) {
             $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
         }
@@ -94,6 +103,7 @@ class MembershipController extends Controller
         }
 
         $member = Member::create($validated);
+
 
         // Créer un compte utilisateur
         // La table users ne contient pas forcément member_id (selon la migration actuelle)

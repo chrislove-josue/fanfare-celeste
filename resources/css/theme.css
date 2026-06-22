@@ -1,0 +1,29 @@
+:root{
+  --fc-blue:#3946B2;
+  --fc-green:#40A81B;
+  --fc-light-blue:#2F8DCD;
+  --fc-gold:#B8905C;
+  --fc-cream:#FEFAF3;
+}
+
+html, body{
+  font-family:'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+body{overflow-x:hidden;background:var(--fc-cream);}
+
+.fc-navbar{
+  background:linear-gradient(135deg,var(--fc-blue),var(--fc-light-blue));
+}
+
+.fc-btn-primary{
+  background:linear-gradient(135deg,var(--fc-blue),var(--fc-light-blue));
+  border:none;
+}
+
+.fc-btn-primary:hover{filter:brightness(0.98);}
+
+.fc-footer{
+  background:linear-gradient(135deg,#0d1b3e,var(--fc-blue));
+}
+

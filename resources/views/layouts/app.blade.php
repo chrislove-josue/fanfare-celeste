@@ -8,16 +8,22 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('resources/css/theme.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        :root {
-            --primary-color: #1a237e;
-            --secondary-color: #ffd700;
-            --accent-color: #d32f2f;
+:root {
+            --primary-color: #3946B2;
+            --secondary-color: #40A81B;
+            --accent-color: #2F8DCD;
+            --fc-gold: #B8905C;
+            --fc-cream: #FEFAF3;
         }
         
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             overflow-x: hidden;
+            background: var(--fc-cream);
         }
         
         .navbar {
