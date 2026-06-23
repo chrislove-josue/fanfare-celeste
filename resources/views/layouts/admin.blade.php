@@ -611,12 +611,6 @@
                     }
                     return $routeName === $routes ? 'active' : '';
                 };
-                $isActiveParent = function($routes) use ($routeName) {
-                    if (is_array($routes)) {
-                        return in_array($routeName, $routes) ? 'open' : '';
-                    }
-                    return $routeName === $routes ? 'open' : '';
-                };
             @endphp
 
             <!-- ===== DASHBOARD ===== -->
@@ -628,32 +622,103 @@
             </a>
 
             <!-- ===== GESTION DES MEMBRES ===== -->
+            <div class="nav-label">Gestion des membres</div>
+
             @can('manage members')
             <a class="nav-link {{ $isActive(['admin.members.index', 'admin.members.create', 'admin.members.edit', 'admin.members.show']) }}" href="{{ route('admin.members.index') }}">
                 <i class="fas fa-users"></i>
-                <span>Membres</span>
-                <span class="badge bg-secondary">{{ \App\Models\Member::where('status', 'pending')->count() }}</span>
+                <span>Tous les membres</span>
+                <span class="badge bg-secondary">{{ \App\Models\Member::count() }}</span>
             </a>
             @endcan
 
+            @can('create members')
+            <a class="nav-link {{ $isActive('admin.members.index') }}" href="{{ route('admin.members.index') }}">
+                <i class="fas fa-user"></i>
+                <span>Tous les membres</span>
+            </a>
+            @endcan
+
+            @can('create members')
+            <a class="nav-link {{ $isActive('admin.members.create') }}" href="{{ route('admin.members.create') }}">
+                <i class="fas fa-user-plus"></i>
+                <span>Ajouter un membre</span>
+            </a>
+            @endcan
+
+            @can('approve members')
+            <a class="nav-link {{ $isActive(['admin.members.approve', 'admin.members.reject']) }}" href="{{ route('admin.members.index', ['status' => 'pending']) }}">
+                <i class="fas fa-user-check"></i>
+                <span>Approbations</span>
+                <span class="badge bg-warning">{{ \App\Models\Member::where('status', 'pending')->count() }}</span>
+            </a>
+            @endcan
+
+            @can('manage members')
+            <a class="nav-link {{ $isActive('admin.members.export') }}" href="{{ route('admin.members.export') }}">
+                <i class="fas fa-file-export"></i>
+                <span>Exporter</span>
+            </a>
+            @endcan
+
+            <!-- ===== DIVIDER ===== -->
+            <hr class="sidebar-divider">
+
             <!-- ===== GESTION FINANCIÈRE ===== -->
+            <div class="nav-label">Finances</div>
+
             @can('manage finances')
             <a class="nav-link {{ $isActive(['admin.financial.dashboard', 'admin.financial.transactions', 'admin.financial.contributions']) }}" href="{{ route('admin.financial.dashboard') }}">
                 <i class="fas fa-coins"></i>
-                <span>Finances</span>
+                <span>Tableau de bord</span>
+            </a>
+
+            <a class="nav-link {{ $isActive('admin.financial.transactions') }}" href="{{ route('admin.financial.transactions') }}">
+                <i class="fas fa-receipt"></i>
+                <span>Transactions</span>
+            </a>
+
+            <a class="nav-link {{ $isActive('admin.financial.contributions') }}" href="{{ route('admin.financial.contributions') }}">
+                <i class="fas fa-hand-holding-heart"></i>
+                <span>Cotisations</span>
+            </a>
+
+            <a class="nav-link {{ $isActive('admin.financial.report') }}" href="{{ route('admin.financial.report') }}">
+                <i class="fas fa-chart-pie"></i>
+                <span>Rapports</span>
             </a>
             @endcan
+
+            <!-- ===== DIVIDER ===== -->
+            <hr class="sidebar-divider">
 
             <!-- ===== GESTION DES ÉVÉNEMENTS ===== -->
+            <div class="nav-label">Événements</div>
+
             @can('manage events')
-            <a class="nav-link {{ $isActive(['admin.events.index', 'admin.events.create', 'admin.events.edit', 'admin.events.calendar']) }}" href="{{ route('admin.events.index') }}">
+            <a class="nav-link {{ $isActive(['admin.events.index', 'admin.events.create', 'admin.events.edit', 'admin.events.show']) }}" href="{{ route('admin.events.index') }}">
                 <i class="fas fa-calendar-alt"></i>
-                <span>Événements</span>
+                <span>Tous les événements</span>
                 <span class="badge bg-primary">{{ \App\Models\Event::upcoming()->count() }}</span>
+            </a>
+
+            <a class="nav-link {{ $isActive('admin.events.create') }}" href="{{ route('admin.events.create') }}">
+                <i class="fas fa-calendar-plus"></i>
+                <span>Créer un événement</span>
+            </a>
+
+            <a class="nav-link {{ $isActive('admin.events.calendar') }}" href="{{ route('admin.events.calendar') }}">
+                <i class="fas fa-calendar-check"></i>
+                <span>Calendrier</span>
             </a>
             @endcan
 
-            <!-- ===== GALERIE ===== -->
+            <!-- ===== DIVIDER ===== -->
+            <hr class="sidebar-divider">
+
+            <!-- ===== GALERIE & DOCUMENTS ===== -->
+            <div class="nav-label">Médias</div>
+
             @can('manage gallery')
             <a class="nav-link {{ $isActive(['admin.gallery.index', 'admin.gallery.create', 'admin.gallery.edit']) }}" href="{{ route('admin.gallery.index') }}">
                 <i class="fas fa-images"></i>
@@ -661,7 +726,6 @@
             </a>
             @endcan
 
-            <!-- ===== DOCUMENTS ===== -->
             @can('manage documents')
             <a class="nav-link {{ $isActive(['admin.documents.index', 'admin.documents.create']) }}" href="{{ route('admin.documents.index') }}">
                 <i class="fas fa-file-alt"></i>
@@ -711,12 +775,6 @@
 
             @can('manage committee')
             <a class="nav-link {{ $isActive(['admin.committee.index', 'admin.committee.create', 'admin.committee.edit']) }}" href="{{ route('admin.committee.index') }}">
-                <i class="fas fa-user-tie"></i>
-                <span>Bureau exécutif</span>
-            </a>
-            
-            @can('manage members')
-            <a class="nav-link {{ $isActive(['admin.members.index', 'admin.members.create', 'admin.members.edit']) }}" href="{{ route('admin.members.index') }}">
                 <i class="fas fa-user-tie"></i>
                 <span>Bureau exécutif</span>
             </a>
@@ -918,30 +976,13 @@
         });
 
         // ============================================
-        // SUBMENU TOGGLE
-        // ============================================
-        document.querySelectorAll('.nav-link.has-submenu').forEach(function(link) {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const submenu = this.nextElementSibling;
-                const chevron = this.querySelector('.chevron');
-                if (submenu) {
-                    submenu.classList.toggle('open');
-                    if (chevron) {
-                        chevron.classList.toggle('open');
-                    }
-                }
-            });
-        });
-
-        // ============================================
-        // GLOBAL SEARCH (placeholder)
+        // GLOBAL SEARCH
         // ============================================
         document.getElementById('globalSearch')?.addEventListener('keyup', function(e) {
             if (e.key === 'Enter') {
                 const query = this.value.trim();
                 if (query.length > 0) {
-                    console.log('Searching for:', query);
+                    window.location.href = '{{ route("admin.members.index") }}?search=' + encodeURIComponent(query);
                 }
             }
         });
