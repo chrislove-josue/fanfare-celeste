@@ -63,6 +63,10 @@ class RolePermissionSeeder extends Seeder
             'manage settings',
 
             'manage documents',
+            'view documents',
+            'upload documents',
+            'delete documents',
+            'approve documents',
         ];
 
         // Créer toutes les permissions
@@ -106,6 +110,10 @@ class RolePermissionSeeder extends Seeder
             // Système
             'manage settings', 'view logs',
             'manage documents',
+            'view documents',
+            'upload documents',
+            'delete documents',
+            'approve documents',
         ]);
 
         // --- PRÉSIDENT (Accès large, sauf suppression et paramètres système) ---
@@ -124,7 +132,11 @@ class RolePermissionSeeder extends Seeder
             'manage pages',
             // Système
             'view logs',
-            'manage documents'
+            'manage documents',
+            'view documents',
+            'upload documents',
+            'delete documents',
+            'approve documents',
         ]);
 
         // --- SECRÉTAIRE (Gestion du contenu et des membres) ---
@@ -142,6 +154,10 @@ class RolePermissionSeeder extends Seeder
             // Système - Accès aux paramètres
             'manage settings',
             'manage documents',
+            'view documents',
+            'upload documents',
+            'delete documents',
+            'approve documents',
         ]);
 
         // --- TRÉSORIER (Gestion financière uniquement) ---
@@ -149,7 +165,11 @@ class RolePermissionSeeder extends Seeder
             'view members',
             'view finances', 'create transactions', 'export reports',
             'view events',
-            'view documents'
+            'view documents',
+            'manage documents',
+            'upload documents',
+            'delete documents',
+            'approve documents',
         ]);
 
         // --- CHEF DE FANFARE ---
@@ -167,7 +187,10 @@ class RolePermissionSeeder extends Seeder
 
         // --- MEMBRE SIMPLE ---
         $member->syncPermissions([
-            'view events'
+            'view events',
+            'view documents',
+            'upload documents',
+            'delete documents',
         ]);
 
         // ============================================

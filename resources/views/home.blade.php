@@ -4,120 +4,269 @@
 
 @section('content')
 <!-- Hero Section -->
-<section class="hero-section" style="background: linear-gradient(135deg, #1a237e, #283593); color: white; padding: 100px 0;">
-    <div class="container">
+<section class="hero-section" style="background: linear-gradient(135deg, #1a237e, #283593); color: white; padding: 100px 0; position: relative; overflow: hidden;">
+    <div class="container position-relative" style="z-index: 2;">
         <div class="row align-items-center">
             <div class="col-lg-6 fade-in-up">
-                <h1 class="display-4 mb-4">Fanfare Céleste<br>La Trompette de Dieu de l'Atlantique</h1>
-                <p class="lead mb-4">Une fanfare au service de Dieu, animée par la passion de la musique et l'excellence.</p>
-                <div class="d-flex gap-3">
-                    <a href="{{ route('membership.apply') }}" class="btn btn-light btn-lg">Adhérer maintenant</a>
-                    <a href="{{ url('/events') }}" class="btn btn-outline-light btn-lg">Nos événements</a>
-
+                <div class="mb-3">
+                    <span class="badge bg-warning text-dark px-3 py-2" style="font-size: 0.9rem;">
+                        <i class="fas fa-music me-2"></i> Événement à venir
+                    </span>
+                </div>
+                <h1 class="display-4 mb-4 fw-bold">Fanfare Céleste<br>La Trompette de Dieu de l'Atlantique</h1>
+                <p class="lead mb-4">Une fanfare au service de Dieu, animée par la passion de la musique et l'excellence. Rejoignez-nous pour vivre une expérience musicale unique.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{{ route('membership.apply') }}" class="btn btn-light btn-lg px-4">
+                        <i class="fas fa-hand-peace me-2"></i> Adhérer maintenant
+                    </a>
+                    <a href="{{ route('public.events.index') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-calendar-alt me-2"></i> Nos événements
+                    </a>
+                    <a href="{{ route('public.gallery.index') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-images me-2"></i> Galerie
+                    </a>
                 </div>
             </div>
             <div class="col-lg-6 text-center" data-aos="fade-left">
-                <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" class="img-fluid" style="max-height: 400px;">
+                <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" class="img-fluid" style="max-height: 400px; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
             </div>
         </div>
     </div>
+    <!-- Décorations -->
+    <div style="position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
+    <div style="position: absolute; bottom: -150px; left: -150px; width: 500px; height: 500px; background: rgba(255,255,255,0.02); border-radius: 50%;"></div>
 </section>
 
 <!-- Statistiques -->
 <section class="stats-section py-5">
     <div class="container">
         <div class="row g-4">
-            <div class="col-md-3" data-aos="fade-up">
-                <div class="stat-card text-center">
-                    <i class="fas fa-users fa-3x mb-3"></i>
-                    <h3 class="counter">150</h3>
-                    <p>Membres Actifs</p>
+            <div class="col-md-3 col-6" data-aos="fade-up">
+                <div class="stat-card text-center p-4 bg-white rounded shadow-sm">
+                    <i class="fas fa-users fa-3x mb-3 text-primary"></i>
+                    <h3 class="counter fw-bold" style="font-size: 2.5rem;">{{ $memberCount ?? 0 }}</h3>
+                    <p class="text-muted mb-0">Membres Actifs</p>
                 </div>
             </div>
-            <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
-                <div class="stat-card text-center">
-                    <i class="fas fa-music fa-3x mb-3"></i>
-                    <h3 class="counter">8</h3>
-                    <p>Sections Musicales</p>
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-card text-center p-4 bg-white rounded shadow-sm">
+                    <i class="fas fa-music fa-3x mb-3 text-success"></i>
+                    <h3 class="counter fw-bold" style="font-size: 2.5rem;">8</h3>
+                    <p class="text-muted mb-0">Sections Musicales</p>
                 </div>
             </div>
-            <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
-                <div class="stat-card text-center">
-                    <i class="fas fa-calendar-check fa-3x mb-3"></i>
-                    <h3 class="counter">50</h3>
-                    <p>Concerts par an</p>
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="stat-card text-center p-4 bg-white rounded shadow-sm">
+                    <i class="fas fa-calendar-check fa-3x mb-3 text-warning"></i>
+                    <h3 class="counter fw-bold" style="font-size: 2.5rem;">{{ $eventCount ?? 0 }}</h3>
+                    <p class="text-muted mb-0">Concerts réalisés</p>
                 </div>
             </div>
-            <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
-                <div class="stat-card text-center">
-                    <i class="fas fa-trophy fa-3x mb-3"></i>
-                    <h3 class="counter">15</h3>
-                    <p>Distinctions</p>
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="stat-card text-center p-4 bg-white rounded shadow-sm">
+                    <i class="fas fa-trophy fa-3x mb-3 text-danger"></i>
+                    <h3 class="counter fw-bold" style="font-size: 2.5rem;">{{ $achievements ?? 0 }}</h3>
+                    <p class="text-muted mb-0">Distinctions</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Événements à venir -->
-<section class="events-section py-5 bg-light">
+<!-- À propos en bref -->
+<section class="about-brief py-5 bg-light">
     <div class="container">
-        <h2 class="text-center mb-5" data-aos="fade-up">Événements à venir</h2>
-        <div class="row">
-            @foreach($upcomingEvents ?? [] as $event)
-            <div class="col-md-4 mb-4" data-aos="fade-up">
-                <div class="card h-100">
+        <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <h2 class="fw-bold mb-3">Une fanfare d'excellence</h2>
+                <p class="lead">La Fanfare Céleste est bien plus qu'une simple fanfare. C'est une famille unie par la passion de la musique et le service de Dieu.</p>
+                <div class="row mt-4">
+                    <div class="col-sm-6 mb-3">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-check-circle text-success mt-1 me-2"></i>
+                            <div>
+                                <h6 class="fw-bold">Formation musicale</h6>
+                                <p class="text-muted small">Des cours pour tous les niveaux</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-check-circle text-success mt-1 me-2"></i>
+                            <div>
+                                <h6 class="fw-bold">Concerts et événements</h6>
+                                <p class="text-muted small">Plus de 50 concerts par an</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-check-circle text-success mt-1 me-2"></i>
+                            <div>
+                                <h6 class="fw-bold">Excellence musicale</h6>
+                                <p class="text-muted small">Des musiciens talentueux</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-check-circle text-success mt-1 me-2"></i>
+                            <div>
+                                <h6 class="fw-bold">Vie spirituelle</h6>
+                                <p class="text-muted small">Au service de Dieu et de la communauté</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ route('about') }}" class="btn btn-primary mt-2">
+                    <i class="fas fa-info-circle me-2"></i> En savoir plus
+                </a>
+            </div>
+            <div class="col-lg-6 mt-4 mt-lg-0" data-aos="fade-left">
+                <img src="https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=800&h=600&fit=crop" alt="Fanfare" class="img-fluid rounded shadow" style="height: 400px; width: 100%; object-fit: cover;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Événements à venir (6 événements) -->
+<section class="events-section py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-5" data-aos="fade-up">
+            <div>
+                <h2 class="fw-bold mb-0">Événements à venir</h2>
+                <p class="text-muted">Découvrez nos prochains concerts et manifestations</p>
+            </div>
+            <a href="{{ route('public.events.index') }}" class="btn btn-primary">
+                <i class="fas fa-calendar-alt me-2"></i> Voir tous les événements
+            </a>
+        </div>
+
+        @if(isset($upcomingEvents) && $upcomingEvents->count() > 0)
+        <div class="row g-4">
+            @foreach($upcomingEvents as $event)
+            <div class="col-md-4 col-lg-4" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
+                <div class="card h-100 shadow-sm hover-shadow transition">
+                    <div class="position-relative">
+                        @if($event->featured_image)
+                            <img src="{{ asset('storage/' . $event->featured_image) }}" 
+                                 alt="{{ $event->title }}" 
+                                 class="card-img-top" 
+                                 style="height: 200px; object-fit: cover;">
+                        @else
+                            <div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-calendar-alt fa-4x text-white opacity-50"></i>
+                            </div>
+                        @endif
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge bg-primary px-3 py-2">
+                                <i class="fas fa-clock me-1"></i> 
+                                {{ $event->start_date->diffForHumans() }}
+                            </span>
+                        </div>
+                    </div>
                     <div class="card-body">
-                        <div class="event-date text-primary mb-2">
-                            <i class="far fa-calendar-alt"></i> {{ $event->start_date->format('d/m/Y H:i') }}
+                        <div class="event-date text-muted small mb-2">
+                            <i class="far fa-calendar-alt text-primary me-1"></i> 
+                            {{ $event->start_date->format('d/m/Y à H:i') }}
                         </div>
-                        <h5 class="card-title">{{ $event->title }}</h5>
-                        <p class="card-text">{{ Str::limit($event->description, 100) }}</p>
+                        <h5 class="card-title fw-bold">{{ $event->title }}</h5>
+                        <p class="card-text text-muted">{{ Str::limit($event->description, 80) }}</p>
                         <div class="event-location mb-2">
-                            <i class="fas fa-map-marker-alt"></i> {{ $event->location }}
+                            <i class="fas fa-map-marker-alt text-danger me-1"></i> 
+                            {{ $event->location }}
                         </div>
-                        <div class="event-participants text-muted mb-3">
+                        <div class="event-participants text-muted small">
                             <i class="fas fa-users me-1"></i>
                             Participants : {{ $event->totalParticipants ?? ($event->members_total ?? 0) }}
                         </div>
-                        <a href="{{ route('public.events.show', $event) }}" class="btn btn-primary">En savoir plus</a>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <a href="{{ route('public.events.show', $event) }}" class="btn btn-primary w-100">
+                            <i class="fas fa-info-circle me-2"></i> En savoir plus
+                        </a>
                     </div>
                 </div>
             </div>
             @endforeach
         </div>
+
+        <!-- Bouton Voir tous les événements (mobile) -->
+        <div class="text-center mt-4 d-md-none">
+            <a href="{{ route('public.events.index') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-calendar-alt me-2"></i> Voir tous les événements
+            </a>
+        </div>
+        @else
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+            <h4>Aucun événement à venir</h4>
+            <p class="text-muted">Revenez bientôt pour découvrir nos prochains événements.</p>
+        </div>
+        @endif
     </div>
 </section>
 
 <!-- Témoignages -->
-<section class="testimonials-section py-5">
+<section class="testimonials-section py-5 bg-light">
     <div class="container">
-        <h2 class="text-center mb-5" data-aos="fade-up">Ce qu'ils disent de nous</h2>
+        <h2 class="text-center fw-bold mb-2" data-aos="fade-up">Ce qu'ils disent de nous</h2>
+        <p class="text-center text-muted mb-5" data-aos="fade-up">Les témoignages de ceux qui nous connaissent</p>
         <div class="row">
             <div class="col-md-4 mb-4" data-aos="fade-up">
-                <div class="card h-100">
-                    <div class="card-body text-center">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
                         <i class="fas fa-quote-left fa-2x text-primary mb-3"></i>
-                        <p class="card-text">"Une fanfare exceptionnelle qui apporte joie et spiritualité à travers leur musique."</p>
-                        <h6 class="mt-3">- Pasteur Jean Claude</h6>
+                        <p class="card-text font-italic">"Une fanfare exceptionnelle qui apporte joie et spiritualité à travers leur musique. Chaque prestation est un moment de grâce."</p>
+                        <div class="mt-3">
+                            <div class="text-warning mb-1">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <h6 class="mb-0">- Pasteur Jean Claude</h6>
+                            <small class="text-muted">Église Évangélique</small>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="card h-100">
-                    <div class="card-body text-center">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
                         <i class="fas fa-quote-left fa-2x text-primary mb-3"></i>
-                        <p class="card-text">"Professionnalisme et excellence dans chaque prestation. Une fierté nationale."</p>
-                        <h6 class="mt-3">- Ministère de la Culture</h6>
+                        <p class="card-text font-italic">"Professionnalisme et excellence dans chaque prestation. Une fierté nationale qui rayonne au-delà de nos frontières."</p>
+                        <div class="mt-3">
+                            <div class="text-warning mb-1">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <h6 class="mb-0">- Ministère de la Culture</h6>
+                            <small class="text-muted">République du Bénin</small>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="card h-100">
-                    <div class="card-body text-center">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
                         <i class="fas fa-quote-left fa-2x text-primary mb-3"></i>
-                        <p class="card-text">"Formidable organisation, discipline et talent. Une référence dans le domaine."</p>
-                        <h6 class="mt-3">- Association des Fanfares</h6>
+                        <p class="card-text font-italic">"Formidable organisation, discipline et talent. Une référence dans le domaine musical au Bénin et en Afrique."</p>
+                        <div class="mt-3">
+                            <div class="text-warning mb-1">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <h6 class="mb-0">- Association des Fanfares</h6>
+                            <small class="text-muted">Afrique de l'Ouest</small>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -126,28 +275,113 @@
 </section>
 
 <!-- Galerie -->
-<section class="gallery-section py-5 bg-light">
+<section class="gallery-section py-5">
     <div class="container">
-        <h2 class="text-center mb-5" data-aos="fade-up">Galerie</h2>
+        <div class="d-flex justify-content-between align-items-center mb-5" data-aos="fade-up">
+            <div>
+                <h2 class="fw-bold mb-0">Galerie</h2>
+                <p class="text-muted">Découvrez nos moments forts en images</p>
+            </div>
+            <a href="{{ route('public.gallery.index') }}" class="btn btn-primary">
+                <i class="fas fa-images me-2"></i> Voir toute la galerie
+            </a>
+        </div>
+
+        @if(isset($recentGalleries) && $recentGalleries->count() > 0)
         <div class="row g-3">
-            @foreach($recentGalleries ?? [] as $gallery)
-            <div class="col-md-3" data-aos="fade-up">
-                <div class="gallery-item position-relative overflow-hidden rounded">
+            @foreach($recentGalleries as $gallery)
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
+                <div class="gallery-item position-relative overflow-hidden rounded shadow-sm">
                     @if($gallery->type == 'photo')
-                        <img src="{{ Storage::url($gallery->file_path) }}" class="img-fluid" style="height: 250px; width: 100%; object-fit: cover;">
+                        <img src="{{ Storage::url($gallery->file_path) }}" 
+                             alt="{{ $gallery->title }}" 
+                             style="height: 200px; width: 100%; object-fit: cover; transition: transform 0.3s ease;">
                     @else
-                        <video src="{{ Storage::url($gallery->file_path) }}" class="img-fluid" style="height: 250px; width: 100%; object-fit: cover;"></video>
+                        <video src="{{ Storage::url($gallery->file_path) }}" 
+                               style="height: 200px; width: 100%; object-fit: cover;"
+                               muted></video>
                     @endif
-                    <div class="overlay position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-2">
-                        <small>{{ $gallery->title }}</small>
+                    <div class="overlay position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-2" style="transform: translateY(100%); transition: transform 0.3s ease;">
+                        <small class="d-block">
+                            <i class="fas fa-{{ $gallery->type == 'photo' ? 'image' : 'video' }} me-1"></i>
+                            {{ $gallery->title }}
+                        </small>
                     </div>
                 </div>
             </div>
             @endforeach
         </div>
-        <div class="text-center mt-4">
-            <a href="{{ url('/admin/gallery') }}" class="btn btn-primary">Voir toute la galerie</a>
 
+        <div class="text-center mt-4 d-md-none">
+            <a href="{{ route('public.gallery.index') }}" class="btn btn-primary">
+                <i class="fas fa-images me-2"></i> Voir toute la galerie
+            </a>
+        </div>
+        @else
+        <div class="text-center py-5">
+            <i class="fas fa-images fa-4x text-muted mb-3"></i>
+            <h4>Aucune image dans la galerie</h4>
+            <p class="text-muted">Revenez bientôt pour découvrir nos photos.</p>
+        </div>
+        @endif
+    </div>
+</section>
+
+<!-- Sections -->
+<section class="sections-section py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-2" data-aos="fade-up">Nos sections</h2>
+        <p class="text-center text-muted mb-5" data-aos="fade-up">Découvrez les différentes familles d'instruments de notre fanfare</p>
+        <div class="row g-4">
+            <div class="col-md-3 col-6" data-aos="fade-up">
+                <div class="text-center p-3 bg-white rounded shadow-sm h-100">
+                    <i class="fas fa-trumpet fa-3x text-primary mb-2"></i>
+                    <h6 class="fw-bold">Trompettes</h6>
+                    <small class="text-muted">25 musiciens</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="50">
+                <div class="text-center p-3 bg-white rounded shadow-sm h-100">
+                    <i class="fas fa-music fa-3x text-success mb-2"></i>
+                    <h6 class="fw-bold">Trombones</h6>
+                    <small class="text-muted">15 musiciens</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="text-center p-3 bg-white rounded shadow-sm h-100">
+                    <i class="fas fa-saxophone fa-3x text-warning mb-2"></i>
+                    <h6 class="fw-bold">Saxophones</h6>
+                    <small class="text-muted">18 musiciens</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="150">
+                <div class="text-center p-3 bg-white rounded shadow-sm h-100">
+                    <i class="fas fa-drum fa-3x text-danger mb-2"></i>
+                    <h6 class="fw-bold">Percussions</h6>
+                    <small class="text-muted">20 musiciens</small>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ route('about.sections') }}" class="btn btn-primary">
+                <i class="fas fa-info-circle me-2"></i> En savoir plus sur nos sections
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Appel à l'action -->
+<section class="cta-section py-5" style="background: linear-gradient(135deg, #1a237e, #283593); color: white;">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-3" data-aos="fade-up">Rejoignez la Fanfare Céleste</h2>
+        <p class="lead mb-4" data-aos="fade-up">Vous êtes musicien ou vous souhaitez apprendre ? Rejoignez notre grande famille !</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3" data-aos="fade-up">
+            <a href="{{ route('membership.apply') }}" class="btn btn-light btn-lg px-5">
+                <i class="fas fa-hand-peace me-2"></i> Adhérer maintenant
+            </a>
+            <a href="{{ route('contact') }}" class="btn btn-outline-light btn-lg px-5">
+                <i class="fas fa-envelope me-2"></i> Nous contacter
+            </a>
         </div>
     </div>
 </section>
@@ -155,15 +389,18 @@
 <!-- Newsletter -->
 <section class="newsletter-section py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
     <div class="container text-center">
-        <h3 data-aos="fade-up">Restez informé</h3>
-        <p class="mb-4" data-aos="fade-up">Abonnez-vous à notre newsletter pour recevoir nos actualités</p>
+        <h3 class="fw-bold" data-aos="fade-up">Restez informé</h3>
+        <p class="mb-4" data-aos="fade-up">Abonnez-vous à notre newsletter pour recevoir nos actualités et événements</p>
         <form action="{{ route('newsletter.subscribe') }}" method="POST" class="row justify-content-center" data-aos="fade-up">
             @csrf
-            <div class="col-md-6">
+            <div class="col-md-6 col-lg-5">
                 <div class="input-group">
                     <input type="email" name="email" class="form-control form-control-lg" placeholder="Votre email" required>
-                    <button type="submit" class="btn btn-light btn-lg">S'abonner</button>
+                    <button type="submit" class="btn btn-light btn-lg">
+                        <i class="fas fa-paper-plane me-2"></i> S'abonner
+                    </button>
                 </div>
+                <small class="d-block mt-2 opacity-75">Recevez nos actualités et ne manquez aucun événement</small>
             </div>
         </form>
     </div>
@@ -196,6 +433,37 @@
         
         observer.observe(counter);
     });
+
+    // Hover effect sur la galerie
+    document.querySelectorAll('.gallery-item').forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.querySelector('.overlay').style.transform = 'translateY(0)';
+            const img = this.querySelector('img, video');
+            if (img) {
+                img.style.transform = 'scale(1.05)';
+            }
+        });
+        item.addEventListener('mouseleave', function() {
+            this.querySelector('.overlay').style.transform = 'translateY(100%)';
+            const img = this.querySelector('img, video');
+            if (img) {
+                img.style.transform = 'scale(1)';
+            }
+        });
+    });
 </script>
+
+<style>
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+    .transition {
+        transition: all 0.3s ease;
+    }
+</style>
 @endpush
 @endsection

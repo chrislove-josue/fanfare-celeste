@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Document;
+use App\Models\Member;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -13,7 +14,7 @@ class DocumentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:view documents')->only(['index', 'show']);
+        $this->middleware('permission:view documents')->only(['index', 'show', 'download']);
         $this->middleware('permission:upload documents')->only(['create', 'store']);
         $this->middleware('permission:delete documents')->only(['destroy']);
     }
@@ -23,14 +24,15 @@ class DocumentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Document::with('uploader');
+        $query = Document::with(['uploader', 'member']);
         
         // Filtres
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('file_name', 'like', "%{$search}%");
             });
         }
         
@@ -38,8 +40,20 @@ class DocumentController extends Controller
             $query->where('category', $request->category);
         }
         
+        if ($request->filled('submission_type')) {
+            $query->where('submission_type', $request->submission_type);
+        }
+        
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        
         if ($request->filled('is_public')) {
             $query->where('is_public', $request->is_public === 'yes');
+        }
+        
+        if ($request->filled('member_id')) {
+            $query->where('member_id', $request->member_id);
         }
         
         if ($request->filled('uploaded_by')) {
@@ -50,12 +64,17 @@ class DocumentController extends Controller
         
         // Données pour les filtres
         $categories = Document::getCategories();
+        $submissionTypes = Document::getSubmissionTypes();
         $users = User::orderBy('name')->get();
+        $members = Member::orderBy('first_name')->get();
         
         // Statistiques
         $totalDocuments = Document::count();
         $publicDocuments = Document::where('is_public', true)->count();
         $privateDocuments = Document::where('is_public', false)->count();
+        $pendingDocuments = Document::where('status', 'pending')->count();
+        $approvedDocuments = Document::where('status', 'approved')->count();
+        $rejectedDocuments = Document::where('status', 'rejected')->count();
         
         // Documents par catégorie
         $categoryStats = [];
@@ -66,10 +85,15 @@ class DocumentController extends Controller
         return view('admin.documents.index', compact(
             'documents',
             'categories',
+            'submissionTypes',
             'users',
+            'members',
             'totalDocuments',
             'publicDocuments',
             'privateDocuments',
+            'pendingDocuments',
+            'approvedDocuments',
+            'rejectedDocuments',
             'categoryStats'
         ));
     }
@@ -80,8 +104,10 @@ class DocumentController extends Controller
     public function create()
     {
         $categories = Document::getCategories();
+        $submissionTypes = Document::getSubmissionTypes();
         $users = User::orderBy('name')->get();
-        return view('admin.documents.create', compact('categories', 'users'));
+        $members = Member::orderBy('first_name')->get();
+        return view('admin.documents.create', compact('categories', 'submissionTypes', 'users', 'members'));
     }
 
     /**
@@ -91,33 +117,34 @@ class DocumentController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'category' => 'required|in:statutes,minutes,financial_report,activity_program,internal,contract,certificate',
+            'category' => 'required|string',
             'description' => 'nullable|string',
-            'file' => 'required|file|max:10240', // 10MB max
+            'file' => 'required|file|max:10240',
             'document_date' => 'nullable|date',
             'is_public' => 'boolean',
+            'submission_type' => 'required|in:admin,member,applicant',
+            'member_id' => 'nullable|exists:members,id',
             'uploaded_by' => 'required|exists:users,id',
+            'status' => 'nullable|in:pending,approved,rejected',
         ]);
 
-        $file = $request->file('file');
-        $fileName = $file->getClientOriginalName();
-        $filePath = $file->store('documents/' . $validated['category'], 'public');
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $path = $file->store('documents/' . $validated['category'], 'public');
+            
+            $validated['file_path'] = $path;
+            $validated['file_name'] = $file->getClientOriginalName();
+            $validated['file_size'] = $file->getSize();
+            $validated['file_type'] = $file->getMimeType();
+        }
 
-        Document::create([
-            'title' => $validated['title'],
-            'category' => $validated['category'],
-            'description' => $validated['description'],
-            'file_path' => $filePath,
-            'file_name' => $fileName,
-            'file_size' => $file->getSize(),
-            'file_type' => $file->getMimeType(),
-            'uploaded_by' => $validated['uploaded_by'],
-            'document_date' => $validated['document_date'],
-            'is_public' => $request->has('is_public'),
-        ]);
+        $validated['is_public'] = $request->has('is_public');
+        $validated['status'] = $request->status ?? 'pending';
+
+        Document::create($validated);
 
         return redirect()->route('admin.documents.index')
-            ->with('success', 'Document ajouté avec succès.');
+            ->with('success', 'Document ajouté avec succès');
     }
 
     /**
@@ -125,60 +152,8 @@ class DocumentController extends Controller
      */
     public function show(Document $document)
     {
+        $document->load(['uploader', 'member']);
         return view('admin.documents.show', compact('document'));
-    }
-
-    /**
-     * Afficher le formulaire d'édition
-     */
-    public function edit(Document $document)
-    {
-        $categories = Document::getCategories();
-        $users = User::orderBy('name')->get();
-        return view('admin.documents.edit', compact('document', 'categories', 'users'));
-    }
-
-    /**
-     * Mettre à jour un document
-     */
-    public function update(Request $request, Document $document)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'category' => 'required|in:statutes,minutes,financial_report,activity_program,internal,contract,certificate',
-            'description' => 'nullable|string',
-            'file' => 'nullable|file|max:10240',
-            'document_date' => 'nullable|date',
-            'is_public' => 'boolean',
-            'uploaded_by' => 'required|exists:users,id',
-        ]);
-
-        $data = [
-            'title' => $validated['title'],
-            'category' => $validated['category'],
-            'description' => $validated['description'],
-            'uploaded_by' => $validated['uploaded_by'],
-            'document_date' => $validated['document_date'],
-            'is_public' => $request->has('is_public'),
-        ];
-
-        if ($request->hasFile('file')) {
-            // Supprimer l'ancien fichier
-            if ($document->file_path) {
-                Storage::disk('public')->delete($document->file_path);
-            }
-            
-            $file = $request->file('file');
-            $data['file_name'] = $file->getClientOriginalName();
-            $data['file_path'] = $file->store('documents/' . $validated['category'], 'public');
-            $data['file_size'] = $file->getSize();
-            $data['file_type'] = $file->getMimeType();
-        }
-
-        $document->update($data);
-
-        return redirect()->route('admin.documents.index')
-            ->with('success', 'Document mis à jour avec succès.');
     }
 
     /**
@@ -186,12 +161,16 @@ class DocumentController extends Controller
      */
     public function download(Document $document)
     {
+        if (!$document->is_public && !auth()->user()->hasPermissionTo('view documents')) {
+            abort(403);
+        }
+
         $filePath = storage_path('app/public/' . $document->file_path);
         
         if (!file_exists($filePath)) {
             return back()->with('error', 'Le fichier n\'existe pas.');
         }
-        
+
         return response()->download($filePath, $document->file_name);
     }
 
@@ -200,27 +179,44 @@ class DocumentController extends Controller
      */
     public function destroy(Document $document)
     {
-        // Supprimer le fichier physique
         if ($document->file_path) {
             Storage::disk('public')->delete($document->file_path);
         }
-        
         $document->delete();
-        
+
         return redirect()->route('admin.documents.index')
-            ->with('success', 'Document supprimé avec succès.');
+            ->with('success', 'Document supprimé avec succès');
     }
 
     /**
-     * Basculer la visibilité d'un document
+     * Approuver un document
      */
-    public function togglePublic(Document $document)
+    public function approve(Document $document)
     {
         $document->update([
-            'is_public' => !$document->is_public
+            'status' => 'approved',
+            'approved_at' => now(),
         ]);
         
         return redirect()->route('admin.documents.index')
-            ->with('success', 'Visibilité du document modifiée.');
+            ->with('success', 'Document approuvé avec succès.');
+    }
+
+    /**
+     * Rejeter un document
+     */
+    public function reject(Request $request, Document $document)
+    {
+        $request->validate([
+            'rejection_reason' => 'nullable|string|max:500',
+        ]);
+        
+        $document->update([
+            'status' => 'rejected',
+            'rejection_reason' => $request->rejection_reason,
+        ]);
+        
+        return redirect()->route('admin.documents.index')
+            ->with('success', 'Document rejeté.');
     }
 }
