@@ -61,6 +61,8 @@ class RolePermissionSeeder extends Seeder
             'manage roles',
             'view logs',
             'manage settings',
+
+            'manage documents',
         ];
 
         // Créer toutes les permissions
@@ -102,7 +104,8 @@ class RolePermissionSeeder extends Seeder
             // Contenu du site
             'manage pages', 'manage carousels', 'manage testimonials', 'manage news',
             // Système
-            'manage settings', 'view logs'
+            'manage settings', 'view logs',
+            'manage documents',
         ]);
 
         // --- PRÉSIDENT (Accès large, sauf suppression et paramètres système) ---
@@ -120,7 +123,8 @@ class RolePermissionSeeder extends Seeder
             // Contenu du site - Gestion des pages uniquement
             'manage pages',
             // Système
-            'view logs'
+            'view logs',
+            'manage documents'
         ]);
 
         // --- SECRÉTAIRE (Gestion du contenu et des membres) ---
@@ -136,7 +140,8 @@ class RolePermissionSeeder extends Seeder
             // Contenu du site - Accès complet
             'manage pages', 'manage carousels', 'manage testimonials', 'manage news',
             // Système - Accès aux paramètres
-            'manage settings'
+            'manage settings',
+            'manage documents',
         ]);
 
         // --- TRÉSORIER (Gestion financière uniquement) ---

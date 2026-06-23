@@ -185,6 +185,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('/settings/cache/clear', [SettingController::class, 'clearCache'])->name('settings.cache.clear');
 });
 
+Route::resource('documents', DocumentController::class);
+Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
+Route::post('/documents/{document}/toggle-public', [DocumentController::class, 'togglePublic'])->name('documents.toggle-public');
+
 // ============================================
 // ROUTES D'AUTHENTIFICATION
 // ============================================

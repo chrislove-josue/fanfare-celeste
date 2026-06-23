@@ -1,4 +1,5 @@
 <?php
+// app/Models/Document.php
 
 namespace App\Models;
 
@@ -12,7 +13,8 @@ class Document extends Model
     
     protected $fillable = [
         'title', 'category', 'description', 'file_path', 'file_name',
-        'file_size', 'file_type', 'uploaded_by', 'document_date', 'is_public'
+        'file_size', 'file_type', 'uploaded_by', 'document_date', 'is_public',
+        'member_id', 'submission_type' // Nouveaux champs
     ];
 
     protected $casts = [
@@ -20,11 +22,18 @@ class Document extends Model
         'is_public' => 'boolean'
     ];
 
+    // Relations
     public function uploader(): BelongsTo
     {
         return $this->belongsTo(User::class, 'uploaded_by');
     }
 
+    public function member(): BelongsTo
+    {
+        return $this->belongsTo(Member::class, 'member_id');
+    }
+
+    // Accesseurs
     public function getFileUrlAttribute(): string
     {
         return Storage::url($this->file_path);
@@ -48,6 +57,24 @@ class Document extends Model
         }
     }
 
+    public function getStatusBadgeAttribute()
+    {
+        $badges = [
+            'pending' => 'bg-warning',
+            'approved' => 'bg-success',
+            'rejected' => 'bg-danger',
+        ];
+        
+        $labels = [
+            'pending' => 'En attente',
+            'approved' => 'Approuvé',
+            'rejected' => 'Rejeté',
+        ];
+        
+        $status = $this->status ?? 'pending';
+        return '<span class="badge ' . ($badges[$status] ?? 'bg-secondary') . '">' . ($labels[$status] ?? $status) . '</span>';
+    }
+
     public static function getCategories()
     {
         return [
@@ -57,7 +84,19 @@ class Document extends Model
             'activity_program' => 'Programmes d\'activités',
             'internal' => 'Documents internes',
             'contract' => 'Contrats',
-            'certificate' => 'Certificats'
+            'certificate' => 'Certificats',
+            'id_document' => 'Pièce d\'identité',
+            'photo' => 'Photo de profil',
+            'membership_form' => 'Formulaire d\'adhésion',
+        ];
+    }
+
+    public static function getSubmissionTypes()
+    {
+        return [
+            'admin' => 'Administration',
+            'member' => 'Membre',
+            'applicant' => 'Candidat',
         ];
     }
 }

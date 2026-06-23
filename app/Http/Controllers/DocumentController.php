@@ -18,12 +18,31 @@ class DocumentController extends Controller
     /**
      * Affiche la liste des documents
      */
-    public function index()
+    public function index(Request $request)
     {
-        $documents = Document::with('uploader')->latest()->paginate(20);
+        $query = Document::with('uploader');
+        
+        // Filtres
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+        
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+        
+        if ($request->filled('is_public')) {
+            $query->where('is_public', $request->is_public === 'yes');
+        }
+        
+        $documents = $query->latest()->paginate(20);
         $categories = Document::getCategories();
         
-        return view('documents.index', compact('documents', 'categories'));
+        return view('admin.documents.index', compact('documents', 'categories'));
     }
 
     /**
@@ -32,8 +51,7 @@ class DocumentController extends Controller
     public function create()
     {
         $categories = Document::getCategories();
-        
-        return view('documents.create', compact('categories'));
+        return view('admin.documents.create', compact('categories'));
     }
 
     /**
@@ -47,7 +65,7 @@ class DocumentController extends Controller
             'description' => 'nullable|string',
             'document_date' => 'nullable|date',
             'is_public' => 'boolean',
-            'file' => 'required|file|max:10240', // 10MB max
+            'file' => 'required|file|max:10240',
         ]);
 
         if ($request->hasFile('file')) {
@@ -74,7 +92,7 @@ class DocumentController extends Controller
      */
     public function show(Document $document)
     {
-        return view('documents.show', compact('document'));
+        return view('admin.documents.show', compact('document'));
     }
 
     /**
@@ -86,7 +104,13 @@ class DocumentController extends Controller
             abort(403);
         }
 
-        return Storage::disk('public')->download($document->file_path, $document->file_name);
+        $filePath = storage_path('app/public/' . $document->file_path);
+        
+        if (!file_exists($filePath)) {
+            return back()->with('error', 'Le fichier n\'existe pas.');
+        }
+
+        return response()->download($filePath, $document->file_name);
     }
 
     /**
@@ -94,7 +118,9 @@ class DocumentController extends Controller
      */
     public function destroy(Document $document)
     {
-        Storage::disk('public')->delete($document->file_path);
+        if ($document->file_path) {
+            Storage::disk('public')->delete($document->file_path);
+        }
         $document->delete();
 
         return redirect()->route('admin.documents.index')
