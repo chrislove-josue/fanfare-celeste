@@ -15,7 +15,7 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
-// Routes publiques (vitrine)
+// Routes publiques (vitrine) - utilisent le layout app.blade.php
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Événements publics
@@ -24,12 +24,6 @@ Route::get('/events/{event}', [PublicEventController::class, 'show'])->name('pub
 Route::get('/events/{event}/participate', [PublicEventController::class, 'participateForm'])->name('public.events.participate');
 Route::post('/events/{event}/participate', [PublicEventController::class, 'participate'])->name('public.events.participate.submit');
 Route::get('/events/{event}/participate-form', [PublicEventController::class, 'participateForm'])->name('public.events.participate.form');
-
-Route::get('/events/{event}/participate-form', [PublicEventController::class, 'participateForm'])
-    ->name('public.events.participate.form');
-
-Route::post('/events/{event}/participate', [PublicEventController::class, 'participate'])
-    ->name('public.events.participate.submit');
 
 // Galerie publique
 Route::get('/gallery', [PublicGalleryController::class, 'index'])->name('public.gallery.index');
@@ -51,7 +45,7 @@ Route::get('/membership/apply', [MembershipController::class, 'applyForm'])->nam
 Route::post('/membership/apply', [MembershipController::class, 'submitApplication'])->name('membership.submit');
 Route::get('/membership/thankyou', [MembershipController::class, 'thankYou'])->name('membership.thankyou');
 
-// Espace personnel (utilisateur connecté)
+// Espace personnel (utilisateur connecté) - utilise le layout admin.blade.php
 Route::middleware(['auth'])->group(function () {
     Route::get('/my/profile', [\App\Http\Controllers\MyProfileController::class, 'profile'])->name('my.profile');
     Route::get('/my/contributions', [\App\Http\Controllers\MyProfileController::class, 'contributions'])->name('my.contributions');
@@ -59,11 +53,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/my/events', [\App\Http\Controllers\MyProfileController::class, 'events'])->name('my.events');
 });
 
-
-// Routes Admin
+// Routes Admin - utilisent le layout admin.blade.php
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
 
-    // Dashboard
+    // Dashboard - redirige selon les rôles
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Profile
@@ -120,7 +113,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::get('/events', [ReportController::class, 'events'])->name('events');
         Route::get('/contributions', [ReportController::class, 'contributions'])->name('contributions');
     });
+
+        // Gestion des pages
+    Route::resource('pages', \App\Http\Controllers\Admin\PageController::class);
+    
+    // Gestion du carousel
+    Route::resource('carousels', \App\Http\Controllers\Admin\CarouselController::class);
+    
+    // Gestion des témoignages
+    Route::resource('testimonials', \App\Http\Controllers\Admin\TestimonialController::class);
+    
+    // Gestion des settings (optionnel)
+    Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
+    Route::post('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 });
 
 require __DIR__.'/auth.php';
-

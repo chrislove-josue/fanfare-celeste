@@ -8,11 +8,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('resources/css/theme.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-:root {
+        :root {
             --primary-color: #3946B2;
             --secondary-color: #40A81B;
             --accent-color: #2F8DCD;
@@ -136,13 +135,11 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/events') }}"><i class="fas fa-calendar-alt"></i> Événements</a>
+                        <a class="nav-link" href="{{ route('public.events.index') }}"><i class="fas fa-calendar-alt"></i> Événements</a>
                     </li>
-
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/gallery') }}"><i class="fas fa-images"></i> Galerie</a>
+                        <a class="nav-link" href="{{ route('public.gallery.index') }}"><i class="fas fa-images"></i> Galerie</a>
                     </li>
-
 
                     @auth
                         <li class="nav-item dropdown">
@@ -150,14 +147,9 @@
                                 <i class="fas fa-user"></i> {{ Auth::user()->name }}
                             </a>
                             <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ route('my.profile') }}"><i class="fas fa-user-circle"></i> Espace personnel</a></li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
-                                @can('manage members')
-                                <li><a class="dropdown-item" href="{{ route('members.index') }}"><i class="fas fa-users"></i> Gestion membres</a></li>
-                                @endcan
-                                @can('manage finances')
-                                <li><a class="dropdown-item" href="{{ route('admin.financial.dashboard') }}"><i class="fas fa-chart-line"></i> Finances</a></li>
-                                @endcan
-
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">
@@ -219,7 +211,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         AOS.init({
             duration: 800,
