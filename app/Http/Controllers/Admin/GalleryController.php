@@ -4,7 +4,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Gallery;
+use App\Models\Album;
+use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -13,205 +14,228 @@ class GalleryController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:manage gallery')->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+        $this->middleware('permission:manage gallery')->except(['index', 'show']);
     }
 
     /**
-     * Liste des photos de la galerie
+     * Liste des albums
      */
     public function index(Request $request)
     {
-        $query = Gallery::with('member');
+        $query = Album::withCount('media');
 
-        // Filtres
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
+            $query->where('title', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%");
-            });
         }
 
         if ($request->filled('category')) {
             $query->where('category', $request->category);
         }
 
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
-        }
-
         if ($request->filled('is_published')) {
             $query->where('is_published', $request->is_published === 'yes');
         }
 
-        $galleries = $query->latest()->paginate(15);
-        $categories = Gallery::getCategories();
-        $types = Gallery::getTypes();
+        $albums = $query->latest()->paginate(15);
+        $categories = Album::getCategories();
 
-        // Statistiques
-        $totalPhotos = Gallery::count();
-        $publishedPhotos = Gallery::where('is_published', true)->count();
-        $draftPhotos = Gallery::where('is_published', false)->count();
-        $totalViews = Gallery::sum('views_count');
-        $totalLikes = Gallery::sum('likes_count');
-
-        return view('admin.gallery.index', compact(
-            'galleries',
-            'categories',
-            'types',
-            'totalPhotos',
-            'publishedPhotos',
-            'draftPhotos',
-            'totalViews',
-            'totalLikes'
-        ));
+        return view('admin.gallery.index', compact('albums', 'categories'));
     }
 
     /**
-     * Formulaire de création
+     * Formulaire de création d'album
      */
     public function create()
     {
-        $categories = Gallery::getCategories();
-        $types = Gallery::getTypes();
-        return view('admin.gallery.create', compact('categories', 'types'));
+        $categories = Album::getCategories();
+        return view('admin.gallery.create', compact('categories'));
     }
 
     /**
-     * Enregistrer une nouvelle photo
+     * Enregistrer un album
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'category' => 'required|string|in:' . implode(',', array_keys(Gallery::getCategories())),
-            'type' => 'required|string|in:photo,video',
-            'file' => 'required|file|max:10240', // 10MB max
+            'category' => 'required|string',
+            'event_date' => 'nullable|date',
+            'location' => 'nullable|string',
             'is_published' => 'boolean',
             'order' => 'nullable|integer',
-            'alt_text' => 'nullable|string|max:255',
+            'cover_image' => 'nullable|image|max:5120',
         ]);
 
-        // Gérer le fichier
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $fileName = time() . '_' . Str::slug($validated['title']) . '.' . $file->getClientOriginalExtension();
-            $filePath = $file->storeAs('galleries', $fileName, 'public');
+        $validated['slug'] = Album::generateSlug($validated['title']);
+        $validated['is_published'] = $request->has('is_published');
+        $validated['created_by'] = auth()->id();
+        $validated['order'] = $request->order ?? 0;
 
-            $validated['file_path'] = $filePath;
-            $validated['file_name'] = $file->getClientOriginalName();
-            $validated['file_size'] = $file->getSize();
-            $validated['mime_type'] = $file->getMimeType();
+        if ($request->hasFile('cover_image')) {
+            $path = $request->file('cover_image')->store('albums/covers', 'public');
+            $validated['cover_image'] = $path;
         }
 
-        $validated['is_published'] = $request->has('is_published');
-        $validated['order'] = $request->order ?? 0;
-        $validated['views_count'] = 0;
-        $validated['likes_count'] = 0;
+        $album = Album::create($validated);
 
-        Gallery::create($validated);
-
-        return redirect()->route('admin.gallery.index')
-            ->with('success', 'Photo ajoutée avec succès !');
+        return redirect()->route('admin.gallery.show', $album)
+            ->with('success', 'Album créé avec succès !');
     }
 
     /**
-     * Afficher les détails d'une photo
+     * Afficher un album
      */
-    public function show(Gallery $gallery)
+    public function show(Album $album)
     {
-        return view('admin.gallery.show', compact('gallery'));
+        $media = $album->media()->orderBy('order')->get();
+        return view('admin.gallery.show', compact('album', 'media'));
     }
 
     /**
      * Formulaire d'édition
      */
-    public function edit(Gallery $gallery)
+    public function edit(Album $album)
     {
-        $categories = Gallery::getCategories();
-        $types = Gallery::getTypes();
-        return view('admin.gallery.edit', compact('gallery', 'categories', 'types'));
+        $categories = Album::getCategories();
+        return view('admin.gallery.edit', compact('album', 'categories'));
     }
 
     /**
-     * Mettre à jour une photo
+     * Mettre à jour un album
      */
-    public function update(Request $request, Gallery $gallery)
+    public function update(Request $request, Album $album)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'category' => 'required|string|in:' . implode(',', array_keys(Gallery::getCategories())),
-            'type' => 'required|string|in:photo,video',
-            'file' => 'nullable|file|max:10240',
+            'category' => 'required|string',
+            'event_date' => 'nullable|date',
+            'location' => 'nullable|string',
             'is_published' => 'boolean',
             'order' => 'nullable|integer',
-            'alt_text' => 'nullable|string|max:255',
+            'cover_image' => 'nullable|image|max:5120',
         ]);
-
-        // Gérer le nouveau fichier si présent
-        if ($request->hasFile('file')) {
-            // Supprimer l'ancien fichier
-            if ($gallery->file_path) {
-                Storage::disk('public')->delete($gallery->file_path);
-            }
-
-            $file = $request->file('file');
-            $fileName = time() . '_' . Str::slug($validated['title']) . '.' . $file->getClientOriginalExtension();
-            $filePath = $file->storeAs('galleries', $fileName, 'public');
-
-            $validated['file_path'] = $filePath;
-            $validated['file_name'] = $file->getClientOriginalName();
-            $validated['file_size'] = $file->getSize();
-            $validated['mime_type'] = $file->getMimeType();
-        }
 
         $validated['is_published'] = $request->has('is_published');
         $validated['order'] = $request->order ?? 0;
 
-        $gallery->update($validated);
-
-        return redirect()->route('admin.gallery.index')
-            ->with('success', 'Photo mise à jour avec succès !');
-    }
-
-    /**
-     * Supprimer une photo
-     */
-    public function destroy(Gallery $gallery)
-    {
-        // Supprimer le fichier
-        if ($gallery->file_path) {
-            Storage::disk('public')->delete($gallery->file_path);
+        if ($request->hasFile('cover_image')) {
+            if ($album->cover_image) {
+                Storage::disk('public')->delete($album->cover_image);
+            }
+            $path = $request->file('cover_image')->store('albums/covers', 'public');
+            $validated['cover_image'] = $path;
         }
 
-        $gallery->delete();
+        $album->update($validated);
 
-        return redirect()->route('admin.gallery.index')
-            ->with('success', 'Photo supprimée avec succès !');
+        return redirect()->route('admin.gallery.show', $album)
+            ->with('success', 'Album mis à jour avec succès !');
     }
 
     /**
-     * Basculer la publication
+     * Supprimer un album
      */
-    public function togglePublish(Gallery $gallery)
+    public function destroy(Album $album)
     {
-        $gallery->togglePublish();
+        // Supprimer tous les médias associés
+        foreach ($album->media as $media) {
+            Storage::disk('public')->delete($media->file_path);
+        }
+        
+        if ($album->cover_image) {
+            Storage::disk('public')->delete($album->cover_image);
+        }
+        
+        $album->delete();
 
-        $status = $gallery->is_published ? 'publiée' : 'dépubliée';
         return redirect()->route('admin.gallery.index')
-            ->with('success', "Photo {$status} avec succès !");
+            ->with('success', 'Album supprimé avec succès !');
+    }
+
+    /**
+     * Ajouter un média à un album
+     */
+    public function addMedia(Request $request, Album $album)
+    {
+        $request->validate([
+            'file' => 'required|file|max:10240',
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'alt_text' => 'nullable|string|max:255',
+            'is_cover' => 'boolean',
+            'is_published' => 'boolean',
+        ]);
+
+        $file = $request->file('file');
+        $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+        $filePath = $file->storeAs('albums/' . $album->id . '/media', $fileName, 'public');
+
+        $isPhoto = in_array($file->getMimeType(), ['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+        
+        $media = Media::create([
+            'album_id' => $album->id,
+            'title' => $request->title ?? $file->getClientOriginalName(),
+            'description' => $request->description,
+            'type' => $isPhoto ? 'photo' : 'video',
+            'file_path' => $filePath,
+            'file_name' => $file->getClientOriginalName(),
+            'file_size' => $file->getSize(),
+            'mime_type' => $file->getMimeType(),
+            'alt_text' => $request->alt_text,
+            'is_cover' => $request->has('is_cover'),
+            'is_published' => $request->has('is_published'),
+            'order' => $album->media()->count() + 1,
+        ]);
+
+        // Si c'est la première photo et que l'album n'a pas de cover
+        if (!$album->cover_image && $isPhoto) {
+            $album->update(['cover_image' => $filePath]);
+        }
+
+        return redirect()->route('admin.gallery.show', $album)
+            ->with('success', 'Média ajouté avec succès !');
+    }
+
+    /**
+     * Supprimer un média
+     */
+    public function deleteMedia(Album $album, Media $media)
+    {
+        Storage::disk('public')->delete($media->file_path);
+        $media->delete();
+
+        return redirect()->route('admin.gallery.show', $album)
+            ->with('success', 'Média supprimé avec succès !');
+    }
+
+    /**
+     * Mettre à jour l'ordre des médias
+     */
+    public function reorderMedia(Request $request, Album $album)
+    {
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'integer|exists:media,id',
+        ]);
+
+        foreach ($request->order as $index => $mediaId) {
+            Media::where('id', $mediaId)->where('album_id', $album->id)->update(['order' => $index + 1]);
+        }
+
+        return response()->json(['success' => true]);
     }
 
     /**
      * Upload en masse
      */
-    public function uploadMass(Request $request)
+    public function uploadMass(Request $request, Album $album)
     {
         $request->validate([
-            'files.*' => 'required|file|max:10240|mimes:jpeg,png,jpg,gif,webp,mp4',
-            'category' => 'required|string',
+            'files.*' => 'required|file|max:10240',
         ]);
 
         $uploaded = 0;
@@ -220,18 +244,20 @@ class GalleryController extends Controller
         foreach ($request->file('files') as $file) {
             try {
                 $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-                $filePath = $file->storeAs('galleries', $fileName, 'public');
+                $filePath = $file->storeAs('albums/' . $album->id . '/media', $fileName, 'public');
 
-                Gallery::create([
+                $isPhoto = in_array($file->getMimeType(), ['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+
+                Media::create([
+                    'album_id' => $album->id,
                     'title' => $file->getClientOriginalName(),
-                    'category' => $request->category,
-                    'type' => in_array($file->getMimeType(), ['video/mp4', 'video/webm']) ? 'video' : 'photo',
+                    'type' => $isPhoto ? 'photo' : 'video',
                     'file_path' => $filePath,
                     'file_name' => $file->getClientOriginalName(),
                     'file_size' => $file->getSize(),
                     'mime_type' => $file->getMimeType(),
                     'is_published' => true,
-                    'order' => 0,
+                    'order' => $album->media()->count() + $uploaded + 1,
                 ]);
                 $uploaded++;
             } catch (\Exception $e) {
@@ -239,7 +265,7 @@ class GalleryController extends Controller
             }
         }
 
-        return redirect()->route('admin.gallery.index')
+        return redirect()->route('admin.gallery.show', $album)
             ->with('success', "{$uploaded} fichier(s) uploadé(s) avec succès. {$failed} échec(s).");
     }
 }

@@ -153,6 +153,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('/gallery/{gallery}/toggle-publish', [\App\Http\Controllers\Admin\GalleryController::class, 'togglePublish'])->name('gallery.toggle-publish');
     Route::post('/gallery/upload-mass', [\App\Http\Controllers\Admin\GalleryController::class, 'uploadMass'])->name('gallery.upload-mass');
 
+    // Gestion des médias dans un album
+    Route::post('/gallery/{album}/media', [\App\Http\Controllers\Admin\GalleryController::class, 'addMedia'])->name('gallery.add-media');
+    Route::delete('/gallery/{album}/media/{media}', [\App\Http\Controllers\Admin\GalleryController::class, 'deleteMedia'])->name('gallery.delete-media');
+    Route::post('/gallery/{album}/reorder', [\App\Http\Controllers\Admin\GalleryController::class, 'reorderMedia'])->name('gallery.reorder');
+    Route::post('/gallery/{album}/upload-mass', [\App\Http\Controllers\Admin\GalleryController::class, 'uploadMass'])->name('gallery.upload-mass');
+
     // ===== DOCUMENTS =====
     Route::resource('documents', DocumentController::class);
     Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
