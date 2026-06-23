@@ -50,6 +50,7 @@ class RolePermissionSeeder extends Seeder
             'view documents',
             'upload documents',
             'delete documents',
+            'approve documents',
 
             // Gestion du contenu du site
             'manage pages',
@@ -57,16 +58,13 @@ class RolePermissionSeeder extends Seeder
             'manage testimonials',
             'manage news',
 
+            // Gestion de la galerie
+            'manage gallery',
+
             // Administration système
             'manage roles',
             'view logs',
             'manage settings',
-
-            'manage documents',
-            'view documents',
-            'upload documents',
-            'delete documents',
-            'approve documents',
         ];
 
         // Créer toutes les permissions
@@ -93,7 +91,7 @@ class RolePermissionSeeder extends Seeder
         // --- SUPER ADMIN (Accès total) ---
         $superAdmin->syncPermissions(Permission::all());
 
-        // --- ADMIN (Accès complet sauf quelques permissions sensibles) ---
+        // --- ADMIN (Accès complet) ---
         $admin->syncPermissions([
             // Membres
             'view members', 'create members', 'edit members', 'delete members', 'approve members',
@@ -104,19 +102,16 @@ class RolePermissionSeeder extends Seeder
             // Bureau
             'view committee', 'manage committee',
             // Documents
-            'view documents', 'upload documents', 'delete documents',
+            'view documents', 'upload documents', 'delete documents', 'approve documents',
             // Contenu du site
             'manage pages', 'manage carousels', 'manage testimonials', 'manage news',
+            // Galerie
+            'manage gallery',
             // Système
             'manage settings', 'view logs',
-            'manage documents',
-            'view documents',
-            'upload documents',
-            'delete documents',
-            'approve documents',
         ]);
 
-        // --- PRÉSIDENT (Accès large, sauf suppression et paramètres système) ---
+        // --- PRÉSIDENT (Accès large) ---
         $president->syncPermissions([
             // Membres
             'view members', 'approve members',
@@ -127,16 +122,11 @@ class RolePermissionSeeder extends Seeder
             // Bureau
             'view committee', 'manage committee',
             // Documents
-            'view documents', 'upload documents',
-            // Contenu du site - Gestion des pages uniquement
+            'view documents', 'upload documents', 'approve documents',
+            // Contenu du site
             'manage pages',
             // Système
             'view logs',
-            'manage documents',
-            'view documents',
-            'upload documents',
-            'delete documents',
-            'approve documents',
         ]);
 
         // --- SECRÉTAIRE (Gestion du contenu et des membres) ---
@@ -148,49 +138,40 @@ class RolePermissionSeeder extends Seeder
             // Bureau
             'view committee',
             // Documents
-            'view documents', 'upload documents',
-            // Contenu du site - Accès complet
+            'view documents', 'upload documents', 'approve documents',
+            // Contenu du site
             'manage pages', 'manage carousels', 'manage testimonials', 'manage news',
-            // Système - Accès aux paramètres
+            // Galerie
+            'manage gallery',
+            // Système
             'manage settings',
-            'manage documents',
-            'view documents',
-            'upload documents',
-            'delete documents',
-            'approve documents',
         ]);
 
         // --- TRÉSORIER (Gestion financière uniquement) ---
         $treasurer->syncPermissions([
             'view members',
-            'view finances', 'create transactions', 'export reports',
+            'view finances', 'create transactions', 'approve transactions', 'export reports',
             'view events',
             'view documents',
-            'manage documents',
-            'upload documents',
-            'delete documents',
-            'approve documents',
         ]);
 
         // --- CHEF DE FANFARE ---
         $conductor->syncPermissions([
             'view members', 'edit members',
             'view events', 'create events', 'edit events', 'manage participations',
-            'view documents'
+            'view documents',
         ]);
 
         // --- RESPONSABLE DE SECTION ---
         $sectionLeader->syncPermissions([
             'view members',
-            'view events', 'manage participations'
+            'view events', 'manage participations',
         ]);
 
         // --- MEMBRE SIMPLE ---
         $member->syncPermissions([
             'view events',
             'view documents',
-            'upload documents',
-            'delete documents',
         ]);
 
         // ============================================
@@ -203,10 +184,13 @@ class RolePermissionSeeder extends Seeder
             [
                 'name' => 'Super Administrateur',
                 'password' => bcrypt('Admin123!'),
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
+                'member_id' => null,
             ]
         );
-        $superAdminUser->assignRole('super-admin');
+        if (!$superAdminUser->hasRole('super-admin')) {
+            $superAdminUser->assignRole('super-admin');
+        }
 
         // 2. Administrateur
         $adminUser = User::firstOrCreate(
@@ -214,10 +198,13 @@ class RolePermissionSeeder extends Seeder
             [
                 'name' => 'Administrateur',
                 'password' => bcrypt('Admin123!'),
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
+                'member_id' => null,
             ]
         );
-        $adminUser->assignRole('admin');
+        if (!$adminUser->hasRole('admin')) {
+            $adminUser->assignRole('admin');
+        }
 
         // 3. Président
         $presidentUser = User::firstOrCreate(
@@ -225,10 +212,13 @@ class RolePermissionSeeder extends Seeder
             [
                 'name' => 'Président',
                 'password' => bcrypt('President123!'),
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
+                'member_id' => 1, // Lier au membre Jean Mendy
             ]
         );
-        $presidentUser->assignRole('president');
+        if (!$presidentUser->hasRole('president')) {
+            $presidentUser->assignRole('president');
+        }
 
         // 4. Secrétaire
         $secretaryUser = User::firstOrCreate(
@@ -236,10 +226,13 @@ class RolePermissionSeeder extends Seeder
             [
                 'name' => 'Secrétaire',
                 'password' => bcrypt('Secret123!'),
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
+                'member_id' => 3, // Lier au membre Paul Zinsou
             ]
         );
-        $secretaryUser->assignRole('secretary');
+        if (!$secretaryUser->hasRole('secretary')) {
+            $secretaryUser->assignRole('secretary');
+        }
 
         // 5. Trésorier
         $treasurerUser = User::firstOrCreate(
@@ -247,10 +240,13 @@ class RolePermissionSeeder extends Seeder
             [
                 'name' => 'Trésorier',
                 'password' => bcrypt('Tresorier123!'),
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
+                'member_id' => 2, // Lier au membre Marie Dossou
             ]
         );
-        $treasurerUser->assignRole('treasurer');
+        if (!$treasurerUser->hasRole('treasurer')) {
+            $treasurerUser->assignRole('treasurer');
+        }
 
         // 6. Chef de fanfare
         $conductorUser = User::firstOrCreate(
@@ -258,10 +254,13 @@ class RolePermissionSeeder extends Seeder
             [
                 'name' => 'Chef de fanfare',
                 'password' => bcrypt('Chef123!'),
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
+                'member_id' => 4, // Lier au membre David Agossou
             ]
         );
-        $conductorUser->assignRole('conductor');
+        if (!$conductorUser->hasRole('conductor')) {
+            $conductorUser->assignRole('conductor');
+        }
 
         // 7. Membre simple
         $memberUser = User::firstOrCreate(
@@ -269,20 +268,31 @@ class RolePermissionSeeder extends Seeder
             [
                 'name' => 'Membre',
                 'password' => bcrypt('Membre123!'),
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
+                'member_id' => null,
             ]
         );
-        $memberUser->assignRole('member');
+        if (!$memberUser->hasRole('member')) {
+            $memberUser->assignRole('member');
+        }
 
+        $this->command->info('========================================');
         $this->command->info('✅ Rôles et permissions créés avec succès !');
+        $this->command->info('========================================');
         $this->command->info('📋 Utilisateurs par défaut :');
-        $this->command->info('   - Super Admin: admin@fanfareceleste.org / Admin123!');
-        $this->command->info('   - Admin: admin@fanfare.com / Admin123!');
-        $this->command->info('   - Président: president@fanfareceleste.org / President123!');
-        $this->command->info('   - Secrétaire: secretaire@fanfareceleste.org / Secret123!');
-        $this->command->info('   - Trésorier: tresorier@fanfareceleste.org / Tresorier123!');
-        $this->command->info('   - Chef: chef@fanfareceleste.org / Chef123!');
-        $this->command->info('   - Membre: membre@fanfareceleste.org / Membre123!');
+        $this->command->info('   🔹 Super Admin: admin@fanfareceleste.org / Admin123!');
+        $this->command->info('   🔹 Admin: admin@fanfare.com / Admin123!');
+        $this->command->info('   🔹 Président: president@fanfareceleste.org / President123!');
+        $this->command->info('   🔹 Secrétaire: secretaire@fanfareceleste.org / Secret123!');
+        $this->command->info('   🔹 Trésorier: tresorier@fanfareceleste.org / Tresorier123!');
+        $this->command->info('   🔹 Chef: chef@fanfareceleste.org / Chef123!');
+        $this->command->info('   🔹 Membre: membre@fanfareceleste.org / Membre123!');
+        $this->command->info('========================================');
+        $this->command->info('📊 Récapitulatif des permissions :');
+        $this->command->info('   Total permissions : ' . Permission::count());
+        $this->command->info('   Total rôles : ' . Role::count());
+        $this->command->info('   Total utilisateurs : ' . User::count());
+        $this->command->info('========================================');
     }
 
     private function hasSpatieTables(): bool

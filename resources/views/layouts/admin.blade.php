@@ -720,11 +720,12 @@
             <div class="nav-label">Médias</div>
 
             @can('manage gallery')
-            <a class="nav-link {{ $isActive(['admin.gallery.index', 'admin.gallery.create', 'admin.gallery.edit']) }}" href="{{ route('admin.gallery.index') }}">
-                <i class="fas fa-images"></i>
-                <span>Galerie</span>
-            </a>
-            @endcan
+<a class="nav-link {{ $isActive(['admin.gallery.index', 'admin.gallery.create', 'admin.gallery.edit']) }}" href="{{ route('admin.gallery.index') }}">
+    <i class="fas fa-images"></i>
+    <span>Galerie</span>
+    <span class="badge bg-primary">{{ \App\Models\Gallery::where('is_published', false)->count() }}</span>
+</a>
+@endcan
 
             @can('manage documents')
             <a class="nav-link {{ $isActive(['admin.documents.index', 'admin.documents.create']) }}" href="{{ route('admin.documents.index') }}">

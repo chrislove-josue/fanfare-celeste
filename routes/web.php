@@ -147,6 +147,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::resource('gallery', GalleryController::class);
     Route::post('/gallery/{gallery}/like', [GalleryController::class, 'like'])->name('gallery.like');
 
+
+        // ===== GESTION DE LA GALERIE =====
+    Route::resource('gallery', \App\Http\Controllers\Admin\GalleryController::class);
+    Route::post('/gallery/{gallery}/toggle-publish', [\App\Http\Controllers\Admin\GalleryController::class, 'togglePublish'])->name('gallery.toggle-publish');
+    Route::post('/gallery/upload-mass', [\App\Http\Controllers\Admin\GalleryController::class, 'uploadMass'])->name('gallery.upload-mass');
+
     // ===== DOCUMENTS =====
     Route::resource('documents', DocumentController::class);
     Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
