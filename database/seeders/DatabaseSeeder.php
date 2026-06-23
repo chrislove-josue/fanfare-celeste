@@ -12,6 +12,8 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             MemberSeeder::class,
             EventSeeder::class,
+            LinkUsersToMembersSeeder::class,
+            CreateMembersForAdminsSeeder::class,
         ]);
     }
 }

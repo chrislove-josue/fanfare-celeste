@@ -48,6 +48,15 @@ class MemberController extends Controller
             $query->where('instrument', $request->instrument);
         }
         
+        // Filtrer par compte utilisateur
+        if ($request->filled('has_user')) {
+            if ($request->has_user === 'yes') {
+                $query->whereHas('user');
+            } elseif ($request->has_user === 'no') {
+                $query->whereDoesntHave('user');
+            }
+        }
+        
         $members = $query->latest()->paginate(15);
         
         // Statistiques pour le filtre
@@ -60,6 +69,7 @@ class MemberController extends Controller
         $activeMembers = Member::where('status', 'active')->count();
         $pendingMembers = Member::where('status', 'pending')->count();
         $newMembers = Member::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count();
+        $usersCount = Member::whereHas('user')->count();
         
         return view('admin.members.index', compact(
             'members', 
@@ -69,7 +79,8 @@ class MemberController extends Controller
             'totalMembers',
             'activeMembers',
             'pendingMembers',
-            'newMembers'
+            'newMembers',
+            'usersCount'
         ));
     }
 
@@ -104,14 +115,14 @@ class MemberController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:members',
+            'email' => 'required|email|unique:members,email',
             'phone' => 'required|string|max:20',
             'whatsapp' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'birth_date' => 'nullable|date',
             'birth_place' => 'nullable|string',
             'instrument' => 'nullable|string',
-            'instrument_level' => 'nullable|in:debutant,intermediaire,avance,expert',
+            'instrument_level' => 'nullable|string|in:debutant,intermediaire,avance,expert',
             'entry_date' => 'nullable|date',
             'section' => 'nullable|string',
             'section_role' => 'nullable|string',
@@ -140,15 +151,6 @@ class MemberController extends Controller
             }
 
             $member = Member::create($validated);
-
-            // Créer un compte utilisateur pour le membre
-            $user = User::create([
-                'name' => $member->full_name,
-                'email' => $member->email,
-                'password' => Hash::make('password123'),
-                'member_id' => $member->id, // Si la colonne existe
-            ]);
-            $user->assignRole('member');
 
             DB::commit();
             
@@ -235,7 +237,7 @@ class MemberController extends Controller
             'birth_date' => 'nullable|date',
             'birth_place' => 'nullable|string',
             'instrument' => 'nullable|string',
-            'instrument_level' => 'nullable|in:debutant,intermediaire,avance,expert',
+            'instrument_level' => 'nullable|string|in:debutant,intermediaire,avance,expert',
             'entry_date' => 'nullable|date',
             'section' => 'nullable|string',
             'section_role' => 'nullable|string',
@@ -254,7 +256,22 @@ class MemberController extends Controller
             $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
         }
 
+        if ($request->hasFile('id_document')) {
+            if ($member->id_document) {
+                Storage::disk('public')->delete($member->id_document);
+            }
+            $validated['id_document'] = $request->file('id_document')->store('members/documents', 'public');
+        }
+
         $member->update($validated);
+
+        // Mettre à jour l'utilisateur associé si existant
+        if ($member->user) {
+            $member->user->update([
+                'name' => $member->full_name,
+                'email' => $member->email,
+            ]);
+        }
 
         return redirect()->route('admin.members.show', $member)
             ->with('success', 'Membre mis à jour avec succès');
@@ -285,9 +302,6 @@ class MemberController extends Controller
     {
         $member->update(['status' => 'active']);
         
-        // Envoyer un email de bienvenue (à implémenter)
-        // Mail::to($member->email)->send(new WelcomeMemberMail($member));
-        
         return redirect()->route('admin.members.show', $member)
             ->with('success', 'Membre approuvé avec succès');
     }
@@ -298,6 +312,61 @@ class MemberController extends Controller
         
         return redirect()->route('admin.members.show', $member)
             ->with('warning', 'Membre rejeté');
+    }
+
+    /**
+     * Créer un compte utilisateur pour un membre
+     */
+    public function createUser(Request $request, Member $member)
+    {
+        // Vérifier si le membre a déjà un compte
+        if ($member->user) {
+            return back()->with('error', 'Ce membre a déjà un compte utilisateur.');
+        }
+
+        $request->validate([
+            'password' => 'required|string|min:6',
+        ]);
+
+        $password = $request->password;
+        
+        // Créer l'utilisateur avec member_id lié
+        $user = User::create([
+            'name' => $member->full_name,
+            'email' => $member->email,
+            'password' => Hash::make($password),
+            'member_id' => $member->id, // Lier au membre
+        ]);
+        
+        // Assigner le rôle "member"
+        $user->assignRole('member');
+
+        return redirect()->route('admin.members.index')
+            ->with('success', 'Compte utilisateur créé avec succès pour ' . $member->full_name . '. Mot de passe : ' . $password);
+    }
+
+    /**
+     * Réinitialiser le mot de passe d'un membre
+     */
+    public function resetPassword(Request $request, Member $member)
+    {
+        if (!$member->user) {
+            return back()->with('error', 'Ce membre n\'a pas de compte utilisateur.');
+        }
+
+        $request->validate([
+            'password' => 'required|string|min:6',
+        ]);
+
+        $password = $request->password;
+        
+        // Mettre à jour le mot de passe
+        $member->user->update([
+            'password' => Hash::make($password),
+        ]);
+
+        return redirect()->route('admin.members.index')
+            ->with('success', 'Mot de passe réinitialisé avec succès pour ' . $member->full_name . '. Nouveau mot de passe : ' . $password);
     }
 
     public function generateCard(Member $member)

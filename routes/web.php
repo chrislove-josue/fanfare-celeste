@@ -75,8 +75,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/my/profile/update', [MyProfileController::class, 'updateProfile'])->name('my.profile.update');
     Route::post('/my/password/update', [MyProfileController::class, 'updatePassword'])->name('my.password.update');
 
+    // Carte de membre
     Route::get('/my/card', [MyProfileController::class, 'card'])->name('my.card');
-
     
     // Contributions
     Route::get('/my/contributions', [MyProfileController::class, 'contributions'])->name('my.contributions');
@@ -108,6 +108,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('/members/{member}/reject', [MemberController::class, 'reject'])->name('members.reject');
     Route::get('/members/{member}/card', [MemberController::class, 'generateCard'])->name('members.card');
     Route::get('/members/export/all', [MemberController::class, 'export'])->name('members.export');
+    
+    // ===== GESTION DES COMPTES UTILISATEURS =====
+    Route::post('/members/{member}/create-user', [MemberController::class, 'createUser'])->name('members.create-user');
+    Route::post('/members/{member}/reset-password', [MemberController::class, 'resetPassword'])->name('members.reset-password');
 
     // ===== GESTION FINANCIÈRE =====
     Route::prefix('financial')->name('financial.')->group(function () {
