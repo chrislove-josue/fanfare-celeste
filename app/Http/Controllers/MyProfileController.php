@@ -143,6 +143,26 @@ public function updatePassword(Request $request)
         ]);
     }
 
+    
+public function card(Request $request)
+{
+    $user = $request->user();
+    $member = $user->member;
+    
+    if (!$member) {
+        return redirect()->route('my.profile')
+            ->with('warning', 'Vous n\'êtes pas encore associé à un membre.');
+    }
+    
+    // Générer le QR Code si disponible
+    $qrCode = null;
+    if (method_exists($member, 'memberCardQrCode')) {
+        $qrCode = $member->memberCardQrCode;
+    }
+    
+    return view('my.card', compact('member', 'qrCode'));
+}
+
     public function events(Request $request)
     {
         $user = $request->user();

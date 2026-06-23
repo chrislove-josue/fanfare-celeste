@@ -798,6 +798,10 @@
                 <span>Mon profil</span>
             </a>
 
+            <a class="nav-link {{ $isActive('my.card') }}" href="{{ route('my.card') }}">
+    <i class="fas fa-id-card"></i>
+    <span>Ma carte</span>
+</a>
             <a class="nav-link {{ $isActive('my.contributions') }}" href="{{ route('my.contributions') }}">
                 <i class="fas fa-hand-holding-heart"></i>
                 <span>Mes cotisations</span>

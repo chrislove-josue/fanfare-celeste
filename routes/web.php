@@ -74,6 +74,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/my/profile', [MyProfileController::class, 'profile'])->name('my.profile');
     Route::post('/my/profile/update', [MyProfileController::class, 'updateProfile'])->name('my.profile.update');
     Route::post('/my/password/update', [MyProfileController::class, 'updatePassword'])->name('my.password.update');
+
+    Route::get('/my/card', [MyProfileController::class, 'card'])->name('my.card');
+
     
     // Contributions
     Route::get('/my/contributions', [MyProfileController::class, 'contributions'])->name('my.contributions');

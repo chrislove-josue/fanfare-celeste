@@ -141,6 +141,14 @@
             </div>
             <div class="card-body">
                 <div class="row g-3">
+                      <div class="col-md-3 col-6">
+        <a href="{{ route('my.card') }}" class="text-decoration-none">
+            <div class="card bg-primary text-white text-center p-3">
+                <i class="fas fa-id-card fa-2x mb-2"></i>
+                <small>Ma carte</small>
+            </div>
+        </a>
+    </div>
                     <div class="col-md-3 col-6">
                         <a href="{{ route('my.contributions') }}" class="text-decoration-none">
                             <div class="card bg-primary text-white text-center p-3">
