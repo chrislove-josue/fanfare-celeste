@@ -370,6 +370,34 @@
             @endcan
         </nav>
 
+        <!-- Dans resources/views/layouts/admin.blade.php, ajoutez cette section -->
+
+<div class="section-title">Contenu du site</div>
+
+@can('manage pages')
+<a class="nav-link {{ $isActive(['admin.pages.index', 'admin.pages.create', 'admin.pages.edit']) }}" href="{{ route('admin.pages.index') }}">
+    <i class="fas fa-file-alt"></i> Pages
+</a>
+@endcan
+
+@can('manage carousels')
+<a class="nav-link {{ $isActive(['admin.carousels.index', 'admin.carousels.create', 'admin.carousels.edit']) }}" href="{{ route('admin.carousels.index') }}">
+    <i class="fas fa-images"></i> Carousel
+</a>
+@endcan
+
+@can('manage testimonials')
+<a class="nav-link {{ $isActive(['admin.testimonials.index', 'admin.testimonials.create', 'admin.testimonials.edit']) }}" href="{{ route('admin.testimonials.index') }}">
+    <i class="fas fa-quote-right"></i> Témoignages
+</a>
+@endcan
+
+@can('manage news')
+<a class="nav-link {{ $isActive(['admin.news.index', 'admin.news.create', 'admin.news.edit']) }}" href="{{ route('admin.news.index') }}">
+    <i class="fas fa-newspaper"></i> Actualités
+</a>
+@endcan
+
         <div class="user-info">
             <div class="user-name">{{ auth()->user()->name }}</div>
             <div class="user-role">
