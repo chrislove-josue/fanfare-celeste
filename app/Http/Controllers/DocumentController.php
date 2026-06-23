@@ -1,8 +1,10 @@
 <?php
+// app/Http/Controllers/DocumentController.php
 
 namespace App\Http\Controllers;
 
 use App\Models\Document;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -27,7 +29,8 @@ class DocumentController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('file_name', 'like', "%{$search}%");
             });
         }
         
@@ -39,10 +42,40 @@ class DocumentController extends Controller
             $query->where('is_public', $request->is_public === 'yes');
         }
         
+        if ($request->filled('uploaded_by')) {
+            $query->where('uploaded_by', $request->uploaded_by);
+        }
+
         $documents = $query->latest()->paginate(20);
         $categories = Document::getCategories();
-        
-        return view('admin.documents.index', compact('documents', 'categories'));
+        $users = User::orderBy('name')->get();
+
+        // Statistiques
+        $totalDocuments = Document::count();
+        $publicDocuments = Document::where('is_public', true)->count();
+        $privateDocuments = Document::where('is_public', false)->count();
+        $pendingDocuments = Document::where('status', 'pending')->count();
+        $approvedDocuments = Document::where('status', 'approved')->count();
+        $rejectedDocuments = Document::where('status', 'rejected')->count();
+
+        // Documents par catégorie
+        $categoryStats = [];
+        foreach ($categories as $key => $label) {
+            $categoryStats[$key] = Document::where('category', $key)->count();
+        }
+
+        return view('admin.documents.index', compact(
+            'documents',
+            'categories',
+            'users',
+            'totalDocuments',
+            'publicDocuments',
+            'privateDocuments',
+            'pendingDocuments',
+            'approvedDocuments',
+            'rejectedDocuments',
+            'categoryStats'
+        ));
     }
 
     /**
