@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             EventSeeder::class,
             LinkUsersToMembersSeeder::class,
             CreateMembersForAdminsSeeder::class,
+            GallerySeeder::class,
         ]);
     }
 }

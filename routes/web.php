@@ -41,7 +41,12 @@ Route::get('/actualites', [PublicNewsController::class, 'index'])->name('public.
 Route::get('/actualites/{slug}', [PublicNewsController::class, 'show'])->name('public.news.show');
 
 // Galerie publique
+
 Route::get('/gallery', [PublicGalleryController::class, 'index'])->name('public.gallery.index');
+Route::get('/gallery/{gallery}', [PublicGalleryController::class, 'show'])->name('public.gallery.show');
+Route::get('/gallery/category/{category}', [PublicGalleryController::class, 'byCategory'])->name('public.gallery.category');
+Route::post('/gallery/{gallery}/like', [PublicGalleryController::class, 'like'])->name('gallery.like');
+
 
 // About (pages statiques)
 Route::get('/about', [HomeController::class, 'history'])->name('about');
