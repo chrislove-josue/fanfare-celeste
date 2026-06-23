@@ -55,15 +55,61 @@ class MemberController extends Controller
         $instruments = Member::select('instrument')->distinct()->whereNotNull('instrument')->pluck('instrument');
         $statuses = ['pending', 'active', 'suspended', 'withdrawn', 'deceased', 'training'];
         
-        return view('admin.members.index', compact('members', 'sections', 'instruments', 'statuses'));
+        // Statistiques pour les cartes
+        $totalMembers = Member::count();
+        $activeMembers = Member::where('status', 'active')->count();
+        $pendingMembers = Member::where('status', 'pending')->count();
+        $newMembers = Member::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count();
+        
+        return view('admin.members.index', compact(
+            'members', 
+            'sections', 
+            'instruments', 
+            'statuses',
+            'totalMembers',
+            'activeMembers',
+            'pendingMembers',
+            'newMembers'
+        ));
     }
 
     public function create()
     {
-        $sections = ['Trompettes', 'Trombones', 'Saxophones', 'Percussions', 'Clairons', 'Batterie'];
-        $instruments = ['Trompette', 'Trombone', 'Saxophone Alto', 'Saxophone Ténor', 'Saxophone Baryton', 'Batterie', 'Caisse Claire', 'Grosse Caisse', 'Cymbales'];
+        $sections = [
+            'Trompettes' => 'Trompettes',
+            'Trombones' => 'Trombones',
+            'Saxophones' => 'Saxophones',
+            'Percussions' => 'Percussions',
+            'Clairons' => 'Clairons',
+            'Batterie' => 'Batterie'
+        ];
         
-        return view('admin.members.create', compact('sections', 'instruments'));
+        $instruments = [
+            'Trompette' => 'Trompette',
+            'Trombone' => 'Trombone',
+            'Saxophone Alto' => 'Saxophone Alto',
+            'Saxophone Ténor' => 'Saxophone Ténor',
+            'Saxophone Baryton' => 'Saxophone Baryton',
+            'Batterie' => 'Batterie',
+            'Caisse Claire' => 'Caisse Claire',
+            'Grosse Caisse' => 'Grosse Caisse',
+            'Cymbales' => 'Cymbales'
+        ];
+        
+        $statuses = [
+            'active' => 'Actif',
+            'pending' => 'En attente',
+            'inactive' => 'Inactif'
+        ];
+        
+        $instrumentLevels = [
+            'debutant' => 'Débutant',
+            'intermediaire' => 'Intermédiaire',
+            'avance' => 'Avancé',
+            'expert' => 'Expert'
+        ];
+        
+        return view('admin.members.create', compact('sections', 'instruments', 'statuses', 'instrumentLevels'));
     }
 
     public function store(Request $request)
@@ -71,29 +117,32 @@ class MemberController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:members',
+            'email' => 'required|email|unique:members,email',
             'phone' => 'required|string|max:20',
             'whatsapp' => 'nullable|string|max:20',
-            'address' => 'required|string',
-            'birth_date' => 'required|date',
+            'address' => 'nullable|string',
+            'birth_date' => 'nullable|date',
             'birth_place' => 'nullable|string',
             'instrument' => 'nullable|string',
-            'instrument_level' => 'nullable|in:debutant,intermediaire,avance,expert',
-            'entry_date' => 'required|date',
+            'instrument_level' => 'nullable|string|in:debutant,intermediaire,avance,expert',
+            'entry_date' => 'nullable|date',
             'section' => 'nullable|string',
+            'section_role' => 'nullable|string',
             'photo' => 'nullable|image|max:2048',
             'id_document' => 'nullable|file|max:5120',
             'emergency_contact_name' => 'nullable|string',
             'emergency_contact_phone' => 'nullable|string',
             'medical_notes' => 'nullable|string',
             'skills' => 'nullable|string',
+            'notes' => 'nullable|string',
+            'status' => 'nullable|in:active,pending,inactive',
         ]);
 
         DB::beginTransaction();
         
         try {
             $validated['member_number'] = Member::generateMemberNumber();
-            $validated['status'] = 'pending';
+            $validated['status'] = $request->status ?? 'pending';
 
             if ($request->hasFile('photo')) {
                 $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
@@ -109,8 +158,8 @@ class MemberController extends Controller
             $user = User::create([
                 'name' => $member->full_name,
                 'email' => $member->email,
-                'password' => Hash::make('password123'), // À changer par l'utilisateur
-                'member_id' => $member->id
+                'password' => Hash::make('password123'),
+                'member_id' => $member->id,
             ]);
             $user->assignRole('member');
 
@@ -121,7 +170,8 @@ class MemberController extends Controller
                 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Erreur lors de l\'ajout: ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de l\'ajout: ' . $e->getMessage())
+                         ->withInput();
         }
     }
 
@@ -132,17 +182,58 @@ class MemberController extends Controller
         $transactions = $member->transactions()->latest()->take(6)->get();
         $committeePosition = $member->currentCommitteePosition;
         
-        return view('admin.members.show', compact('member', 'contributions', 'events', 'transactions', 'committeePosition'));
+        return view('admin.members.show', compact(
+            'member', 
+            'contributions', 
+            'events', 
+            'transactions', 
+            'committeePosition'
+        ));
     }
 
     public function edit(Member $member)
     {
-        $sections = ['Trompettes', 'Trombones', 'Saxophones', 'Percussions', 'Clairons', 'Batterie'];
-        $instruments = ['Trompette', 'Trombone', 'Saxophone Alto', 'Saxophone Ténor', 'Saxophone Baryton', 'Batterie', 'Caisse Claire', 'Grosse Caisse', 'Cymbales'];
-        $statuses = ['pending', 'active', 'suspended', 'withdrawn', 'deceased', 'training'];
-        $instrumentLevels = ['debutant', 'intermediaire', 'avance', 'expert'];
+        $sections = [
+            'Trompettes' => 'Trompettes',
+            'Trombones' => 'Trombones',
+            'Saxophones' => 'Saxophones',
+            'Percussions' => 'Percussions',
+            'Clairons' => 'Clairons',
+            'Batterie' => 'Batterie'
+        ];
         
-        return view('admin.members.edit', compact('member', 'sections', 'instruments', 'statuses', 'instrumentLevels'));
+        $instruments = [
+            'Trompette' => 'Trompette',
+            'Trombone' => 'Trombone',
+            'Saxophone Alto' => 'Saxophone Alto',
+            'Saxophone Ténor' => 'Saxophone Ténor',
+            'Saxophone Baryton' => 'Saxophone Baryton',
+            'Batterie' => 'Batterie',
+            'Caisse Claire' => 'Caisse Claire',
+            'Grosse Caisse' => 'Grosse Caisse',
+            'Cymbales' => 'Cymbales'
+        ];
+        
+        $statuses = [
+            'active' => 'Actif',
+            'pending' => 'En attente',
+            'inactive' => 'Inactif'
+        ];
+        
+        $instrumentLevels = [
+            'debutant' => 'Débutant',
+            'intermediaire' => 'Intermédiaire',
+            'avance' => 'Avancé',
+            'expert' => 'Expert'
+        ];
+        
+        return view('admin.members.edit', compact(
+            'member', 
+            'sections', 
+            'instruments', 
+            'statuses', 
+            'instrumentLevels'
+        ));
     }
 
     public function update(Request $request, Member $member)
@@ -150,13 +241,18 @@ class MemberController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:members,email,' . $member->id,
             'phone' => 'required|string|max:20',
             'whatsapp' => 'nullable|string|max:20',
-            'address' => 'required|string',
+            'address' => 'nullable|string',
+            'birth_date' => 'nullable|date',
+            'birth_place' => 'nullable|string',
             'instrument' => 'nullable|string',
-            'instrument_level' => 'nullable|in:debutant,intermediaire,avance,expert',
+            'instrument_level' => 'nullable|string|in:debutant,intermediaire,avance,expert',
+            'entry_date' => 'nullable|date',
             'section' => 'nullable|string',
-            'status' => 'required|in:pending,active,suspended,withdrawn,deceased,training',
+            'section_role' => 'nullable|string',
+            'status' => 'required|in:active,pending,inactive',
             'emergency_contact_name' => 'nullable|string',
             'emergency_contact_phone' => 'nullable|string',
             'medical_notes' => 'nullable|string',
@@ -171,7 +267,22 @@ class MemberController extends Controller
             $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
         }
 
+        if ($request->hasFile('id_document')) {
+            if ($member->id_document) {
+                Storage::disk('public')->delete($member->id_document);
+            }
+            $validated['id_document'] = $request->file('id_document')->store('members/documents', 'public');
+        }
+
         $member->update($validated);
+
+        // Mettre à jour l'utilisateur associé si existant
+        if ($member->user) {
+            $member->user->update([
+                'name' => $member->full_name,
+                'email' => $member->email,
+            ]);
+        }
 
         return redirect()->route('admin.members.show', $member)
             ->with('success', 'Membre mis à jour avec succès');
@@ -211,7 +322,7 @@ class MemberController extends Controller
 
     public function reject(Member $member)
     {
-        $member->update(['status' => 'withdrawn']);
+        $member->update(['status' => 'inactive']);
         
         return redirect()->route('admin.members.show', $member)
             ->with('warning', 'Membre rejeté');
@@ -230,7 +341,7 @@ class MemberController extends Controller
     public function export()
     {
         $members = Member::all();
-        $pdf = PDF::loadView('members.export', compact('members'));
+        $pdf = PDF::loadView('admin.members.export', compact('members'));
         $pdf->setPaper('a4', 'landscape');
         
         return $pdf->download('liste_membres_' . date('Y-m-d') . '.pdf');

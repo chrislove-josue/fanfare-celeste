@@ -18,7 +18,9 @@ class RolePermissionSeeder extends Seeder
 
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Permissions existantes + nouvelles pour le contenu
+        // ============================================
+        // DÉFINITION DES PERMISSIONS
+        // ============================================
         $permissions = [
             // Gestion des membres
             'view members',
@@ -49,23 +51,26 @@ class RolePermissionSeeder extends Seeder
             'upload documents',
             'delete documents',
 
-            // Gestion du contenu (NOUVEAU)
+            // Gestion du contenu du site
             'manage pages',
             'manage carousels',
             'manage testimonials',
             'manage news',
 
-            // Administration
+            // Administration système
             'manage roles',
             'view logs',
             'manage settings',
         ];
 
+        // Créer toutes les permissions
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Créer les rôles
+        // ============================================
+        // CRÉATION DES RÔLES
+        // ============================================
         $superAdmin = Role::firstOrCreate(['name' => 'super-admin']);
         $admin = Role::firstOrCreate(['name' => 'admin']);
         $president = Role::firstOrCreate(['name' => 'president']);
@@ -75,28 +80,66 @@ class RolePermissionSeeder extends Seeder
         $sectionLeader = Role::firstOrCreate(['name' => 'section-leader']);
         $member = Role::firstOrCreate(['name' => 'member']);
 
-        // Assigner les permissions
+        // ============================================
+        // ASSIGNATION DES PERMISSIONS PAR RÔLE
+        // ============================================
+
+        // --- SUPER ADMIN (Accès total) ---
         $superAdmin->syncPermissions(Permission::all());
 
+        // --- ADMIN (Accès complet sauf quelques permissions sensibles) ---
         $admin->syncPermissions([
+            // Membres
             'view members', 'create members', 'edit members', 'delete members', 'approve members',
+            // Finances
             'view finances', 'create transactions', 'approve transactions', 'export reports',
+            // Événements
             'view events', 'create events', 'edit events', 'delete events', 'manage participations',
+            // Bureau
             'view committee', 'manage committee',
+            // Documents
             'view documents', 'upload documents', 'delete documents',
+            // Contenu du site
             'manage pages', 'manage carousels', 'manage testimonials', 'manage news',
-            'manage settings'
+            // Système
+            'manage settings', 'view logs'
         ]);
 
+        // --- PRÉSIDENT (Accès large, sauf suppression et paramètres système) ---
         $president->syncPermissions([
+            // Membres
             'view members', 'approve members',
+            // Finances
             'view finances', 'approve transactions',
+            // Événements
             'view events', 'create events', 'edit events',
+            // Bureau
             'view committee', 'manage committee',
+            // Documents
             'view documents', 'upload documents',
+            // Contenu du site - Gestion des pages uniquement
+            'manage pages',
+            // Système
             'view logs'
         ]);
 
+        // --- SECRÉTAIRE (Gestion du contenu et des membres) ---
+        $secretary->syncPermissions([
+            // Membres
+            'view members', 'create members', 'edit members',
+            // Événements
+            'view events', 'create events', 'edit events', 'manage participations',
+            // Bureau
+            'view committee',
+            // Documents
+            'view documents', 'upload documents',
+            // Contenu du site - Accès complet
+            'manage pages', 'manage carousels', 'manage testimonials', 'manage news',
+            // Système - Accès aux paramètres
+            'manage settings'
+        ]);
+
+        // --- TRÉSORIER (Gestion financière uniquement) ---
         $treasurer->syncPermissions([
             'view members',
             'view finances', 'create transactions', 'export reports',
@@ -104,56 +147,114 @@ class RolePermissionSeeder extends Seeder
             'view documents'
         ]);
 
-        $secretary->syncPermissions([
-            'view members', 'create members', 'edit members',
-            'view events', 'create events', 'edit events', 'manage participations',
-            'view committee',
-            'view documents', 'upload documents',
-            'manage pages', 'manage carousels', 'manage testimonials', 'manage news'
-        ]);
-
+        // --- CHEF DE FANFARE ---
         $conductor->syncPermissions([
             'view members', 'edit members',
             'view events', 'create events', 'edit events', 'manage participations',
             'view documents'
         ]);
 
+        // --- RESPONSABLE DE SECTION ---
         $sectionLeader->syncPermissions([
             'view members',
             'view events', 'manage participations'
         ]);
 
+        // --- MEMBRE SIMPLE ---
         $member->syncPermissions([
             'view events'
         ]);
 
-        // Créer un super administrateur par défaut
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@fanfareceleste.org'],
-            ['name' => 'Super Administrateur', 'password' => bcrypt('Admin123!'), 'email_verified_at' => now()]
-        );
-        $admin->assignRole('super-admin');
+        // ============================================
+        // CRÉATION DES UTILISATEURS PAR DÉFAUT
+        // ============================================
 
-        // Créer un administrateur simple
+        // 1. Super Administrateur
+        $superAdminUser = User::firstOrCreate(
+            ['email' => 'admin@fanfareceleste.org'],
+            [
+                'name' => 'Super Administrateur',
+                'password' => bcrypt('Admin123!'),
+                'email_verified_at' => now()
+            ]
+        );
+        $superAdminUser->assignRole('super-admin');
+
+        // 2. Administrateur
         $adminUser = User::firstOrCreate(
             ['email' => 'admin@fanfare.com'],
-            ['name' => 'Administrateur', 'password' => bcrypt('Admin123!'), 'email_verified_at' => now()]
+            [
+                'name' => 'Administrateur',
+                'password' => bcrypt('Admin123!'),
+                'email_verified_at' => now()
+            ]
         );
         $adminUser->assignRole('admin');
 
-        // Créer un président par défaut
+        // 3. Président
         $presidentUser = User::firstOrCreate(
             ['email' => 'president@fanfareceleste.org'],
-            ['name' => 'Président', 'password' => bcrypt('President123!'), 'email_verified_at' => now()]
+            [
+                'name' => 'Président',
+                'password' => bcrypt('President123!'),
+                'email_verified_at' => now()
+            ]
         );
         $presidentUser->assignRole('president');
 
-        // Créer un trésorier par défaut
+        // 4. Secrétaire
+        $secretaryUser = User::firstOrCreate(
+            ['email' => 'secretaire@fanfareceleste.org'],
+            [
+                'name' => 'Secrétaire',
+                'password' => bcrypt('Secret123!'),
+                'email_verified_at' => now()
+            ]
+        );
+        $secretaryUser->assignRole('secretary');
+
+        // 5. Trésorier
         $treasurerUser = User::firstOrCreate(
             ['email' => 'tresorier@fanfareceleste.org'],
-            ['name' => 'Trésorier', 'password' => bcrypt('Tresorier123!'), 'email_verified_at' => now()]
+            [
+                'name' => 'Trésorier',
+                'password' => bcrypt('Tresorier123!'),
+                'email_verified_at' => now()
+            ]
         );
         $treasurerUser->assignRole('treasurer');
+
+        // 6. Chef de fanfare
+        $conductorUser = User::firstOrCreate(
+            ['email' => 'chef@fanfareceleste.org'],
+            [
+                'name' => 'Chef de fanfare',
+                'password' => bcrypt('Chef123!'),
+                'email_verified_at' => now()
+            ]
+        );
+        $conductorUser->assignRole('conductor');
+
+        // 7. Membre simple
+        $memberUser = User::firstOrCreate(
+            ['email' => 'membre@fanfareceleste.org'],
+            [
+                'name' => 'Membre',
+                'password' => bcrypt('Membre123!'),
+                'email_verified_at' => now()
+            ]
+        );
+        $memberUser->assignRole('member');
+
+        $this->command->info('✅ Rôles et permissions créés avec succès !');
+        $this->command->info('📋 Utilisateurs par défaut :');
+        $this->command->info('   - Super Admin: admin@fanfareceleste.org / Admin123!');
+        $this->command->info('   - Admin: admin@fanfare.com / Admin123!');
+        $this->command->info('   - Président: president@fanfareceleste.org / President123!');
+        $this->command->info('   - Secrétaire: secretaire@fanfareceleste.org / Secret123!');
+        $this->command->info('   - Trésorier: tresorier@fanfareceleste.org / Tresorier123!');
+        $this->command->info('   - Chef: chef@fanfareceleste.org / Chef123!');
+        $this->command->info('   - Membre: membre@fanfareceleste.org / Membre123!');
     }
 
     private function hasSpatieTables(): bool

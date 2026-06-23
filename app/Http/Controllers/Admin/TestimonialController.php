@@ -30,6 +30,7 @@ class TestimonialController extends Controller
             'content' => 'required|string',
             'rating' => 'nullable|integer|min:1|max:5',
             'is_active' => 'boolean',
+            'is_approved' => 'boolean',
             'order' => 'integer',
         ]);
 
@@ -58,6 +59,7 @@ class TestimonialController extends Controller
             'content' => 'required|string',
             'rating' => 'nullable|integer|min:1|max:5',
             'is_active' => 'boolean',
+            'is_approved' => 'boolean',
             'order' => 'integer',
         ]);
 
@@ -84,5 +86,14 @@ class TestimonialController extends Controller
 
         return redirect()->route('admin.testimonials.index')
             ->with('success', 'Témoignage supprimé avec succès !');
+    }
+
+    // Méthode pour approuver un témoignage
+    public function approve(Testimonial $testimonial)
+    {
+        $testimonial->update(['is_approved' => true]);
+        
+        return redirect()->route('admin.testimonials.index')
+            ->with('success', 'Témoignage approuvé avec succès !');
     }
 }

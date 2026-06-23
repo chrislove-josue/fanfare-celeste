@@ -37,7 +37,12 @@ class EventController extends Controller
 
     public function create()
     {
-        $users = \App\Models\User::role(['president', 'conductor', 'super-admin'])->get();
+        // Récupérer tous les utilisateurs (pas seulement ceux avec des rôles)
+        $users = \App\Models\User::all();
+        
+        // Si vous voulez filtrer par rôles, assurez-vous que les rôles existent
+        // $users = \App\Models\User::role(['president', 'conductor', 'super-admin', 'admin'])->get();
+        
         $types = Event::getTypes();
         
         return view('admin.events.create', compact('users', 'types'));
@@ -53,7 +58,7 @@ class EventController extends Controller
             'end_date' => 'required|date|after:start_date',
             'location' => 'required|string',
             'location_url' => 'nullable|url',
-            'responsible_id' => 'required|exists:users,id',
+            'responsible_id' => 'nullable|exists:users,id', // Rendre nullable
             'budget' => 'nullable|numeric|min:0',
             'notes' => 'nullable|string',
             'poster' => 'nullable|image|max:2048'
@@ -76,10 +81,7 @@ class EventController extends Controller
         $participants = $event->participations()->with('member')->get();
         $availableMembers = Member::where('status', 'active')->get();
 
-        // Tous les membres du club sont considérés comme participants
-        // => Total participants = membres du club + inscriptions publiques
         $membersTotal = Member::query()->count();
-
         $publicRegistrationsCount = \App\Models\EventPublicRegistration::query()
             ->where('event_id', $event->id)
             ->count();
@@ -95,7 +97,12 @@ class EventController extends Controller
 
     public function edit(Event $event)
     {
-        $users = \App\Models\User::role(['president', 'conductor', 'super-admin'])->get();
+        // Récupérer tous les utilisateurs
+        $users = \App\Models\User::all();
+        
+        // Si vous voulez filtrer par rôles
+        // $users = \App\Models\User::role(['president', 'conductor', 'super-admin', 'admin'])->get();
+        
         $types = Event::getTypes();
         $statuses = Event::getStatuses();
         
@@ -112,7 +119,7 @@ class EventController extends Controller
             'end_date' => 'required|date|after:start_date',
             'location' => 'required|string',
             'location_url' => 'nullable|url',
-            'responsible_id' => 'required|exists:users,id',
+            'responsible_id' => 'nullable|exists:users,id', // Rendre nullable
             'status' => 'required|in:planned,upcoming,ongoing,completed,cancelled',
             'budget' => 'nullable|numeric|min:0',
             'actual_cost' => 'nullable|numeric|min:0',
