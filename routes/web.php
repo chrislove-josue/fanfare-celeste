@@ -36,6 +36,9 @@ Route::get('/about/vision', [HomeController::class, 'vision'])->name('about.visi
 Route::get('/about/committee', [HomeController::class, 'committee'])->name('about.committee');
 Route::get('/about/sections', [HomeController::class, 'sections'])->name('about.sections');
 
+// Pages dynamiques (doit être après les routes statiques)
+Route::get('/page/{slug}', [HomeController::class, 'showPage'])->name('page.show');
+
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 Route::post('/contact/send', [HomeController::class, 'sendContact'])->name('contact.send');
 Route::post('/newsletter/subscribe', [HomeController::class, 'newsletterSubscribe'])->name('newsletter.subscribe');
@@ -45,7 +48,7 @@ Route::get('/membership/apply', [MembershipController::class, 'applyForm'])->nam
 Route::post('/membership/apply', [MembershipController::class, 'submitApplication'])->name('membership.submit');
 Route::get('/membership/thankyou', [MembershipController::class, 'thankYou'])->name('membership.thankyou');
 
-// Espace personnel (utilisateur connecté) - utilise le layout admin.blade.php
+// Espace personnel (utilisateur connecté)
 Route::middleware(['auth'])->group(function () {
     Route::get('/my/profile', [\App\Http\Controllers\MyProfileController::class, 'profile'])->name('my.profile');
     Route::get('/my/contributions', [\App\Http\Controllers\MyProfileController::class, 'contributions'])->name('my.contributions');
@@ -53,10 +56,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/my/events', [\App\Http\Controllers\MyProfileController::class, 'events'])->name('my.events');
 });
 
-// Routes Admin - utilisent le layout admin.blade.php
+// Routes Admin
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
 
-    // Dashboard - redirige selon les rôles
+    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Profile
@@ -114,18 +117,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::get('/contributions', [ReportController::class, 'contributions'])->name('contributions');
     });
 
-        // Gestion des pages
+    // Gestion du contenu du site
     Route::resource('pages', \App\Http\Controllers\Admin\PageController::class);
-    
-    // Gestion du carousel
     Route::resource('carousels', \App\Http\Controllers\Admin\CarouselController::class);
-    
-    // Gestion des témoignages
     Route::resource('testimonials', \App\Http\Controllers\Admin\TestimonialController::class);
     
-    // Gestion des settings (optionnel)
-    Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
-    Route::post('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+    // Gestion des news (si vous voulez ajouter un CRUD pour les news)
+    Route::resource('news', \App\Http\Controllers\Admin\NewsController::class);
+    
+    // Settings
+    Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
+    Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 });
 
 require __DIR__.'/auth.php';

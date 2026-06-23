@@ -12,16 +12,13 @@ class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        // Si les tables Spatie ne sont pas créées (cas actuel), on skip pour que
-        // le reste des seeders puisse remplir la base.
         if (! $this->hasSpatieTables()) {
             return;
         }
 
-        // Réinitialiser les rôles et permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Créer les permissions
+        // Permissions existantes + nouvelles pour le contenu
         $permissions = [
             // Gestion des membres
             'view members',
@@ -52,6 +49,12 @@ class RolePermissionSeeder extends Seeder
             'upload documents',
             'delete documents',
 
+            // Gestion du contenu (NOUVEAU)
+            'manage pages',
+            'manage carousels',
+            'manage testimonials',
+            'manage news',
+
             // Administration
             'manage roles',
             'view logs',
@@ -64,6 +67,7 @@ class RolePermissionSeeder extends Seeder
 
         // Créer les rôles
         $superAdmin = Role::firstOrCreate(['name' => 'super-admin']);
+        $admin = Role::firstOrCreate(['name' => 'admin']);
         $president = Role::firstOrCreate(['name' => 'president']);
         $treasurer = Role::firstOrCreate(['name' => 'treasurer']);
         $secretary = Role::firstOrCreate(['name' => 'secretary']);
@@ -73,6 +77,16 @@ class RolePermissionSeeder extends Seeder
 
         // Assigner les permissions
         $superAdmin->syncPermissions(Permission::all());
+
+        $admin->syncPermissions([
+            'view members', 'create members', 'edit members', 'delete members', 'approve members',
+            'view finances', 'create transactions', 'approve transactions', 'export reports',
+            'view events', 'create events', 'edit events', 'delete events', 'manage participations',
+            'view committee', 'manage committee',
+            'view documents', 'upload documents', 'delete documents',
+            'manage pages', 'manage carousels', 'manage testimonials', 'manage news',
+            'manage settings'
+        ]);
 
         $president->syncPermissions([
             'view members', 'approve members',
@@ -94,7 +108,8 @@ class RolePermissionSeeder extends Seeder
             'view members', 'create members', 'edit members',
             'view events', 'create events', 'edit events', 'manage participations',
             'view committee',
-            'view documents', 'upload documents'
+            'view documents', 'upload documents',
+            'manage pages', 'manage carousels', 'manage testimonials', 'manage news'
         ]);
 
         $conductor->syncPermissions([
@@ -119,6 +134,13 @@ class RolePermissionSeeder extends Seeder
         );
         $admin->assignRole('super-admin');
 
+        // Créer un administrateur simple
+        $adminUser = User::firstOrCreate(
+            ['email' => 'admin@fanfare.com'],
+            ['name' => 'Administrateur', 'password' => bcrypt('Admin123!'), 'email_verified_at' => now()]
+        );
+        $adminUser->assignRole('admin');
+
         // Créer un président par défaut
         $presidentUser = User::firstOrCreate(
             ['email' => 'president@fanfareceleste.org'],
@@ -136,7 +158,6 @@ class RolePermissionSeeder extends Seeder
 
     private function hasSpatieTables(): bool
     {
-        // Au minimum on a besoin de permissions/roles si tu utilises les classes Spatie.
         try {
             return DB::selectOne("SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name IN ('permissions','roles') LIMIT 1") !== null;
         } catch (\Throwable $e) {
@@ -144,4 +165,3 @@ class RolePermissionSeeder extends Seeder
         }
     }
 }
-

@@ -8,6 +8,7 @@ use App\Models\Gallery;
 use App\Models\Testimonial;
 use App\Models\CommitteeMember;
 use App\Models\Member;
+use App\Models\Page; // Ajout du modèle Page
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -21,7 +22,6 @@ class HomeController extends Controller
     {
         $upcomingEvents = Event::upcoming()->take(3)->get();
 
-        // Pour afficher le nombre de participants sur la home pour chaque événement
         $membersTotal = Member::query()->count();
         $publicRegistrations = \App\Models\EventPublicRegistration::query()
             ->whereIn('event_id', $upcomingEvents->pluck('id'))
@@ -34,11 +34,13 @@ class HomeController extends Controller
             $event->totalParticipants = $membersTotal + $event->publicRegistrationsCount;
             return $event;
         });
+        
         $latestNews = News::where('status', 'published')
             ->where('published_at', '<=', now())
             ->latest('published_at')
             ->take(3)
             ->get();
+            
         $recentGalleries = Gallery::latest()->take(6)->get();
         $testimonials = Testimonial::where('is_approved', true)->latest()->take(3)->get();
         $committee = CommitteeMember::with('member')
@@ -50,18 +52,23 @@ class HomeController extends Controller
         $eventCount = Event::where('status', 'completed')->count();
         $achievements = 15;
         
+        // Récupérer les pages personnalisées pour la home si elles existent
+        $homePage = Page::where('slug', 'accueil')->where('is_published', true)->first();
+        
         return view('home', compact(
             'upcomingEvents', 'latestNews', 'recentGalleries',
-            'testimonials', 'committee', 'memberCount', 'eventCount', 'achievements'
+            'testimonials', 'committee', 'memberCount', 'eventCount', 'achievements',
+            'homePage'
         ));
     }
 
     /**
-     * Page historique
+     * Page historique - Utilise le contenu dynamique ou la vue statique
      */
     public function history()
     {
-        return view('about.history');
+        $page = Page::where('slug', 'histoire')->where('is_published', true)->first();
+        return view('about.history', compact('page'));
     }
 
     /**
@@ -69,7 +76,8 @@ class HomeController extends Controller
      */
     public function mission()
     {
-        return view('about.mission');
+        $page = Page::where('slug', 'mission')->where('is_published', true)->first();
+        return view('about.mission', compact('page'));
     }
 
     /**
@@ -77,7 +85,8 @@ class HomeController extends Controller
      */
     public function vision()
     {
-        return view('about.vision');
+        $page = Page::where('slug', 'vision')->where('is_published', true)->first();
+        return view('about.vision', compact('page'));
     }
 
     /**
@@ -105,7 +114,9 @@ class HomeController extends Controller
             'section_leader_percussion' => 'Responsable Percussions',
         ];
         
-        return view('about.committee', compact('committeeMembers', 'positions'));
+        $page = Page::where('slug', 'bureau-executif')->where('is_published', true)->first();
+        
+        return view('about.committee', compact('committeeMembers', 'positions', 'page'));
     }
 
     /**
@@ -148,7 +159,9 @@ class HomeController extends Controller
             ]
         ];
         
-        return view('about.sections', compact('sections'));
+        $page = Page::where('slug', 'sections')->where('is_published', true)->first();
+        
+        return view('about.sections', compact('sections', 'page'));
     }
 
     /**
@@ -156,7 +169,8 @@ class HomeController extends Controller
      */
     public function contact()
     {
-        return view('contact');
+        $page = Page::where('slug', 'contact')->where('is_published', true)->first();
+        return view('contact', compact('page'));
     }
 
     /**
@@ -173,17 +187,16 @@ class HomeController extends Controller
         ]);
 
         try {
-            // Envoi d'email (à configurer)
             Mail::send('emails.contact', $validated, function ($mail) use ($validated) {
                 $mail->to('contact@fanfare-celeste.com')
                     ->subject($validated['subject'])
                     ->replyTo($validated['email'], $validated['name']);
             });
 
-            return redirect()->route('contact')->with('success', 'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.');
+            return redirect()->route('contact')->with('success', 'Votre message a été envoyé avec succès.');
         } catch (\Exception $e) {
             Log::error('Erreur envoi email: ' . $e->getMessage());
-            return redirect()->route('contact')->with('error', 'Une erreur est survenue. Veuillez réessayer plus tard.');
+            return redirect()->route('contact')->with('error', 'Une erreur est survenue.');
         }
     }
 
@@ -196,7 +209,18 @@ class HomeController extends Controller
             'email' => 'required|email'
         ]);
 
-        // À implémenter avec un service de newsletter
         return redirect()->route('home')->with('success', 'Inscription à la newsletter réussie !');
+    }
+    
+    /**
+     * Affichage d'une page dynamique par slug
+     */
+    public function showPage($slug)
+    {
+        $page = Page::where('slug', $slug)
+            ->where('is_published', true)
+            ->firstOrFail();
+        
+        return view('pages.show', compact('page'));
     }
 }
