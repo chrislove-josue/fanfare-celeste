@@ -183,6 +183,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::resource('partners', PartnerController::class);
     Route::post('/partners/{partner}/toggle-active', [PartnerController::class, 'toggleActive'])->name('partners.toggle-active');
 
+    // Admin - Gestion des messages de contact
+    Route::resource('contact-messages', \App\Http\Controllers\Admin\ContactMessageController::class);
+
     // ===== PARAMÈTRES =====
     Route::get('/settings', [SettingController::class, 'index'])->name('settings');
     Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');

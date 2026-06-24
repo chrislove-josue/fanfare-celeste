@@ -29,6 +29,7 @@ class RolePermissionSeeder extends Seeder
             'edit members',
             'delete members',
             'approve members',
+            'manage members',
 
             // Gestion financière
             'view finances',
@@ -97,7 +98,7 @@ class RolePermissionSeeder extends Seeder
 
         // --- ADMIN (Accès complet) ---
         $admin->syncPermissions([
-            'view members', 'create members', 'edit members', 'delete members', 'approve members',
+            'view members', 'create members', 'edit members', 'delete members', 'approve members','manage members',
             'view finances', 'create transactions', 'approve transactions', 'export reports',
             'view events', 'create events', 'edit events', 'delete events', 'manage participations',
             'view committee', 'manage committee',
@@ -110,7 +111,7 @@ class RolePermissionSeeder extends Seeder
 
         // --- PRÉSIDENT (Accès large) ---
         $president->syncPermissions([
-            'view members', 'approve members',
+            'view members', 'approve members','manage members',
             'view finances', 'approve transactions',
             'view events', 'create events', 'edit events',
             'view committee', 'manage committee',
@@ -121,7 +122,7 @@ class RolePermissionSeeder extends Seeder
 
         // --- SECRÉTAIRE (Gestion du contenu et des membres) ---
         $secretary->syncPermissions([
-            'view members', 'create members', 'edit members',
+            'view members', 'create members', 'edit members','manage members',
             'view events', 'create events', 'edit events', 'manage participations',
             'view committee',
             'view documents', 'upload documents', 'approve documents',

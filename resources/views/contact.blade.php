@@ -5,12 +5,13 @@
 @section('content')
 <div class="container py-5">
     <div class="row g-4">
-        <!-- Formulaire de contact -->
-        <div class="col-lg-6">
-            <div class="contact-form">
-                <h1 class="display-5 fw-bold mb-3">Contactez-nous</h1>
-                <p class="lead mb-4">Nous sommes à votre disposition pour toute information ou demande.</p>
+        <!-- Section principale avec bouton WhatsApp -->
+        <div class="col-lg-6 mx-auto">
+            <div class="text-center">
+                <h1 class="display-4 fw-bold mb-4">Contactez-nous</h1>
+                <p class="lead mb-5">Nous sommes à votre disposition pour toute information ou demande.</p>
                 
+                <!-- Message de succès si nécessaire -->
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         <i class="fas fa-check-circle me-2"></i>
@@ -19,140 +20,105 @@
                     </div>
                 @endif
                 
-                @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <!-- Carte WhatsApp -->
+                <div class="card shadow-lg border-0 mb-5" style="background: linear-gradient(135deg, #25D366, #128C7E); color: white; border-radius: 20px; overflow: hidden;">
+                    <div class="card-body p-5">
+                        <div class="mb-4">
+                            <i class="fab fa-whatsapp" style="font-size: 5rem;"></i>
+                        </div>
+                        <h2 class="fw-bold mb-3">Discutons sur WhatsApp</h2>
+                        <p class="mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                            Cliquez sur le bouton ci-dessous pour nous contacter directement via WhatsApp.<br>
+                            Nous vous répondrons dans les plus brefs délais.
+                        </p>
+                        <a href="https://wa.me/22998123353" target="_blank" class="btn btn-light btn-lg px-5 py-3" style="border-radius: 50px; font-weight: 600;">
+                            <i class="fab fa-whatsapp me-2" style="color: #25D366; font-size: 1.3rem;"></i>
+                            Nous contacter sur WhatsApp
+                        </a>
+                        <div class="mt-4">
+                            <small style="opacity: 0.7;">
+                                <i class="fas fa-clock me-1"></i> Réponse rapide garantie
+                            </small>
+                        </div>
                     </div>
-                @endif
+                </div>
                 
-                <form action="{{ route('contact.send') }}" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Nom complet <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" 
-                               value="{{ old('name') }}" placeholder="Votre nom complet" required>
-                        @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
-                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" 
-                               value="{{ old('email') }}" placeholder="votre@email.com" required>
-                        @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Téléphone</label>
-                        <input type="tel" name="phone" class="form-control @error('phone') is-invalid @enderror" 
-                               value="{{ old('phone') }}" placeholder="+229 97 00 00 00">
-                        @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Sujet <span class="text-danger">*</span></label>
-                        <input type="text" name="subject" class="form-control @error('subject') is-invalid @enderror" 
-                               value="{{ old('subject') }}" placeholder="Sujet de votre message" required>
-                        @error('subject') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Message <span class="text-danger">*</span></label>
-                        <textarea name="message" rows="5" class="form-control @error('message') is-invalid @enderror" 
-                                  placeholder="Écrivez votre message ici..." required>{{ old('message') }}</textarea>
-                        @error('message') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary btn-lg w-100">
-                        <i class="fas fa-paper-plane me-2"></i> Envoyer le message
-                    </button>
-                </form>
-            </div>
-        </div>
-        
-        <!-- Informations de contact -->
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <h4 class="fw-bold mb-3">
-                        <i class="fas fa-info-circle text-primary me-2"></i>
-                        Nos coordonnées
-                    </h4>
-                    <hr>
-                    <div class="d-flex align-items-start mb-3">
-                        <i class="fas fa-map-marker-alt text-primary me-3 mt-1" style="font-size: 1.2rem;"></i>
-                        <div>
-                            <strong>Adresse</strong>
-                            <p class="mb-0 text-muted">Cotonou, Bénin</p>
+                <!-- Informations supplémentaires -->
+                <div class="row g-3 mt-4">
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-phone text-primary" style="font-size: 2rem;"></i>
+                                <h6 class="fw-bold mt-2">Téléphone</h6>
+                                <p class="text-muted mb-0">+229 97 00 00 00</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="d-flex align-items-start mb-3">
-                        <i class="fas fa-phone text-primary me-3 mt-1" style="font-size: 1.2rem;"></i>
-                        <div>
-                            <strong>Téléphone</strong>
-                            <p class="mb-0 text-muted">+229 97 00 00 00</p>
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-envelope text-primary" style="font-size: 2rem;"></i>
+                                <h6 class="fw-bold mt-2">Email</h6>
+                                <p class="text-muted mb-0">contact@fanfareceleste.org</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="d-flex align-items-start mb-3">
-                        <i class="fab fa-whatsapp text-success me-3 mt-1" style="font-size: 1.2rem;"></i>
-                        <div>
-                            <strong>WhatsApp</strong>
-                            <p class="mb-0 text-muted">+229 97 00 00 00</p>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-start">
-                        <i class="fas fa-envelope text-primary me-3 mt-1" style="font-size: 1.2rem;"></i>
-                        <div>
-                            <strong>Email</strong>
-                            <p class="mb-0 text-muted">contact@fanfareceleste.org</p>
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-map-marker-alt text-primary" style="font-size: 2rem;"></i>
+                                <h6 class="fw-bold mt-2">Adresse</h6>
+                                <p class="text-muted mb-0">Cotonou, Bénin</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <h4 class="fw-bold mb-3">
-                        <i class="fas fa-clock text-primary me-2"></i>
-                        Nos horaires
-                    </h4>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted">🎵 Répétitions</span>
-                        <span class="fw-semibold">Mercredi & Samedi 16h-19h</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted">🏢 Bureau</span>
-                        <span class="fw-semibold">Lun - Ven 9h-17h</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span class="text-muted">📋 Permanence</span>
-                        <span class="fw-semibold">Samedi 10h-13h</span>
+                
+                <!-- Horaires -->
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-clock text-primary me-2"></i>
+                            Nos horaires
+                        </h5>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <small class="text-muted">Répétitions</small>
+                                <p class="fw-semibold mb-0">Mer & Sam<br>16h-19h</p>
+                            </div>
+                            <div class="col-sm-4">
+                                <small class="text-muted">Bureau</small>
+                                <p class="fw-semibold mb-0">Lun - Ven<br>9h-17h</p>
+                            </div>
+                            <div class="col-sm-4">
+                                <small class="text-muted">Permanence</small>
+                                <p class="fw-semibold mb-0">Samedi<br>10h-13h</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h4 class="fw-bold mb-3">
-                        <i class="fas fa-share-alt text-primary me-2"></i>
-                        Suivez-nous
-                    </h4>
-                    <hr>
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="#" class="btn btn-outline-primary">
-                            <i class="fab fa-facebook-f me-2"></i> Facebook
-                        </a>
-                        <a href="#" class="btn btn-outline-danger">
-                            <i class="fab fa-instagram me-2"></i> Instagram
-                        </a>
-                        <a href="#" class="btn btn-outline-danger">
-                            <i class="fab fa-youtube me-2"></i> YouTube
-                        </a>
-                        <a href="#" class="btn btn-outline-success">
-                            <i class="fab fa-whatsapp me-2"></i> WhatsApp
-                        </a>
+                
+                <!-- Réseaux sociaux -->
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-share-alt text-primary me-2"></i>
+                            Suivez-nous
+                        </h5>
+                        <div class="d-flex justify-content-center gap-3 flex-wrap">
+                            <a href="#" class="btn btn-outline-primary">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="btn btn-outline-danger">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="btn btn-outline-danger">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                            <a href="https://wa.me/22998123353" target="_blank" class="btn btn-outline-success">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -178,20 +144,6 @@
 
 @push('styles')
 <style>
-    .contact-form .form-control {
-        border-radius: 8px;
-        padding: 12px 15px;
-        border: 1px solid #e0e0e0;
-        transition: all 0.3s ease;
-    }
-    .contact-form .form-control:focus {
-        border-color: #3946B2;
-        box-shadow: 0 0 0 0.2rem rgba(57, 70, 178, 0.15);
-    }
-    .contact-form .form-label {
-        font-weight: 600;
-        color: #333;
-    }
     .card {
         border-radius: 12px;
         transition: all 0.3s ease;
@@ -205,6 +157,10 @@
     .btn-outline-success:hover {
         transform: translateY(-2px);
     }
+    .btn-light:hover {
+        transform: scale(1.02);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
 </style>
 @endpush
 
@@ -214,9 +170,7 @@
 @endif
 <script>
     function initMap() {
-        // Coordonnées de la Fanfare Céleste à Cotonou
         const location = { lat: 6.3702928, lng: 2.3912362 };
-        
         const map = new google.maps.Map(document.getElementById("map"), {
             zoom: 15,
             center: location,
@@ -229,7 +183,6 @@
                 }
             ]
         });
-        
         const marker = new google.maps.Marker({
             position: location,
             map: map,
@@ -240,8 +193,6 @@
                 scaledSize: new google.maps.Size(40, 40)
             }
         });
-        
-        // Info window
         const infoWindow = new google.maps.InfoWindow({
             content: `
                 <div style="padding: 10px; text-align: center;">
@@ -255,15 +206,13 @@
                 </div>
             `
         });
-        
         marker.addListener('click', function() {
             infoWindow.open(map, marker);
         });
-        
-        // Ouvrir automatiquement l'info window
         setTimeout(function() {
             infoWindow.open(map, marker);
         }, 1000);
     }
 </script>
 @endpush
+@endsection
