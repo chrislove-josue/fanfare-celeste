@@ -1,3 +1,4 @@
+
 @extends('layouts.app')
 
 @section('title', 'Accueil - Fanfare Céleste')
@@ -467,11 +468,11 @@
 </section>
 
 <!-- Appel à l'action -->
-<section class="cta-section py-5" style="background: linear-gradient(135deg, #1a237e, #283593); color: white;">
+<section class="cta-section py-5 my-10" style="background: linear-gradient(135deg, #1a237e, #283593); color: white;">
     <div class="container text-center">
-        <h2 class="fw-bold mb-3" data-aos="fade-up">Rejoignez la Fanfare Céleste</h2>
-        <p class="lead mb-4" data-aos="fade-up">Vous êtes musicien ou vous souhaitez apprendre ? Rejoignez notre grande famille !</p>
-        <div class="d-flex flex-wrap justify-content-center gap-3" data-aos="fade-up">
+        <h2 class="fw-bold mb-3">Rejoignez la Fanfare Céleste</h2>
+        <p class="lead mb-4">Vous êtes musicien ou vous souhaitez apprendre ? Rejoignez notre grande famille !</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
             <a href="{{ route('membership.apply') }}" class="btn btn-light btn-lg px-5">
                 <i class="fas fa-hand-peace me-2"></i> Adhérer maintenant
             </a>
@@ -485,9 +486,9 @@
 <!-- Newsletter -->
 <section class="newsletter-section py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
     <div class="container text-center">
-        <h3 class="fw-bold" data-aos="fade-up">Restez informé</h3>
-        <p class="mb-4" data-aos="fade-up">Abonnez-vous à notre newsletter pour recevoir nos actualités et événements</p>
-        <form action="{{ route('newsletter.subscribe') }}" method="POST" class="row justify-content-center" data-aos="fade-up">
+        <h3 class="fw-bold">Restez informé</h3>
+        <p class="mb-4">Abonnez-vous à notre newsletter pour recevoir nos actualités et événements</p>
+        <form action="{{ route('newsletter.subscribe') }}" method="POST" class="row justify-content-center">
             @csrf
             <div class="col-md-6 col-lg-5">
                 <div class="input-group">
