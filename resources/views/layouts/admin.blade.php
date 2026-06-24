@@ -591,9 +591,10 @@
         <!-- Brand - Fixe en haut -->
         <div class="sidebar-brand">
             <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center gap-3">
-                <div class="logo-icon">
-                    <i class="fas fa-music"></i>
-                </div>
+                
+                <img src="{{ asset('storage/logo/logo-blanc.jpeg') }}" 
+         alt="Fanfare Céleste" 
+         style="height: 60px; width: auto;">
                 <div>
                     <div class="brand-text">Fanfare Céleste</div>
                     <div class="brand-sub">Administration</div>

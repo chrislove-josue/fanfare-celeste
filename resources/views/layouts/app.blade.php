@@ -112,9 +112,12 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <i class="fas fa-music"></i> Fanfare Céleste
-            </a>
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('home') }}">
+    <img src="{{ asset('storage/logo/logo-blanc.jpeg') }}" 
+         alt="Fanfare Céleste" 
+         style="height: 80px; width: auto;">
+    <span>FCTDA</span>
+</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>

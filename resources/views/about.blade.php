@@ -184,7 +184,7 @@
                     </h5>
                     <div class="row g-4 justify-content-center">
                         @foreach($categoryPartners as $partner)
-                        <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}" data-aos-mobile="false">
+                        <div class="col-6 col-md-4 col-lg-3" data-aos-delay="{{ $loop->index * 50 }}" data-aos-mobile="false">
                             <div class="card h-100 shadow-sm text-center border-0 hover-card">
                                 <div class="card-body p-3">
                                     @if($partner->logo_url)
