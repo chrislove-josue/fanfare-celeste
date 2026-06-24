@@ -62,6 +62,9 @@ class RolePermissionSeeder extends Seeder
             // Gestion de la galerie
             'manage gallery',
 
+            // Gestion des partenaires (NOUVEAU)
+            'manage partners',
+
             // Administration système
             'manage roles',
             'view logs',
@@ -101,6 +104,7 @@ class RolePermissionSeeder extends Seeder
             'view documents', 'upload documents', 'delete documents', 'approve documents',
             'manage pages', 'manage carousels', 'manage testimonials', 'manage news',
             'manage gallery',
+            'manage partners', // NOUVEAU
             'manage settings', 'view logs',
         ]);
 
@@ -123,6 +127,7 @@ class RolePermissionSeeder extends Seeder
             'view documents', 'upload documents', 'approve documents',
             'manage pages', 'manage carousels', 'manage testimonials', 'manage news',
             'manage gallery',
+            'manage partners', // NOUVEAU
             'manage settings',
         ]);
 
@@ -154,7 +159,7 @@ class RolePermissionSeeder extends Seeder
         ]);
 
         // ============================================
-        // CRÉATION DES UTILISATEURS ADMIN (Sans liaison membre)
+        // CRÉATION DES UTILISATEURS ADMIN
         // ============================================
 
         // 1. Super Administrateur
@@ -185,7 +190,7 @@ class RolePermissionSeeder extends Seeder
             $adminUser->assignRole('admin');
         }
 
-        // 3. Président - Sans liaison membre (sera lié plus tard)
+        // 3. Président
         $presidentUser = User::firstOrCreate(
             ['email' => 'president@fanfareceleste.org'],
             [
@@ -199,7 +204,7 @@ class RolePermissionSeeder extends Seeder
             $presidentUser->assignRole('president');
         }
 
-        // 4. Secrétaire - Sans liaison membre
+        // 4. Secrétaire
         $secretaryUser = User::firstOrCreate(
             ['email' => 'secretaire@fanfareceleste.org'],
             [
@@ -213,7 +218,7 @@ class RolePermissionSeeder extends Seeder
             $secretaryUser->assignRole('secretary');
         }
 
-        // 5. Trésorier - Sans liaison membre
+        // 5. Trésorier
         $treasurerUser = User::firstOrCreate(
             ['email' => 'tresorier@fanfareceleste.org'],
             [
@@ -227,7 +232,7 @@ class RolePermissionSeeder extends Seeder
             $treasurerUser->assignRole('treasurer');
         }
 
-        // 6. Chef de fanfare - Sans liaison membre
+        // 6. Chef de fanfare
         $conductorUser = User::firstOrCreate(
             ['email' => 'chef@fanfareceleste.org'],
             [

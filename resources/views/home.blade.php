@@ -32,7 +32,6 @@
             </div>
         </div>
     </div>
-    <!-- Décorations -->
     <div style="position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
     <div style="position: absolute; bottom: -150px; left: -150px; width: 500px; height: 500px; background: rgba(255,255,255,0.02); border-radius: 50%;"></div>
 </section>
@@ -129,7 +128,7 @@
     </div>
 </section>
 
-<!-- Événements à venir (6 événements) -->
+<!-- Événements à venir -->
 <section class="events-section py-5">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-5" data-aos="fade-up">
@@ -191,7 +190,6 @@
             @endforeach
         </div>
 
-        <!-- Bouton Voir tous les événements (mobile) -->
         <div class="text-center mt-4 d-md-none">
             <a href="{{ route('public.events.index') }}" class="btn btn-primary btn-lg">
                 <i class="fas fa-calendar-alt me-2"></i> Voir tous les événements
@@ -291,23 +289,29 @@
         <div class="row g-3">
             @foreach($recentGalleries as $gallery)
             <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
-                <div class="gallery-item position-relative overflow-hidden rounded shadow-sm">
-                    @if($gallery->type == 'photo')
-                        <img src="{{ Storage::url($gallery->file_path) }}" 
-                             alt="{{ $gallery->title }}" 
-                             style="height: 200px; width: 100%; object-fit: cover; transition: transform 0.3s ease;">
-                    @else
-                        <video src="{{ Storage::url($gallery->file_path) }}" 
-                               style="height: 200px; width: 100%; object-fit: cover;"
-                               muted></video>
-                    @endif
-                    <div class="overlay position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-2" style="transform: translateY(100%); transition: transform 0.3s ease;">
-                        <small class="d-block">
-                            <i class="fas fa-{{ $gallery->type == 'photo' ? 'image' : 'video' }} me-1"></i>
-                            {{ $gallery->title }}
-                        </small>
+                <a href="{{ route('public.gallery.show', $gallery) }}" class="text-decoration-none">
+                    <div class="gallery-item position-relative overflow-hidden rounded shadow-sm">
+                        @if($gallery->cover_image_url)
+                            <img src="{{ $gallery->cover_image_url }}" 
+                                 alt="{{ $gallery->title }}" 
+                                 style="height: 200px; width: 100%; object-fit: cover; transition: transform 0.3s ease;">
+                        @else
+                            <div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-images fa-3x text-white opacity-50"></i>
+                            </div>
+                        @endif
+                        <div class="overlay position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-2">
+                            <small class="d-block text-truncate">
+                                <i class="fas fa-images me-1"></i>
+                                {{ Str::limit($gallery->title, 30) }}
+                            </small>
+                            <small class="d-block">
+                                <i class="fas fa-photo-video me-1"></i>
+                                {{ $gallery->media_count ?? 0 }} médias
+                            </small>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             @endforeach
         </div>
@@ -316,6 +320,33 @@
             <a href="{{ route('public.gallery.index') }}" class="btn btn-primary">
                 <i class="fas fa-images me-2"></i> Voir toute la galerie
             </a>
+        </div>
+        @elseif(isset($recentMedia) && $recentMedia->count() > 0)
+        <div class="row g-3">
+            @foreach($recentMedia as $media)
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
+                <div class="gallery-item position-relative overflow-hidden rounded shadow-sm">
+                    @if($media->type == 'photo')
+                        <img src="{{ $media->file_url }}" 
+                             alt="{{ $media->title }}" 
+                             style="height: 200px; width: 100%; object-fit: cover; transition: transform 0.3s ease;">
+                    @else
+                        <video src="{{ $media->file_url }}" 
+                               style="height: 200px; width: 100%; object-fit: cover;"
+                               muted></video>
+                        <div class="position-absolute top-50 start-50 translate-middle">
+                            <i class="fas fa-play-circle fa-2x text-white opacity-75"></i>
+                        </div>
+                    @endif
+                    <div class="overlay position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-2">
+                        <small class="d-block">
+                            <i class="fas fa-{{ $media->type == 'photo' ? 'image' : 'video' }} me-1"></i>
+                            {{ Str::limit($media->title, 30) }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            @endforeach
         </div>
         @else
         <div class="text-center py-5">
@@ -363,10 +394,75 @@
             </div>
         </div>
         <div class="text-center mt-4">
-            <a href="{{ route('about.sections') }}" class="btn btn-primary">
+            <a href="{{ route('about') }}" class="btn btn-primary">
                 <i class="fas fa-info-circle me-2"></i> En savoir plus sur nos sections
             </a>
         </div>
+    </div>
+</section>
+
+<!-- Partenaires - Slide Infini -->
+<section class="partners-section py-5" style="background: #f8f9fa; overflow: hidden;">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-2" data-aos="fade-up">Nos Partenaires</h2>
+        <p class="text-center text-muted mb-5" data-aos="fade-up">Ils nous accompagnent dans notre mission</p>
+        
+        @if(isset($partners) && $partners->count() > 0)
+        <div class="partner-slider-wrapper" style="position: relative; overflow: hidden;">
+            <div class="partner-slider" style="display: flex; animation: slidePartners 20s linear infinite; width: max-content;">
+                <!-- Première série -->
+                @foreach($partners as $partner)
+                <div class="partner-item text-center" style="min-width: 150px; padding: 0 15px;">
+                    <div class="p-3 bg-white rounded shadow-sm hover-shadow transition" style="height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        @if($partner->logo_url)
+                            <img src="{{ $partner->logo_url }}" 
+                                 alt="{{ $partner->name }}" 
+                                 class="img-fluid" 
+                                 style="max-height: 50px; object-fit: contain; filter: grayscale(0); transition: filter 0.3s ease;">
+                        @else
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 50px;">
+                                <i class="fas fa-building fa-2x text-muted"></i>
+                            </div>
+                        @endif
+                        <small class="d-block mt-1 text-muted" style="font-size: 0.7rem;">{{ Str::limit($partner->name, 20) }}</small>
+                    </div>
+                </div>
+                @endforeach
+                <!-- Deuxième série pour l'effet infini -->
+                @foreach($partners as $partner)
+                <div class="partner-item text-center" style="min-width: 150px; padding: 0 15px;">
+                    <div class="p-3 bg-white rounded shadow-sm hover-shadow transition" style="height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        @if($partner->logo_url)
+                            <img src="{{ $partner->logo_url }}" 
+                                 alt="{{ $partner->name }}" 
+                                 class="img-fluid" 
+                                 style="max-height: 50px; object-fit: contain; filter: grayscale(0); transition: filter 0.3s ease;">
+                        @else
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 50px;">
+                                <i class="fas fa-building fa-2x text-muted"></i>
+                            </div>
+                        @endif
+                        <small class="d-block mt-1 text-muted" style="font-size: 0.7rem;">{{ Str::limit($partner->name, 20) }}</small>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            
+            <!-- Gradient overlay pour l'effet de fondu -->
+            <div style="position: absolute; top: 0; left: 0; width: 80px; height: 100%; background: linear-gradient(to right, #f8f9fa, transparent); pointer-events: none; z-index: 2;"></div>
+            <div style="position: absolute; top: 0; right: 0; width: 80px; height: 100%; background: linear-gradient(to left, #f8f9fa, transparent); pointer-events: none; z-index: 2;"></div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{{ route('about') }}#partenaires" class="btn btn-primary">
+                <i class="fas fa-handshake me-2"></i> Voir tous nos partenaires
+            </a>
+        </div>
+        @else
+        <div class="text-center py-4">
+            <p class="text-muted">Nos partenaires seront bientôt disponibles.</p>
+        </div>
+        @endif
     </div>
 </section>
 
@@ -406,6 +502,74 @@
     </div>
 </section>
 
+@push('styles')
+<style>
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+    .transition {
+        transition: all 0.3s ease;
+    }
+    .gallery-item .overlay {
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+    }
+    .gallery-item:hover .overlay {
+        transform: translateY(0);
+    }
+    .gallery-item img,
+    .gallery-item video {
+        transition: transform 0.3s ease;
+    }
+
+    /* Animation slide infini des partenaires */
+    @keyframes slidePartners {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    .partner-slider {
+        display: flex;
+        animation: slidePartners 25s linear infinite;
+        width: max-content;
+    }
+
+    .partner-slider:hover {
+        animation-play-state: paused;
+    }
+
+    .partner-item {
+        flex-shrink: 0;
+    }
+
+    .partner-item img {
+        transition: all 0.3s ease;
+    }
+
+    .partner-item:hover img {
+        transform: scale(1.05);
+        filter: brightness(0.9);
+    }
+
+    .partner-item .hover-shadow {
+        transition: all 0.3s ease;
+    }
+
+    .partner-item .hover-shadow:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    }
+</style>
+@endpush
+
 @push('scripts')
 <script>
     // Animation des compteurs
@@ -437,33 +601,41 @@
     // Hover effect sur la galerie
     document.querySelectorAll('.gallery-item').forEach(item => {
         item.addEventListener('mouseenter', function() {
-            this.querySelector('.overlay').style.transform = 'translateY(0)';
+            const overlay = this.querySelector('.overlay');
+            if (overlay) {
+                overlay.style.transform = 'translateY(0)';
+            }
             const img = this.querySelector('img, video');
             if (img) {
                 img.style.transform = 'scale(1.05)';
             }
         });
         item.addEventListener('mouseleave', function() {
-            this.querySelector('.overlay').style.transform = 'translateY(100%)';
+            const overlay = this.querySelector('.overlay');
+            if (overlay) {
+                overlay.style.transform = 'translateY(100%)';
+            }
             const img = this.querySelector('img, video');
             if (img) {
                 img.style.transform = 'scale(1)';
             }
         });
     });
-</script>
 
-<style>
-    .hover-shadow {
-        transition: all 0.3s ease;
-    }
-    .hover-shadow:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
-    }
-    .transition {
-        transition: all 0.3s ease;
-    }
-</style>
+    // Pause du slide des partenaires au survol
+    document.querySelector('.partner-slider-wrapper')?.addEventListener('mouseenter', function() {
+        const slider = this.querySelector('.partner-slider');
+        if (slider) {
+            slider.style.animationPlayState = 'paused';
+        }
+    });
+
+    document.querySelector('.partner-slider-wrapper')?.addEventListener('mouseleave', function() {
+        const slider = this.querySelector('.partner-slider');
+        if (slider) {
+            slider.style.animationPlayState = 'running';
+        }
+    });
+</script>
 @endpush
 @endsection

@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\News;
 use App\Models\Gallery;
+use App\Models\GalleryMedia;
 use App\Models\Testimonial;
 use App\Models\CommitteeMember;
 use App\Models\Member;
-use App\Models\Page; // Ajout du modèle Page
+use App\Models\Page;
+use App\Models\Partner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -41,7 +43,16 @@ class HomeController extends Controller
             ->take(3)
             ->get();
             
-        $recentGalleries = Gallery::latest()->take(6)->get();
+        $recentGalleries = Gallery::with(['media' => function($query) {
+            $query->where('is_published', true)->orderBy('order');
+        }])->where('is_published', true)->latest()->take(8)->get();
+        
+        $recentMedia = GalleryMedia::where('is_published', true)
+            ->with('gallery')
+            ->latest()
+            ->take(8)
+            ->get();
+        
         $testimonials = Testimonial::where('is_approved', true)->latest()->take(3)->get();
         $committee = CommitteeMember::with('member')
             ->where('is_current', true)
@@ -52,48 +63,42 @@ class HomeController extends Controller
         $eventCount = Event::where('status', 'completed')->count();
         $achievements = 15;
         
+        // Récupérer les partenaires actifs
+        $partners = Partner::active()->ordered()->get();
+        $partnerCategories = Partner::getCategories();
+        
         // Récupérer les pages personnalisées pour la home si elles existent
         $homePage = Page::where('slug', 'accueil')->where('is_published', true)->first();
         
         return view('home', compact(
-            'upcomingEvents', 'latestNews', 'recentGalleries',
-            'testimonials', 'committee', 'memberCount', 'eventCount', 'achievements',
-            'homePage'
+            'upcomingEvents', 
+            'latestNews', 
+            'recentGalleries',
+            'recentMedia',
+            'testimonials', 
+            'committee', 
+            'memberCount', 
+            'eventCount', 
+            'achievements',
+            'homePage',
+            'partners',
+            'partnerCategories'
         ));
     }
 
     /**
-     * Page historique - Utilise le contenu dynamique ou la vue statique
+     * Page À propos - regroupe toutes les sous-pages
      */
-    public function history()
+    public function about()
     {
-        $page = Page::where('slug', 'histoire')->where('is_published', true)->first();
-        return view('about.history', compact('page'));
-    }
-
-    /**
-     * Page mission
-     */
-    public function mission()
-    {
-        $page = Page::where('slug', 'mission')->where('is_published', true)->first();
-        return view('about.mission', compact('page'));
-    }
-
-    /**
-     * Page vision
-     */
-    public function vision()
-    {
-        $page = Page::where('slug', 'vision')->where('is_published', true)->first();
-        return view('about.vision', compact('page'));
-    }
-
-    /**
-     * Page bureau exécutif
-     */
-    public function committee()
-    {
+        // Historique
+        $historyPage = Page::where('slug', 'histoire')->where('is_published', true)->first();
+        
+        // Mission & Vision
+        $missionPage = Page::where('slug', 'mission')->where('is_published', true)->first();
+        $visionPage = Page::where('slug', 'vision')->where('is_published', true)->first();
+        
+        // Bureau exécutif
         $committeeMembers = CommitteeMember::with('member')
             ->where('is_current', true)
             ->orderBy('position_order')
@@ -114,16 +119,7 @@ class HomeController extends Controller
             'section_leader_percussion' => 'Responsable Percussions',
         ];
         
-        $page = Page::where('slug', 'bureau-executif')->where('is_published', true)->first();
-        
-        return view('about.committee', compact('committeeMembers', 'positions', 'page'));
-    }
-
-    /**
-     * Page sections
-     */
-    public function sections()
-    {
+        // Sections
         $sections = [
             'trumpet' => [
                 'name' => 'Trompettes',
@@ -159,18 +155,64 @@ class HomeController extends Controller
             ]
         ];
         
-        $page = Page::where('slug', 'sections')->where('is_published', true)->first();
+        // Partenaires
+        $partners = Partner::active()->ordered()->get();
+        $partnerCategories = Partner::getCategories();
         
-        return view('about.sections', compact('sections', 'page'));
+        // Page principale "À propos"
+        $aboutPage = Page::where('slug', 'a-propos')->where('is_published', true)->first();
+        
+        return view('about', compact(
+            'historyPage',
+            'missionPage',
+            'visionPage',
+            'committeeMembers',
+            'positions',
+            'sections',
+            'partners',
+            'partnerCategories',
+            'aboutPage'
+        ));
     }
 
     /**
-     * Page contact
+     * Page historique - Redirige vers about
      */
-    public function contact()
+    public function history()
     {
-        $page = Page::where('slug', 'contact')->where('is_published', true)->first();
-        return view('contact', compact('page'));
+        return redirect()->route('about');
+    }
+
+    /**
+     * Page mission - Redirige vers about
+     */
+    public function mission()
+    {
+        return redirect()->route('about');
+    }
+
+    /**
+     * Page vision - Redirige vers about
+     */
+    public function vision()
+    {
+        return redirect()->route('about');
+    }
+
+    /**
+     * Page bureau exécutif - Redirige vers about
+     */
+    public function committee()
+    {
+        return redirect()->route('about');
+    }
+
+    /**
+     * Page sections - Redirige vers about
+     */
+    public function sections()
+    {
+        return redirect()->route('about');
     }
 
     /**

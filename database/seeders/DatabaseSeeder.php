@@ -27,6 +27,8 @@ class DatabaseSeeder extends Seeder
             
             // 6. Remplir la galerie
             GallerySeeder::class,
+            
+            PartnerSeeder::class,
         ]);
     }
 }

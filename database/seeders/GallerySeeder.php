@@ -22,7 +22,7 @@ class GallerySeeder extends Seeder
         $this->command->info('🎨 Création des galeries et médias...');
         $this->command->info('========================================');
 
-        // Catégories avec leurs icônes
+        // Catégories
         $categories = [
             'concerts' => '🎵 Concerts',
             'rehearsals' => '🎶 Répétitions',
@@ -36,11 +36,27 @@ class GallerySeeder extends Seeder
         $galleryCount = 0;
         $mediaCount = 0;
 
-        // ============================================
-        // 1. CRÉATION DES GALERIES (ALBUMS)
-        // ============================================
+        // Tableau d'images réelles (Unsplash - photos de fanfare/musique)
+        $realImages = [
+            'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800', // Concert
+            'https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=800', // Orchestre
+            'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800', // Musique
+            'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800', // Festival
+            'https://images.unsplash.com/photo-1460881680851-30b4e771aedc?w=800', // Concert
+            'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=800', // Scène
+            'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800', // Événement
+            'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800', // Concert
+            'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=800', // Événement
+            'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800', // Groupe
+            'https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=800', // Cérémonie
+            'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800', // Mariage
+            'https://images.unsplash.com/photo-1518706604296-ba0529fc9e40?w=800', // Trophée
+            'https://images.unsplash.com/photo-1533230408717-46b9393e6b26?w=800', // Trophée
+        ];
 
-        // Trophées et distinctions - 1 galerie avec plusieurs médias
+        // ============================================
+        // 1. GALERIE TROPHÉES
+        // ============================================
         $gallery = $this->createGallery([
             'title' => '🏆 Nos Trophées et Distinctions',
             'description' => 'Collection des trophées et reconnaissances obtenues par la Fanfare Céleste au fil des années.',
@@ -52,7 +68,6 @@ class GallerySeeder extends Seeder
         ]);
         $galleryCount++;
 
-        // Ajouter des médias à la galerie des trophées
         $trophyMedia = [
             ['title' => 'Trophée d\'Excellence 2024', 'description' => 'Premier prix au Concours National des Fanfares'],
             ['title' => 'Distinction Ministérielle', 'description' => 'Reconnaissance du Ministère de la Culture'],
@@ -60,11 +75,14 @@ class GallerySeeder extends Seeder
             ['title' => 'Certificat d\'Excellence', 'description' => 'Reconnue comme référence musicale'],
         ];
         foreach ($trophyMedia as $index => $data) {
-            $this->addMediaToGallery($gallery, $data['title'], $data['description'], 'photo', $index === 0);
+            $imageUrl = $realImages[array_rand($realImages)];
+            $this->addMediaToGallery($gallery, $data['title'], $data['description'], 'photo', $index === 0, $imageUrl);
             $mediaCount++;
         }
 
-        // Concerts - 2 galeries
+        // ============================================
+        // 2. GALERIES CONCERTS
+        // ============================================
         $concertGalleries = [
             [
                 'title' => '🎵 Concert de Gala 2024',
@@ -104,12 +122,15 @@ class GallerySeeder extends Seeder
             $galleryCount++;
 
             foreach ($concertData['media'] as $index => $data) {
-                $this->addMediaToGallery($gallery, $data['title'], $data['description'], 'photo', $index === 0);
+                $imageUrl = $realImages[array_rand($realImages)];
+                $this->addMediaToGallery($gallery, $data['title'], $data['description'], 'photo', $index === 0, $imageUrl);
                 $mediaCount++;
             }
         }
 
-        // Événements - 1 galerie
+        // ============================================
+        // 3. GALERIE ÉVÉNEMENTS
+        // ============================================
         $gallery = $this->createGallery([
             'title' => '📅 Événements Marquants',
             'description' => 'Les événements qui ont marqué la vie de la fanfare.',
@@ -128,11 +149,14 @@ class GallerySeeder extends Seeder
             ['title' => 'Festival des Arts', 'description' => 'Participation au festival culturel'],
         ];
         foreach ($eventMedia as $index => $data) {
-            $this->addMediaToGallery($gallery, $data['title'], $data['description'], 'photo', $index === 0);
+            $imageUrl = $realImages[array_rand($realImages)];
+            $this->addMediaToGallery($gallery, $data['title'], $data['description'], 'photo', $index === 0, $imageUrl);
             $mediaCount++;
         }
 
-        // Vie des membres - 1 galerie
+        // ============================================
+        // 4. GALERIE VIE DES MEMBRES
+        // ============================================
         $gallery = $this->createGallery([
             'title' => '👥 Vie des Membres',
             'description' => 'Les moments forts de la vie communautaire de notre fanfare.',
@@ -150,11 +174,14 @@ class GallerySeeder extends Seeder
             ['title' => 'Sortie de Promotion', 'description' => 'Cérémonie de sortie'],
         ];
         foreach ($memberMedia as $index => $data) {
-            $this->addMediaToGallery($gallery, $data['title'], $data['description'], 'photo', $index === 0);
+            $imageUrl = $realImages[array_rand($realImages)];
+            $this->addMediaToGallery($gallery, $data['title'], $data['description'], 'photo', $index === 0, $imageUrl);
             $mediaCount++;
         }
 
-        // Cérémonies - 1 galerie
+        // ============================================
+        // 5. GALERIE CÉRÉMONIES
+        // ============================================
         $gallery = $this->createGallery([
             'title' => '⛪ Cérémonies Religieuses',
             'description' => 'Les cérémonies religieuses auxquelles participe la fanfare.',
@@ -170,11 +197,14 @@ class GallerySeeder extends Seeder
             ['title' => 'Cérémonie de Bénédiction', 'description' => 'Bénédiction de la fanfare'],
         ];
         foreach ($ceremonyMedia as $index => $data) {
-            $this->addMediaToGallery($gallery, $data['title'], $data['description'], 'photo', $index === 0);
+            $imageUrl = $realImages[array_rand($realImages)];
+            $this->addMediaToGallery($gallery, $data['title'], $data['description'], 'photo', $index === 0, $imageUrl);
             $mediaCount++;
         }
 
-        // Photos de groupe - 1 galerie
+        // ============================================
+        // 6. GALERIE PHOTOS DE GROUPE
+        // ============================================
         $gallery = $this->createGallery([
             'title' => '📸 Photos de Famille',
             'description' => 'Les photos de groupe de la Fanfare Céleste à travers les années.',
@@ -185,42 +215,20 @@ class GallerySeeder extends Seeder
         $galleryCount++;
 
         for ($i = 1; $i <= 5; $i++) {
+            $imageUrl = $realImages[array_rand($realImages)];
             $this->addMediaToGallery(
                 $gallery,
                 'Photo de Famille ' . (2020 + $i),
                 'Toute la fanfare réunie en ' . (2020 + $i),
                 'photo',
-                $i === 1
+                $i === 1,
+                $imageUrl
             );
             $mediaCount++;
         }
 
         // ============================================
-        // 2. AJOUT D'UNE GALERIE AVEC VIDÉOS
-        // ============================================
-        $gallery = $this->createGallery([
-            'title' => '🎬 Vidéos des Concerts',
-            'description' => 'Extraits vidéo des meilleurs concerts de la fanfare.',
-            'category' => 'concerts',
-            'is_published' => true,
-            'event_date' => '2024-06-01',
-            'location' => 'Cotonou, Bénin',
-            'order' => $galleryCount + 1,
-        ]);
-        $galleryCount++;
-
-        // Ajouter des vidéos (placeholders avec images)
-        $videoMedia = [
-            ['title' => 'Concert de Gala - Extrait', 'description' => 'Extrait du concert de gala'],
-            ['title' => 'Festival International - Performance', 'description' => 'Performance au festival'],
-        ];
-        foreach ($videoMedia as $index => $data) {
-            $this->addMediaToGallery($gallery, $data['title'], $data['description'], 'video', $index === 0);
-            $mediaCount++;
-        }
-
-        // ============================================
-        // 3. STATISTIQUES
+        // 7. STATISTIQUES
         // ============================================
         $this->command->info('========================================');
         $this->command->info('✅ Galeries créées avec succès !');
@@ -230,7 +238,6 @@ class GallerySeeder extends Seeder
         $this->command->info("   - Médias ajoutés : {$mediaCount}");
         $this->command->info('========================================');
         
-        // Détail par catégorie
         $this->command->info('📂 Détail par catégorie :');
         foreach ($categories as $key => $label) {
             $count = Gallery::where('category', $key)->count();
@@ -243,9 +250,6 @@ class GallerySeeder extends Seeder
         $this->command->info('🎉 Seeder terminé !');
     }
 
-    /**
-     * Créer une galerie
-     */
     private function createGallery(array $data): Gallery
     {
         $gallery = Gallery::create([
@@ -264,18 +268,24 @@ class GallerySeeder extends Seeder
         return $gallery;
     }
 
-    /**
-     * Ajouter un média à une galerie
-     */
-    private function addMediaToGallery(Gallery $gallery, string $title, string $description, string $type = 'photo', bool $isCover = false)
+    private function addMediaToGallery(Gallery $gallery, string $title, string $description, string $type = 'photo', bool $isCover = false, string $imageUrl = null)
     {
         try {
-            // Générer une image placeholder
-            $imageData = $this->generatePlaceholderImage($title);
+            if ($imageUrl) {
+                // Télécharger l'image depuis l'URL
+                $imageContent = @file_get_contents($imageUrl);
+                if ($imageContent === false) {
+                    throw new \Exception('Impossible de télécharger l\'image');
+                }
+            } else {
+                // Générer une image placeholder
+                $imageContent = $this->generatePlaceholderImage($title);
+            }
+            
             $fileName = time() . '_' . Str::random(10) . '.jpg';
             $filePath = 'galleries/' . $gallery->id . '/media/' . $fileName;
             
-            Storage::disk('public')->put($filePath, $imageData);
+            Storage::disk('public')->put($filePath, $imageContent);
 
             GalleryMedia::create([
                 'gallery_id' => $gallery->id,
@@ -284,7 +294,7 @@ class GallerySeeder extends Seeder
                 'type' => $type,
                 'file_path' => $filePath,
                 'file_name' => $fileName,
-                'file_size' => strlen($imageData),
+                'file_size' => strlen($imageContent),
                 'mime_type' => 'image/jpeg',
                 'is_cover' => $isCover,
                 'is_published' => true,
@@ -293,7 +303,6 @@ class GallerySeeder extends Seeder
                 'likes_count' => rand(0, 50),
             ]);
 
-            // Si c'est la première photo, la définir comme couverture
             if ($isCover && !$gallery->cover_image) {
                 $gallery->update(['cover_image' => $filePath]);
             }
@@ -303,16 +312,12 @@ class GallerySeeder extends Seeder
         }
     }
 
-    /**
-     * Générer une image placeholder
-     */
     private function generatePlaceholderImage(string $text): string
     {
         $width = 800;
         $height = 600;
         $image = imagecreatetruecolor($width, $height);
 
-        // Couleurs aléatoires
         $colors = [
             ['r' => 57, 'g' => 70, 'b' => 178],
             ['r' => 64, 'g' => 168, 'b' => 27],
@@ -331,18 +336,15 @@ class GallerySeeder extends Seeder
 
         imagefill($image, 0, 0, $bgColor);
 
-        // Ajouter un dégradé
         for ($i = 0; $i < $height; $i += 2) {
             $alpha = ($i / $height) * 30;
             $overlay = imagecolorallocatealpha($image, 255, 255, 255, $alpha);
             imageline($image, 0, $i, $width, $i, $overlay);
         }
 
-        // Ajouter un cadre
         $borderColor = imagecolorallocate($image, 255, 255, 255);
         imagerectangle($image, 10, 10, $width - 10, $height - 10, $borderColor);
 
-        // Texte principal
         $text = mb_substr($text, 0, 25);
         $fontSize = 5;
         $textWidth = imagefontwidth($fontSize) * strlen($text);
@@ -350,25 +352,15 @@ class GallerySeeder extends Seeder
         $x = ($width - $textWidth) / 2;
         $y = ($height - $textHeight) / 2 - 20;
 
-        // Ombre du texte
         imagestring($image, $fontSize, $x + 2, $y + 2, $text, $shadowColor);
         imagestring($image, $fontSize, $x, $y, $text, $textColor);
 
-        // Sous-titre
         $subText = 'Fanfare Céleste';
         $subWidth = imagefontwidth(3) * strlen($subText);
         $subX = ($width - $subWidth) / 2;
         $subY = $y + $textHeight + 20;
         imagestring($image, 3, $subX, $subY, $subText, $textColor);
 
-        // Ajouter un emoji musique
-        $emoji = '🎵';
-        $emojiWidth = imagefontwidth(3) * strlen($emoji);
-        $emojiX = ($width - $emojiWidth) / 2;
-        $emojiY = $y - 40;
-        imagestring($image, 3, $emojiX, $emojiY, $emoji, $textColor);
-
-        // Sauvegarder
         ob_start();
         imagejpeg($image, null, 80);
         $imageData = ob_get_clean();

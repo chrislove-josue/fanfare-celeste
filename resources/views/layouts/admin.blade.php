@@ -633,13 +633,6 @@
             @endcan
 
             @can('create members')
-            <a class="nav-link {{ $isActive('admin.members.index') }}" href="{{ route('admin.members.index') }}">
-                <i class="fas fa-user"></i>
-                <span>Tous les membres</span>
-            </a>
-            @endcan
-
-            @can('create members')
             <a class="nav-link {{ $isActive('admin.members.create') }}" href="{{ route('admin.members.create') }}">
                 <i class="fas fa-user-plus"></i>
                 <span>Ajouter un membre</span>
@@ -720,12 +713,12 @@
             <div class="nav-label">Médias</div>
 
             @can('manage gallery')
-<a class="nav-link {{ $isActive(['admin.gallery.index', 'admin.gallery.create', 'admin.gallery.edit']) }}" href="{{ route('admin.gallery.index') }}">
-    <i class="fas fa-images"></i>
-    <span>Galerie</span>
-    <span class="badge bg-primary">{{ \App\Models\Gallery::where('is_published', false)->count() }}</span>
-</a>
-@endcan
+            <a class="nav-link {{ $isActive(['admin.gallery.index', 'admin.gallery.create', 'admin.gallery.edit']) }}" href="{{ route('admin.gallery.index') }}">
+                <i class="fas fa-images"></i>
+                <span>Galerie</span>
+                <span class="badge bg-primary">{{ \App\Models\Gallery::where('is_published', false)->count() }}</span>
+            </a>
+            @endcan
 
             @can('manage documents')
             <a class="nav-link {{ $isActive(['admin.documents.index', 'admin.documents.create']) }}" href="{{ route('admin.documents.index') }}">
@@ -771,6 +764,20 @@
             <!-- ===== DIVIDER ===== -->
             <hr class="sidebar-divider">
 
+            <!-- ===== GESTION DES PARTENAIRES ===== -->
+            <div class="nav-label">Partenaires</div>
+
+            @can('manage partners')
+            <a class="nav-link {{ $isActive(['admin.partners.index', 'admin.partners.create', 'admin.partners.edit']) }}" href="{{ route('admin.partners.index') }}">
+                <i class="fas fa-handshake"></i>
+                <span>Partenaires</span>
+                <span class="badge bg-info">{{ \App\Models\Partner::where('is_active', true)->count() }}</span>
+            </a>
+            @endcan
+
+            <!-- ===== DIVIDER ===== -->
+            <hr class="sidebar-divider">
+
             <!-- ===== GESTION ===== -->
             <div class="nav-label">Gestion</div>
 
@@ -789,7 +796,7 @@
             @endcan
 
             <!-- ===== DIVIDER ===== -->
-            <hr class="sidebar-divider">
+            <hr class="sidebar-divider>
 
             <!-- ===== ESPACE PERSONNEL ===== -->
             <div class="nav-label">Espace personnel</div>
@@ -800,9 +807,10 @@
             </a>
 
             <a class="nav-link {{ $isActive('my.card') }}" href="{{ route('my.card') }}">
-    <i class="fas fa-id-card"></i>
-    <span>Ma carte</span>
-</a>
+                <i class="fas fa-id-card"></i>
+                <span>Ma carte</span>
+            </a>
+
             <a class="nav-link {{ $isActive('my.contributions') }}" href="{{ route('my.contributions') }}">
                 <i class="fas fa-hand-holding-heart"></i>
                 <span>Mes cotisations</span>
@@ -818,9 +826,11 @@
                 <span>Mes participations</span>
             </a>
 
+            <!-- ===== DIVIDER ===== -->
+            <hr class="sidebar-divider">
+
             <!-- ===== PARAMÈTRES ===== -->
             @can('manage settings')
-            <hr class="sidebar-divider">
             <div class="nav-label">Système</div>
 
             <a class="nav-link {{ $isActive('admin.settings') }}" href="{{ route('admin.settings') }}">

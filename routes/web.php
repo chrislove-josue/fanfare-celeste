@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\CarouselController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\PublicNewsController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,13 +47,15 @@ Route::get('/gallery/{gallery}', [PublicGalleryController::class, 'show'])->name
 Route::get('/gallery/category/{category}', [PublicGalleryController::class, 'byCategory'])->name('public.gallery.category');
 Route::post('/gallery/{gallery}/like', [PublicGalleryController::class, 'like'])->name('gallery.like');
 
-// About (pages statiques)
-Route::get('/about', [HomeController::class, 'history'])->name('about');
-Route::get('/about/history', [HomeController::class, 'history'])->name('about.history');
-Route::get('/about/mission', [HomeController::class, 'mission'])->name('about.mission');
-Route::get('/about/vision', [HomeController::class, 'vision'])->name('about.vision');
-Route::get('/about/committee', [HomeController::class, 'committee'])->name('about.committee');
-Route::get('/about/sections', [HomeController::class, 'sections'])->name('about.sections');
+// About - Page unique
+Route::get('/about', [HomeController::class, 'about'])->name('about');
+
+// Redirections des anciennes pages vers about
+Route::get('/about/history', function() { return redirect()->route('about'); });
+Route::get('/about/mission', function() { return redirect()->route('about'); });
+Route::get('/about/vision', function() { return redirect()->route('about'); });
+Route::get('/about/committee', function() { return redirect()->route('about'); });
+Route::get('/about/sections', function() { return redirect()->route('about'); });
 
 // Pages dynamiques (doit être après les routes statiques)
 Route::get('/page/{slug}', [HomeController::class, 'showPage'])->name('page.show');
@@ -73,21 +76,12 @@ Route::get('/membership/thankyou', [MembershipController::class, 'thankYou'])->n
 // ESPACE PERSONNEL (Utilisateur connecté)
 // ============================================
 Route::middleware(['auth'])->group(function () {
-    // Profil
     Route::get('/my/profile', [MyProfileController::class, 'profile'])->name('my.profile');
     Route::post('/my/profile/update', [MyProfileController::class, 'updateProfile'])->name('my.profile.update');
     Route::post('/my/password/update', [MyProfileController::class, 'updatePassword'])->name('my.password.update');
-
-    // Carte de membre
     Route::get('/my/card', [MyProfileController::class, 'card'])->name('my.card');
-    
-    // Contributions
     Route::get('/my/contributions', [MyProfileController::class, 'contributions'])->name('my.contributions');
-    
-    // Transactions
     Route::get('/my/transactions', [MyProfileController::class, 'transactions'])->name('my.transactions');
-    
-    // Événements
     Route::get('/my/events', [MyProfileController::class, 'events'])->name('my.events');
 });
 
@@ -141,17 +135,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('/events/calendar/view', [EventController::class, 'calendar'])->name('events.calendar');
     Route::get('/events/{event}/report', [EventController::class, 'report'])->name('events.report');
 
-    // ===== GESTION DE LA GALERIE (Albums + Médias) =====
+    // ===== GESTION DE LA GALERIE =====
     Route::resource('gallery', \App\Http\Controllers\Admin\GalleryController::class);
-    
-    // Gestion des médias dans une galerie
     Route::post('/gallery/{gallery}/media', [\App\Http\Controllers\Admin\GalleryController::class, 'addMedia'])->name('gallery.add-media');
     Route::delete('/gallery/{gallery}/media/{media}', [\App\Http\Controllers\Admin\GalleryController::class, 'deleteMedia'])->name('gallery.delete-media');
     Route::post('/gallery/{gallery}/reorder', [\App\Http\Controllers\Admin\GalleryController::class, 'reorderMedia'])->name('gallery.reorder');
     Route::post('/gallery/{gallery}/upload-mass', [\App\Http\Controllers\Admin\GalleryController::class, 'uploadMass'])->name('gallery.upload-mass');
     Route::post('/gallery/{gallery}/toggle-publish', [\App\Http\Controllers\Admin\GalleryController::class, 'togglePublish'])->name('gallery.toggle-publish');
 
-    // ===== DOCUMENTS =====
+    // ===== GESTION DES DOCUMENTS =====
     Route::resource('documents', DocumentController::class);
     Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
     Route::post('/documents/{document}/toggle-public', [DocumentController::class, 'togglePublic'])->name('documents.toggle-public');
@@ -171,25 +163,24 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     });
 
     // ===== GESTION DU CONTENU DU SITE =====
-    
-    // Pages
     Route::resource('pages', PageController::class);
     Route::post('/pages/{page}/publish', [PageController::class, 'publish'])->name('pages.publish');
     Route::post('/pages/{page}/unpublish', [PageController::class, 'unpublish'])->name('pages.unpublish');
     
-    // Carousel
     Route::resource('carousels', CarouselController::class);
     Route::post('/carousels/{carousel}/toggle', [CarouselController::class, 'toggle'])->name('carousels.toggle');
     
-    // Témoignages
     Route::resource('testimonials', TestimonialController::class);
     Route::post('/testimonials/{testimonial}/approve', [TestimonialController::class, 'approve'])->name('testimonials.approve');
     Route::post('/testimonials/{testimonial}/toggle', [TestimonialController::class, 'toggle'])->name('testimonials.toggle');
     
-    // Actualités (News)
     Route::resource('news', NewsController::class);
     Route::post('/news/{news}/publish', [NewsController::class, 'publish'])->name('news.publish');
     Route::get('/news/{news}/show', [NewsController::class, 'show'])->name('news.show');
+
+    // ===== GESTION DES PARTENAIRES =====
+    Route::resource('partners', PartnerController::class);
+    Route::post('/partners/{partner}/toggle-active', [PartnerController::class, 'toggleActive'])->name('partners.toggle-active');
 
     // ===== PARAMÈTRES =====
     Route::get('/settings', [SettingController::class, 'index'])->name('settings');

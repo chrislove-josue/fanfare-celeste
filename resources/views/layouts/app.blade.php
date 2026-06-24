@@ -123,16 +123,8 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('home') }}"><i class="fas fa-home"></i> Accueil</a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-info-circle"></i> À propos
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ route('about.history') }}">Historique</a></li>
-                            <li><a class="dropdown-item" href="{{ route('about.mission') }}">Mission & Vision</a></li>
-                            <li><a class="dropdown-item" href="{{ route('about.committee') }}">Bureau Exécutif</a></li>
-                            <li><a class="dropdown-item" href="{{ route('about.sections') }}">Sections</a></li>
-                        </ul>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('about') }}"><i class="fas fa-info-circle"></i> À propos</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('public.events.index') }}"><i class="fas fa-calendar-alt"></i> Événements</a>
@@ -140,21 +132,27 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('public.gallery.index') }}"><i class="fas fa-images"></i> Galerie</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('contact') }}"><i class="fas fa-envelope"></i> Contact</a>
+                    </li>
 
                     @auth
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-user"></i> {{ Auth::user()->name }}
                             </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ route('my.profile') }}"><i class="fas fa-user-circle"></i> Espace personnel</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ route('my.profile') }}"><i class="fas fa-user-circle"></i> Mon profil</a></li>
+                                <li><a class="dropdown-item" href="{{ route('my.card') }}"><i class="fas fa-id-card"></i> Ma carte</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="fas fa-tachometer-alt"></i> Administration</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
-                                        <button type="submit" class="dropdown-item">Déconnexion</button>
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-sign-out-alt"></i> Déconnexion
+                                        </button>
                                     </form>
                                 </li>
                             </ul>
@@ -188,9 +186,11 @@
                 </div>
                 <div class="col-md-4 mb-4">
                     <h5>Contact Rapide</h5>
-                    <p><i class="fas fa-phone"></i> +229 97 00 00 00<br>
-                    <i class="fas fa-envelope"></i> contact@fanfareceleste.org<br>
-                    <i class="fab fa-whatsapp"></i> +229 97 00 00 00</p>
+                    <p>
+                        <i class="fas fa-phone"></i> +229 97 00 00 00<br>
+                        <i class="fas fa-envelope"></i> contact@fanfareceleste.org<br>
+                        <i class="fab fa-whatsapp"></i> +229 97 00 00 00
+                    </p>
                 </div>
                 <div class="col-md-4 mb-4">
                     <h5>Suivez-nous</h5>
@@ -204,7 +204,7 @@
             </div>
             <hr class="bg-light">
             <div class="text-center">
-                <p class="mb-0">&copy; 2024 Fanfare Céleste - Tous droits réservés</p>
+                <p class="mb-0">&copy; {{ date('Y') }} Fanfare Céleste - Tous droits réservés</p>
             </div>
         </div>
     </footer>
