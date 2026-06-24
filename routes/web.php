@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\PublicNewsController;
+use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
 
 // ============================================
@@ -61,8 +62,8 @@ Route::get('/about/sections', function() { return redirect()->route('about'); })
 Route::get('/page/{slug}', [HomeController::class, 'showPage'])->name('page.show');
 
 // Contact
-Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
-Route::post('/contact/send', [HomeController::class, 'sendContact'])->name('contact.send');
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::post('/contact/send', [ContactController::class, 'send'])->name('contact.send');
 
 // Newsletter
 Route::post('/newsletter/subscribe', [HomeController::class, 'newsletterSubscribe'])->name('newsletter.subscribe');
