@@ -1,4 +1,5 @@
 <?php
+// database/seeders/LinkUsersToMembersSeeder.php
 
 namespace Database\Seeders;
 
@@ -47,16 +48,6 @@ class LinkUsersToMembersSeeder extends Seeder
         $this->command->info("⚠️ {$alreadyLinked} utilisateur(s) déjà lié(s).");
         $this->command->info("❌ {$notFound} utilisateur(s) sans membre correspondant.");
         $this->command->info('========================================');
-        
-        // Afficher la liste des utilisateurs non liés
-        if ($notFound > 0) {
-            $this->command->warn('📋 Utilisateurs sans membre correspondant :');
-            foreach ($users as $user) {
-                if (!Member::where('email', $user->email)->first()) {
-                    $this->command->warn("   - {$user->name} ({$user->email})");
-                }
-            }
-        }
         
         $this->command->info('Liaison utilisateurs-membres terminée ! 🎉');
     }

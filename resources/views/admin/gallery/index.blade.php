@@ -1,11 +1,11 @@
 @extends('layouts.admin')
 
-@section('title', 'Gestion de la galerie')
+@section('title', 'Gestion des albums')
 
-@section('page-title', 'Galerie')
-@section('page-subtitle', 'Gestion des photos et vidéos')
+@section('page-title', 'Albums')
+@section('page-subtitle', 'Gestion des albums photos et vidéos')
 @section('breadcrumb')
-    <li class="breadcrumb-item active">Galerie</li>
+    <li class="breadcrumb-item active">Albums</li>
 @endsection
 
 @section('content')
@@ -13,16 +13,11 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0">
             <i class="fas fa-images me-2 text-primary"></i>
-            Gestion de la galerie
+            Albums
         </h1>
-        <div>
-            <a href="{{ route('admin.gallery.create') }}" class="btn btn-primary me-2">
-                <i class="fas fa-plus me-2"></i> Ajouter une photo
-            </a>
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#uploadMassModal">
-                <i class="fas fa-upload me-2"></i> Upload en masse
-            </button>
-        </div>
+        <a href="{{ route('admin.gallery.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i> Nouvel album
+        </a>
     </div>
 
     @if(session('success'))
@@ -33,87 +28,15 @@
         </div>
     @endif
 
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show">
-            <i class="fas fa-exclamation-circle me-2"></i>
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    <!-- Statistiques -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card shadow-sm">
-                <div class="card-body d-flex align-items-center">
-                    <div class="me-3">
-                        <div class="bg-primary rounded-circle p-2 text-white">
-                            <i class="fas fa-images"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="text-muted small">Total photos</div>
-                        <div class="h5 mb-0">{{ $totalPhotos }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm">
-                <div class="card-body d-flex align-items-center">
-                    <div class="me-3">
-                        <div class="bg-success rounded-circle p-2 text-white">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="text-muted small">Publiées</div>
-                        <div class="h5 mb-0">{{ $publishedPhotos }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm">
-                <div class="card-body d-flex align-items-center">
-                    <div class="me-3">
-                        <div class="bg-secondary rounded-circle p-2 text-white">
-                            <i class="fas fa-eye-slash"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="text-muted small">Brouillons</div>
-                        <div class="h5 mb-0">{{ $draftPhotos }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm">
-                <div class="card-body d-flex align-items-center">
-                    <div class="me-3">
-                        <div class="bg-info rounded-circle p-2 text-white">
-                            <i class="fas fa-heart"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="text-muted small">Total likes</div>
-                        <div class="h5 mb-0">{{ $totalLikes }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Filtres -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <form method="GET" action="{{ route('admin.gallery.index') }}" class="row g-3">
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <label class="form-label fw-semibold">Recherche</label>
-                    <input type="text" name="search" class="form-control" value="{{ request('search') }}" placeholder="Titre, description...">
+                    <input type="text" name="search" class="form-control" value="{{ request('search') }}" placeholder="Titre...">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label class="form-label fw-semibold">Catégorie</label>
                     <select name="category" class="form-select">
                         <option value="">Toutes</option>
@@ -124,18 +47,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label fw-semibold">Type</label>
-                    <select name="type" class="form-select">
-                        <option value="">Tous</option>
-                        @foreach($types as $key => $label)
-                            <option value="{{ $key }}" {{ request('type') == $key ? 'selected' : '' }}>
-                                {{ $label }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label class="form-label fw-semibold">Statut</label>
                     <select name="is_published" class="form-select">
                         <option value="">Tous</option>
@@ -143,7 +55,7 @@
                         <option value="no" {{ request('is_published') == 'no' ? 'selected' : '' }}>Brouillon</option>
                     </select>
                 </div>
-                <div class="col-md-3 d-flex align-items-end gap-2">
+                <div class="col-md-2 d-flex align-items-end gap-2">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="fas fa-filter me-1"></i> Filtrer
                     </button>
@@ -155,162 +67,107 @@
         </div>
     </div>
 
-    <!-- Liste des photos -->
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 80px;">Image</th>
-                            <th>Titre</th>
-                            <th>Catégorie</th>
-                            <th>Type</th>
-                            <th>Statut</th>
-                            <th>Vues</th>
-                            <th>Likes</th>
-                            <th>Ordre</th>
-                            <th style="width: 200px;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($galleries as $gallery)
-                        <tr>
-                            <td>
-                                @if($gallery->file_path)
-                                    <img src="{{ asset('storage/' . $gallery->file_path) }}" 
-                                         alt="{{ $gallery->title }}" 
-                                         style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;">
-                                @else
-                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" 
-                                         style="width: 60px; height: 60px;">
-                                        <i class="fas fa-image text-muted fa-2x"></i>
-                                    </div>
-                                @endif
-                            </td>
-                            <td>
-                                <strong>{{ Str::limit($gallery->title, 30) }}</strong>
-                                @if($gallery->description)
-                                    <br>
-                                    <small class="text-muted">{{ Str::limit($gallery->description, 40) }}</small>
-                                @endif
-                            </td>
-                            <td>
-                                <span class="badge bg-info">{{ $gallery->category_label }}</span>
-                            </td>
-                            <td>
-                                <span class="badge bg-secondary">
-                                    <i class="fas fa-{{ $gallery->type_icon }} me-1"></i>
-                                    {{ ucfirst($gallery->type) }}
-                                </span>
-                            </td>
-                            <td>
-                                @if($gallery->is_published)
-                                    <span class="badge bg-success">Publié</span>
-                                @else
-                                    <span class="badge bg-secondary">Brouillon</span>
-                                @endif
-                            </td>
-                            <td>{{ $gallery->views_count ?? 0 }}</td>
-                            <td>{{ $gallery->likes_count ?? 0 }}</td>
-                            <td>{{ $gallery->order ?? 0 }}</td>
-                            <td>
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <a href="{{ route('admin.gallery.show', $gallery) }}" class="btn btn-info" title="Voir">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ route('admin.gallery.edit', $gallery) }}" class="btn btn-warning" title="Modifier">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('admin.gallery.toggle-publish', $gallery) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-{{ $gallery->is_published ? 'secondary' : 'success' }}" 
-                                                title="{{ $gallery->is_published ? 'Dépublier' : 'Publier' }}">
-                                            <i class="fas fa-{{ $gallery->is_published ? 'eye-slash' : 'eye' }}"></i>
-                                        </button>
-                                    </form>
-                                    <form action="{{ route('admin.gallery.destroy', $gallery) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger" title="Supprimer" 
-                                                onclick="return confirm('Supprimer cette photo ?')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="9" class="text-center py-4">
-                                <i class="fas fa-images fa-2x d-block mb-2 text-muted"></i>
-                                <p class="text-muted">Aucune photo dans la galerie</p>
-                                <a href="{{ route('admin.gallery.create') }}" class="btn btn-sm btn-primary">
-                                    <i class="fas fa-plus me-2"></i> Ajouter une photo
-                                </a>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card-footer">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <span class="text-muted small">
-                        Affichage de {{ $galleries->firstItem() ?? 0 }} à {{ $galleries->lastItem() ?? 0 }} sur {{ $galleries->total() }} photos
-                    </span>
-                </div>
-                <div>
-                    {{ $galleries->links() }}
+    <!-- Liste des albums -->
+    <div class="row">
+        @forelse($albums as $album)
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="card h-100 shadow-sm hover-shadow transition">
+                <a href="{{ route('admin.gallery.show', $album) }}" class="text-decoration-none">
+                    <div class="position-relative">
+                        @if($album->cover_image_url)
+                            <img src="{{ $album->cover_image_url }}" 
+                                 alt="{{ $album->title }}" 
+                                 class="card-img-top" 
+                                 style="height: 200px; object-fit: cover;">
+                        @else
+                            <div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-images fa-4x text-white opacity-50"></i>
+                            </div>
+                        @endif
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge bg-dark bg-opacity-75 px-3 py-2">
+                                <i class="fas fa-{{ $album->media_count > 0 ? 'image' : 'images' }} me-1"></i>
+                                {{ $album->media_count }} médias
+                            </span>
+                        </div>
+                        @if(!$album->is_published)
+                            <div class="position-absolute top-0 start-0 m-2">
+                                <span class="badge bg-secondary">Brouillon</span>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-1">{{ Str::limit($album->title, 35) }}</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-tag me-1"></i> 
+                                {{ $album->category_label }}
+                            </small>
+                            <small class="text-muted">
+                                <i class="fas fa-calendar-alt me-1"></i>
+                                {{ $album->created_at->format('d/m/Y') }}
+                            </small>
+                        </div>
+                        @if($album->description)
+                            <p class="text-muted small mt-2 mb-0">{{ Str::limit($album->description, 60) }}</p>
+                        @endif
+                    </div>
+                </a>
+                <div class="card-footer bg-transparent border-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted">
+                                <i class="fas fa-eye me-1"></i> {{ $album->views_count ?? 0 }}
+                            </small>
+                            <small class="text-muted ms-2">
+                                <i class="fas fa-heart me-1 text-danger"></i> {{ $album->likes_count ?? 0 }}
+                            </small>
+                        </div>
+                        <div>
+                            <a href="{{ route('admin.gallery.edit', $album) }}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ route('admin.gallery.destroy', $album) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer cet album ?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        @empty
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-images fa-4x text-muted mb-3"></i>
+                <h4>Aucun album</h4>
+                <p class="text-muted">Créez votre premier album photo</p>
+                <a href="{{ route('admin.gallery.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i> Créer un album
+                </a>
+            </div>
+        </div>
+        @endforelse
+    </div>
+
+    <div class="mt-4">
+        {{ $albums->links() }}
     </div>
 </div>
 
-<!-- Modal Upload en masse -->
-<div class="modal fade" id="uploadMassModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form action="{{ route('admin.gallery.upload-mass') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-upload me-2 text-success"></i>
-                        Upload en masse
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Catégorie</label>
-                        <select name="category" class="form-select" required>
-                            <option value="">Sélectionner une catégorie</option>
-                            @foreach($categories as $key => $label)
-                                <option value="{{ $key }}">{{ $label }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Fichiers</label>
-                        <input type="file" name="files[]" class="form-control" multiple accept="image/*,video/*" required>
-                        <small class="text-muted">Vous pouvez sélectionner plusieurs fichiers (JPG, PNG, GIF, WEBP, MP4)</small>
-                    </div>
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Les fichiers seront automatiquement publiés et le titre sera le nom du fichier.
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-upload me-2"></i> Uploader
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+<style>
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+    .transition {
+        transition: all 0.3s ease;
+    }
+</style>
 @endsection

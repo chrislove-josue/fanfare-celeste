@@ -11,7 +11,10 @@ return new class extends Migration
     {
         Schema::create('media', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('album_id')->constrained('albums')->onDelete('cascade');
+            
+            // Utiliser unsignedBigInteger pour la clé étrangère
+            $table->unsignedBigInteger('album_id');
+            
             $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->enum('type', ['photo', 'video'])->default('photo');
@@ -33,6 +36,12 @@ return new class extends Migration
             $table->index(['album_id', 'order']);
             $table->index('type');
             $table->index('is_published');
+
+            // Clé étrangère
+            $table->foreign('album_id')
+                  ->references('id')
+                  ->on('albums')
+                  ->onDelete('cascade');
         });
     }
 

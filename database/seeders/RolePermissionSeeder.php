@@ -1,4 +1,5 @@
 <?php
+// database/seeders/RolePermissionSeeder.php
 
 namespace Database\Seeders;
 
@@ -93,57 +94,35 @@ class RolePermissionSeeder extends Seeder
 
         // --- ADMIN (Accès complet) ---
         $admin->syncPermissions([
-            // Membres
             'view members', 'create members', 'edit members', 'delete members', 'approve members',
-            // Finances
             'view finances', 'create transactions', 'approve transactions', 'export reports',
-            // Événements
             'view events', 'create events', 'edit events', 'delete events', 'manage participations',
-            // Bureau
             'view committee', 'manage committee',
-            // Documents
             'view documents', 'upload documents', 'delete documents', 'approve documents',
-            // Contenu du site
             'manage pages', 'manage carousels', 'manage testimonials', 'manage news',
-            // Galerie
             'manage gallery',
-            // Système
             'manage settings', 'view logs',
         ]);
 
         // --- PRÉSIDENT (Accès large) ---
         $president->syncPermissions([
-            // Membres
             'view members', 'approve members',
-            // Finances
             'view finances', 'approve transactions',
-            // Événements
             'view events', 'create events', 'edit events',
-            // Bureau
             'view committee', 'manage committee',
-            // Documents
             'view documents', 'upload documents', 'approve documents',
-            // Contenu du site
             'manage pages',
-            // Système
             'view logs',
         ]);
 
         // --- SECRÉTAIRE (Gestion du contenu et des membres) ---
         $secretary->syncPermissions([
-            // Membres
             'view members', 'create members', 'edit members',
-            // Événements
             'view events', 'create events', 'edit events', 'manage participations',
-            // Bureau
             'view committee',
-            // Documents
             'view documents', 'upload documents', 'approve documents',
-            // Contenu du site
             'manage pages', 'manage carousels', 'manage testimonials', 'manage news',
-            // Galerie
             'manage gallery',
-            // Système
             'manage settings',
         ]);
 
@@ -175,7 +154,7 @@ class RolePermissionSeeder extends Seeder
         ]);
 
         // ============================================
-        // CRÉATION DES UTILISATEURS PAR DÉFAUT
+        // CRÉATION DES UTILISATEURS ADMIN (Sans liaison membre)
         // ============================================
 
         // 1. Super Administrateur
@@ -206,56 +185,56 @@ class RolePermissionSeeder extends Seeder
             $adminUser->assignRole('admin');
         }
 
-        // 3. Président
+        // 3. Président - Sans liaison membre (sera lié plus tard)
         $presidentUser = User::firstOrCreate(
             ['email' => 'president@fanfareceleste.org'],
             [
                 'name' => 'Président',
                 'password' => bcrypt('President123!'),
                 'email_verified_at' => now(),
-                'member_id' => 1, // Lier au membre Jean Mendy
+                'member_id' => null,
             ]
         );
         if (!$presidentUser->hasRole('president')) {
             $presidentUser->assignRole('president');
         }
 
-        // 4. Secrétaire
+        // 4. Secrétaire - Sans liaison membre
         $secretaryUser = User::firstOrCreate(
             ['email' => 'secretaire@fanfareceleste.org'],
             [
                 'name' => 'Secrétaire',
                 'password' => bcrypt('Secret123!'),
                 'email_verified_at' => now(),
-                'member_id' => 3, // Lier au membre Paul Zinsou
+                'member_id' => null,
             ]
         );
         if (!$secretaryUser->hasRole('secretary')) {
             $secretaryUser->assignRole('secretary');
         }
 
-        // 5. Trésorier
+        // 5. Trésorier - Sans liaison membre
         $treasurerUser = User::firstOrCreate(
             ['email' => 'tresorier@fanfareceleste.org'],
             [
                 'name' => 'Trésorier',
                 'password' => bcrypt('Tresorier123!'),
                 'email_verified_at' => now(),
-                'member_id' => 2, // Lier au membre Marie Dossou
+                'member_id' => null,
             ]
         );
         if (!$treasurerUser->hasRole('treasurer')) {
             $treasurerUser->assignRole('treasurer');
         }
 
-        // 6. Chef de fanfare
+        // 6. Chef de fanfare - Sans liaison membre
         $conductorUser = User::firstOrCreate(
             ['email' => 'chef@fanfareceleste.org'],
             [
                 'name' => 'Chef de fanfare',
                 'password' => bcrypt('Chef123!'),
                 'email_verified_at' => now(),
-                'member_id' => 4, // Lier au membre David Agossou
+                'member_id' => null,
             ]
         );
         if (!$conductorUser->hasRole('conductor')) {
@@ -293,6 +272,9 @@ class RolePermissionSeeder extends Seeder
         $this->command->info('   Total rôles : ' . Role::count());
         $this->command->info('   Total utilisateurs : ' . User::count());
         $this->command->info('========================================');
+        
+        $this->command->warn('⚠️ Les utilisateurs (Président, Secrétaire, Trésorier, Chef)');
+        $this->command->warn('   seront liés aux membres lors du seeder LinkUsersToMembersSeeder.');
     }
 
     private function hasSpatieTables(): bool
