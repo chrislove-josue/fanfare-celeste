@@ -1,9 +1,9 @@
 @extends('layouts.admin')
 
-@section('title', 'Modifier la photo')
+@section('title', 'Modifier la galerie')
 
-@section('page-title', 'Modifier la photo')
-@section('page-subtitle', 'Modifier les informations de la photo')
+@section('page-title', 'Modifier la galerie')
+@section('page-subtitle', 'Modifier les informations de la galerie')
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ route('admin.gallery.index') }}">Galerie</a></li>
     <li class="breadcrumb-item active">Modifier</li>
@@ -14,7 +14,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0">
             <i class="fas fa-edit me-2 text-warning"></i>
-            Modifier la photo
+            Modifier la galerie
         </h1>
         <div>
             <a href="{{ route('admin.gallery.show', $gallery) }}" class="btn btn-info me-2">
@@ -49,14 +49,13 @@
 
                 <div class="row g-3">
                     <div class="col-md-8">
-                        <!-- Image actuelle -->
-                        @if($gallery->file_path)
+                        @if($gallery->cover_image_url)
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">Image actuelle</label>
+                                <label class="form-label fw-semibold">Image de couverture actuelle</label>
                                 <div>
-                                    <img src="{{ asset('storage/' . $gallery->file_path) }}" 
+                                    <img src="{{ $gallery->cover_image_url }}" 
                                          alt="{{ $gallery->title }}" 
-                                         style="max-width: 100%; max-height: 300px; border-radius: 8px;">
+                                         style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 1px solid #ddd;">
                                 </div>
                             </div>
                         @endif
@@ -80,11 +79,11 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Nouveau fichier</label>
-                            <input type="file" name="file" class="form-control @error('file') is-invalid @enderror" 
-                                   accept="image/*,video/*">
-                            <small class="text-muted">Laissez vide pour conserver le fichier actuel</small>
-                            @error('file')
+                            <label class="form-label fw-semibold">Nouvelle image de couverture</label>
+                            <input type="file" name="cover_image" class="form-control @error('cover_image') is-invalid @enderror" 
+                                   accept="image/*">
+                            <small class="text-muted">Laissez vide pour conserver l'image actuelle</small>
+                            @error('cover_image')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -109,15 +108,19 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold">Type</label>
-                                    <select name="type" class="form-select @error('type') is-invalid @enderror">
-                                        @foreach($types as $key => $label)
-                                            <option value="{{ $key }}" {{ old('type', $gallery->type) == $key ? 'selected' : '' }}>
-                                                {{ $label }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('type')
+                                    <label class="form-label fw-semibold">Date de l'événement</label>
+                                    <input type="date" name="event_date" class="form-control @error('event_date') is-invalid @enderror" 
+                                           value="{{ old('event_date', optional($gallery->event_date)->format('Y-m-d')) }}">
+                                    @error('event_date')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Lieu</label>
+                                    <input type="text" name="location" class="form-control @error('location') is-invalid @enderror" 
+                                           value="{{ old('location', $gallery->location) }}" placeholder="Lieu de l'événement">
+                                    @error('location')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -131,32 +134,21 @@
                                     @enderror
                                 </div>
 
-                                <div class="mb-3">
-                                    <div class="form-check form-switch">
-                                        <input type="hidden" name="is_published" value="0">
-                                        <input type="checkbox" class="form-check-input" id="is_published" 
-                                               name="is_published" value="1" {{ old('is_published', $gallery->is_published) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_published">
-                                            <i class="fas fa-eye me-1"></i> Publié
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">Texte alternatif</label>
-                                    <input type="text" name="alt_text" class="form-control @error('alt_text') is-invalid @enderror" 
-                                           value="{{ old('alt_text', $gallery->alt_text) }}" placeholder="Description SEO">
-                                    @error('alt_text')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                <div class="form-check form-switch">
+                                    <input type="hidden" name="is_published" value="0">
+                                    <input type="checkbox" class="form-check-input" id="is_published" 
+                                           name="is_published" value="1" {{ old('is_published', $gallery->is_published) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_published">
+                                        <i class="fas fa-eye me-1"></i> Publié
+                                    </label>
                                 </div>
 
                                 <hr>
                                 <div class="text-muted small">
-                                    <div>Créé le : {{ $gallery->created_at->format('d/m/Y à H:i') }}</div>
-                                    <div>Dernière modif : {{ $gallery->updated_at->format('d/m/Y à H:i') }}</div>
-                                    <div>Vues : {{ $gallery->views_count ?? 0 }}</div>
-                                    <div>Likes : {{ $gallery->likes_count ?? 0 }}</div>
+                                    <div><strong>Créé le :</strong> {{ $gallery->created_at->format('d/m/Y à H:i') }}</div>
+                                    <div><strong>Médias :</strong> {{ $gallery->media_count }}</div>
+                                    <div><strong>Vues :</strong> {{ $gallery->views_count ?? 0 }}</div>
+                                    <div><strong>Likes :</strong> {{ $gallery->likes_count ?? 0 }}</div>
                                 </div>
                             </div>
                         </div>

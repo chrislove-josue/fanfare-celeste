@@ -7,64 +7,87 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Gallery extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'galleries';
-
     protected $fillable = [
         'title',
+        'slug',
         'description',
+        'cover_image',
         'category',
-        'type',
-        'file_path',
-        'file_name',
-        'file_size',
-        'mime_type',
+        'is_published',
+        'event_date',
+        'location',
+        'order',
         'views_count',
         'likes_count',
-        'downloads_count',
-        'is_published',
-        'published_at',
-        'order',
-        'member_id',
-        'alt_text',
-        'metadata',
+        'created_by',
     ];
 
     protected $casts = [
         'is_published' => 'boolean',
-        'published_at' => 'datetime',
+        'event_date' => 'date',
+        'order' => 'integer',
         'views_count' => 'integer',
         'likes_count' => 'integer',
-        'downloads_count' => 'integer',
-        'order' => 'integer',
-        'metadata' => 'array',
     ];
 
-    protected $appends = [
-        'file_url',
-        'category_label',
-        'type_icon',
-        'formatted_size',
-        'is_new',
-    ];
+    protected $appends = ['cover_image_url', 'media_count', 'category_label'];
 
-    // Relations
-    public function member()
+    // ============================================
+    // RELATIONS
+    // ============================================
+    
+    public function media()
     {
-        return $this->belongsTo(Member::class);
+        return $this->hasMany(GalleryMedia::class)->orderBy('order');
     }
 
-    // Accesseurs
-    public function getFileUrlAttribute(): ?string
+    public function publishedMedia()
     {
-        if (!$this->file_path) {
-            return null;
+        return $this->hasMany(GalleryMedia::class)->where('is_published', true)->orderBy('order');
+    }
+
+    public function photos()
+    {
+        return $this->hasMany(GalleryMedia::class)->where('type', 'photo')->orderBy('order');
+    }
+
+    public function videos()
+    {
+        return $this->hasMany(GalleryMedia::class)->where('type', 'video')->orderBy('order');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    // ============================================
+    // ACCESSORS
+    // ============================================
+    
+    public function getCoverImageUrlAttribute(): ?string
+    {
+        if ($this->cover_image) {
+            return Storage::url($this->cover_image);
         }
-        return Storage::url($this->file_path);
+        
+        $firstMedia = $this->media()->where('type', 'photo')->first();
+        if ($firstMedia) {
+            return Storage::url($firstMedia->file_path);
+        }
+        
+        return null;
+    }
+
+    public function getMediaCountAttribute(): int
+    {
+        return $this->media()->count();
     }
 
     public function getCategoryLabelAttribute(): string
@@ -73,37 +96,10 @@ class Gallery extends Model
         return $categories[$this->category] ?? $this->category;
     }
 
-    public function getTypeIconAttribute(): string
-    {
-        return $this->type === 'photo' ? 'fa-image' : 'fa-video';
-    }
-
-    public function getFormattedSizeAttribute(): string
-    {
-        $bytes = $this->file_size;
-        if (!$bytes) return '0 bytes';
-        
-        if ($bytes >= 1073741824) {
-            return number_format($bytes / 1073741824, 2) . ' GB';
-        } elseif ($bytes >= 1048576) {
-            return number_format($bytes / 1048576, 2) . ' MB';
-        } elseif ($bytes >= 1024) {
-            return number_format($bytes / 1024, 2) . ' KB';
-        } elseif ($bytes > 1) {
-            return $bytes . ' bytes';
-        } elseif ($bytes == 1) {
-            return '1 byte';
-        } else {
-            return '0 bytes';
-        }
-    }
-
-    public function getIsNewAttribute(): bool
-    {
-        return $this->created_at->diffInDays(now()) <= 7;
-    }
-
-    // Méthodes statiques
+    // ============================================
+    // MÉTHODES STATIQUES
+    // ============================================
+    
     public static function getCategories()
     {
         return [
@@ -117,38 +113,30 @@ class Gallery extends Model
         ];
     }
 
-    public static function getTypes()
+    public static function generateSlug($title)
     {
-        return [
-            'photo' => 'Photo',
-            'video' => 'Vidéo',
-        ];
+        $slug = Str::slug($title);
+        $count = static::where('slug', 'LIKE', "{$slug}%")->count();
+        return $count ? "{$slug}-{$count}" : $slug;
     }
 
-    // Scopes
+    // ============================================
+    // SCOPES
+    // ============================================
+    
     public function scopePublished($query)
     {
-        return $query->where('is_published', true)
-                    ->where(function($q) {
-                        $q->whereNull('published_at')
-                          ->orWhere('published_at', '<=', now());
-                    });
+        return $query->where('is_published', true);
     }
 
     public function scopeOrdered($query)
     {
-        return $query->orderBy('order', 'asc')
-                    ->orderBy('created_at', 'desc');
+        return $query->orderBy('order')->orderBy('created_at', 'desc');
     }
 
     public function scopeByCategory($query, $category)
     {
         return $query->where('category', $category);
-    }
-
-    public function scopeByType($query, $type)
-    {
-        return $query->where('type', $type);
     }
 
     public function scopeMostViewed($query, $limit = 6)
@@ -161,7 +149,10 @@ class Gallery extends Model
         return $query->orderBy('created_at', 'desc')->take($limit);
     }
 
-    // Méthodes
+    // ============================================
+    // MÉTHODES
+    // ============================================
+    
     public function incrementViews()
     {
         $this->increment('views_count');
@@ -172,19 +163,15 @@ class Gallery extends Model
         $this->increment('likes_count');
     }
 
-    public function incrementDownloads()
+    public function getRouteKeyName()
     {
-        $this->increment('downloads_count');
+        return 'slug';
     }
 
     public function togglePublish()
     {
         $this->is_published = !$this->is_published;
-        if ($this->is_published && !$this->published_at) {
-            $this->published_at = now();
-        }
         $this->save();
-        
         return $this;
     }
 }

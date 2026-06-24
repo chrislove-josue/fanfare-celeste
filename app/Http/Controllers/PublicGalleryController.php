@@ -4,25 +4,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gallery;
+use App\Models\GalleryMedia;
 use Illuminate\Http\Request;
 
 class PublicGalleryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Gallery::published()->ordered();
+        $query = Gallery::withCount('media')->published()->ordered();
 
-        // Filtre par catégorie
         if ($request->filled('category')) {
             $query->byCategory($request->category);
         }
 
-        // Filtre par type
-        if ($request->filled('type')) {
-            $query->byType($request->type);
-        }
-
-        // Recherche
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -31,62 +25,62 @@ class PublicGalleryController extends Controller
             });
         }
 
-        $galleries = $query->paginate(12);
+        $galleries = $query->paginate(9);
         $categories = Gallery::getCategories();
-        
+
         // Statistiques
-        $totalPhotos = Gallery::published()->where('type', 'photo')->count();
-        $totalVideos = Gallery::published()->where('type', 'video')->count();
         $totalGalleries = Gallery::published()->count();
+        $totalMedia = GalleryMedia::where('is_published', true)->count();
+        $totalPhotos = GalleryMedia::where('is_published', true)->where('type', 'photo')->count();
+        $totalVideos = GalleryMedia::where('is_published', true)->where('type', 'video')->count();
 
-        // Dernières photos par catégorie
-        $latestByCategory = [];
-        foreach (array_keys($categories) as $category) {
-            $latestByCategory[$category] = Gallery::published()
-                ->byCategory($category)
-                ->latest()
-                ->take(3)
-                ->get();
-        }
-
-        // Mise en avant (les plus vus)
-        $mostViewed = Gallery::published()
+        // Galeries en vedette
+        $featuredGalleries = Gallery::published()
+            ->withCount('media')
             ->orderBy('views_count', 'desc')
+            ->take(3)
+            ->get();
+
+        // Dernières galeries
+        $recentGalleries = Gallery::published()
+            ->withCount('media')
+            ->latest()
             ->take(6)
             ->get();
 
         return view('public.gallery.index', compact(
             'galleries',
             'categories',
+            'totalGalleries',
+            'totalMedia',
             'totalPhotos',
             'totalVideos',
-            'totalGalleries',
-            'latestByCategory',
-            'mostViewed'
+            'featuredGalleries',
+            'recentGalleries'
         ));
     }
 
     public function show(Gallery $gallery)
     {
-        // Incrémenter le compteur de vues
+        // Incrémenter les vues
         $gallery->incrementViews();
 
+        $media = $gallery->publishedMedia()->get();
         $related = Gallery::published()
             ->where('category', $gallery->category)
             ->where('id', '!=', $gallery->id)
             ->take(4)
             ->get();
 
-        return view('public.gallery.show', compact('gallery', 'related'));
+        return view('public.gallery.show', compact('gallery', 'media', 'related'));
     }
 
     public function byCategory($category)
     {
         $categories = Gallery::getCategories();
         
-        // Vérifier si la catégorie existe
         if (!isset($categories[$category])) {
-            abort(404, 'Catégorie non trouvée');
+            abort(404);
         }
 
         $galleries = Gallery::published()
@@ -102,6 +96,7 @@ class PublicGalleryController extends Controller
     public function like(Gallery $gallery)
     {
         $gallery->incrementLikes();
+        
         return back()->with('success', 'Merci pour votre like !');
     }
 }

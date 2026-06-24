@@ -41,12 +41,10 @@ Route::get('/actualites', [PublicNewsController::class, 'index'])->name('public.
 Route::get('/actualites/{slug}', [PublicNewsController::class, 'show'])->name('public.news.show');
 
 // Galerie publique
-
 Route::get('/gallery', [PublicGalleryController::class, 'index'])->name('public.gallery.index');
 Route::get('/gallery/{gallery}', [PublicGalleryController::class, 'show'])->name('public.gallery.show');
 Route::get('/gallery/category/{category}', [PublicGalleryController::class, 'byCategory'])->name('public.gallery.category');
 Route::post('/gallery/{gallery}/like', [PublicGalleryController::class, 'like'])->name('gallery.like');
-
 
 // About (pages statiques)
 Route::get('/about', [HomeController::class, 'history'])->name('about');
@@ -143,25 +141,22 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('/events/calendar/view', [EventController::class, 'calendar'])->name('events.calendar');
     Route::get('/events/{event}/report', [EventController::class, 'report'])->name('events.report');
 
-    // ===== GALERIE =====
-    Route::resource('gallery', GalleryController::class);
-    Route::post('/gallery/{gallery}/like', [GalleryController::class, 'like'])->name('gallery.like');
-
-
-        // ===== GESTION DE LA GALERIE =====
+    // ===== GESTION DE LA GALERIE (Albums + Médias) =====
     Route::resource('gallery', \App\Http\Controllers\Admin\GalleryController::class);
+    
+    // Gestion des médias dans une galerie
+    Route::post('/gallery/{gallery}/media', [\App\Http\Controllers\Admin\GalleryController::class, 'addMedia'])->name('gallery.add-media');
+    Route::delete('/gallery/{gallery}/media/{media}', [\App\Http\Controllers\Admin\GalleryController::class, 'deleteMedia'])->name('gallery.delete-media');
+    Route::post('/gallery/{gallery}/reorder', [\App\Http\Controllers\Admin\GalleryController::class, 'reorderMedia'])->name('gallery.reorder');
+    Route::post('/gallery/{gallery}/upload-mass', [\App\Http\Controllers\Admin\GalleryController::class, 'uploadMass'])->name('gallery.upload-mass');
     Route::post('/gallery/{gallery}/toggle-publish', [\App\Http\Controllers\Admin\GalleryController::class, 'togglePublish'])->name('gallery.toggle-publish');
-    Route::post('/gallery/upload-mass', [\App\Http\Controllers\Admin\GalleryController::class, 'uploadMass'])->name('gallery.upload-mass');
-
-    // Gestion des médias dans un album
-    Route::post('/gallery/{album}/media', [\App\Http\Controllers\Admin\GalleryController::class, 'addMedia'])->name('gallery.add-media');
-    Route::delete('/gallery/{album}/media/{media}', [\App\Http\Controllers\Admin\GalleryController::class, 'deleteMedia'])->name('gallery.delete-media');
-    Route::post('/gallery/{album}/reorder', [\App\Http\Controllers\Admin\GalleryController::class, 'reorderMedia'])->name('gallery.reorder');
-    Route::post('/gallery/{album}/upload-mass', [\App\Http\Controllers\Admin\GalleryController::class, 'uploadMass'])->name('gallery.upload-mass');
 
     // ===== DOCUMENTS =====
     Route::resource('documents', DocumentController::class);
     Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
+    Route::post('/documents/{document}/toggle-public', [DocumentController::class, 'togglePublic'])->name('documents.toggle-public');
+    Route::post('/documents/{document}/approve', [DocumentController::class, 'approve'])->name('documents.approve');
+    Route::post('/documents/{document}/reject', [DocumentController::class, 'reject'])->name('documents.reject');
 
     // ===== BUREAU EXÉCUTIF =====
     Route::resource('committee', CommitteeController::class);
@@ -201,10 +196,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
     Route::post('/settings/cache/clear', [SettingController::class, 'clearCache'])->name('settings.cache.clear');
 });
-
-Route::resource('documents', DocumentController::class);
-Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
-Route::post('/documents/{document}/toggle-public', [DocumentController::class, 'togglePublic'])->name('documents.toggle-public');
 
 // ============================================
 // ROUTES D'AUTHENTIFICATION

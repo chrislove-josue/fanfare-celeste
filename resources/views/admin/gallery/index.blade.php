@@ -1,23 +1,25 @@
 @extends('layouts.admin')
 
-@section('title', 'Gestion des albums')
+@section('title', 'Gestion de la galerie')
 
-@section('page-title', 'Albums')
-@section('page-subtitle', 'Gestion des albums photos et vidéos')
+@section('page-title', 'Galerie')
+@section('page-subtitle', 'Gestion des albums et médias')
 @section('breadcrumb')
-    <li class="breadcrumb-item active">Albums</li>
+    <li class="breadcrumb-item active">Galerie</li>
 @endsection
 
 @section('content')
 <div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
         <h1 class="h3 mb-0">
             <i class="fas fa-images me-2 text-primary"></i>
-            Albums
+            Gestion de la galerie
         </h1>
-        <a href="{{ route('admin.gallery.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i> Nouvel album
-        </a>
+        <div class="mt-2 mt-md-0">
+            <a href="{{ route('admin.gallery.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i> Nouvelle galerie
+            </a>
+        </div>
     </div>
 
     @if(session('success'))
@@ -28,13 +30,77 @@
         </div>
     @endif
 
+    <!-- Statistiques -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex align-items-center">
+                    <div class="me-3">
+                        <div class="bg-primary rounded-circle p-2 text-white">
+                            <i class="fas fa-images"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-muted small">Total galeries</div>
+                        <div class="h5 mb-0">{{ $totalGalleries ?? 0 }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex align-items-center">
+                    <div class="me-3">
+                        <div class="bg-success rounded-circle p-2 text-white">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-muted small">Publiées</div>
+                        <div class="h5 mb-0">{{ $publishedGalleries ?? 0 }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex align-items-center">
+                    <div class="me-3">
+                        <div class="bg-secondary rounded-circle p-2 text-white">
+                            <i class="fas fa-eye-slash"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-muted small">Brouillons</div>
+                        <div class="h5 mb-0">{{ $draftGalleries ?? 0 }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex align-items-center">
+                    <div class="me-3">
+                        <div class="bg-info rounded-circle p-2 text-white">
+                            <i class="fas fa-photo-video"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-muted small">Médias totaux</div>
+                        <div class="h5 mb-0">{{ $totalMedia ?? 0 }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Filtres -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <form method="GET" action="{{ route('admin.gallery.index') }}" class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Recherche</label>
-                    <input type="text" name="search" class="form-control" value="{{ request('search') }}" placeholder="Titre...">
+                    <input type="text" name="search" class="form-control" value="{{ request('search') }}" placeholder="Titre, description...">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">Catégorie</label>
@@ -67,16 +133,16 @@
         </div>
     </div>
 
-    <!-- Liste des albums -->
-    <div class="row">
-        @forelse($albums as $album)
-        <div class="col-md-4 col-lg-3 mb-4">
-            <div class="card h-100 shadow-sm hover-shadow transition">
-                <a href="{{ route('admin.gallery.show', $album) }}" class="text-decoration-none">
+    <!-- Liste des galeries -->
+    <div class="row g-4">
+        @forelse($galleries as $gallery)
+        <div class="col-md-4 col-lg-3">
+            <div class="card shadow-sm h-100 hover-shadow transition">
+                <a href="{{ route('admin.gallery.show', $gallery) }}" class="text-decoration-none">
                     <div class="position-relative">
-                        @if($album->cover_image_url)
-                            <img src="{{ $album->cover_image_url }}" 
-                                 alt="{{ $album->title }}" 
+                        @if($gallery->cover_image_url)
+                            <img src="{{ $gallery->cover_image_url }}" 
+                                 alt="{{ $gallery->title }}" 
                                  class="card-img-top" 
                                  style="height: 200px; object-fit: cover;">
                         @else
@@ -86,55 +152,66 @@
                         @endif
                         <div class="position-absolute top-0 end-0 m-2">
                             <span class="badge bg-dark bg-opacity-75 px-3 py-2">
-                                <i class="fas fa-{{ $album->media_count > 0 ? 'image' : 'images' }} me-1"></i>
-                                {{ $album->media_count }} médias
+                                <i class="fas fa-{{ $gallery->category === 'trophies' ? 'trophy' : 'image' }} me-1"></i>
+                                {{ $gallery->category_label }}
                             </span>
                         </div>
-                        @if(!$album->is_published)
+                        @if(!$gallery->is_published)
                             <div class="position-absolute top-0 start-0 m-2">
-                                <span class="badge bg-secondary">Brouillon</span>
+                                <span class="badge bg-warning text-dark px-3 py-2">
+                                    <i class="fas fa-eye-slash me-1"></i> Brouillon
+                                </span>
                             </div>
                         @endif
-                    </div>
-                    <div class="card-body">
-                        <h6 class="fw-bold mb-1">{{ Str::limit($album->title, 35) }}</h6>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <small class="text-muted">
-                                <i class="fas fa-tag me-1"></i> 
-                                {{ $album->category_label }}
-                            </small>
-                            <small class="text-muted">
-                                <i class="fas fa-calendar-alt me-1"></i>
-                                {{ $album->created_at->format('d/m/Y') }}
-                            </small>
+                        <div class="position-absolute bottom-0 start-0 m-2">
+                            <span class="badge bg-primary px-3 py-2">
+                                <i class="fas fa-photo-video me-1"></i> {{ $gallery->media_count }} médias
+                            </span>
                         </div>
-                        @if($album->description)
-                            <p class="text-muted small mt-2 mb-0">{{ Str::limit($album->description, 60) }}</p>
-                        @endif
                     </div>
                 </a>
-                <div class="card-footer bg-transparent border-0">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-1 text-dark">{{ Str::limit($gallery->title, 40) }}</h6>
+                    @if($gallery->description)
+                        <p class="text-muted small mb-2">{{ Str::limit($gallery->description, 60) }}</p>
+                    @endif
                     <div class="d-flex justify-content-between align-items-center">
-                        <div>
+                        <small class="text-muted">
+                            <i class="fas fa-calendar-alt me-1"></i> 
+                            {{ $gallery->created_at->format('d/m/Y') }}
+                        </small>
+                        <div class="d-flex gap-2">
                             <small class="text-muted">
-                                <i class="fas fa-eye me-1"></i> {{ $album->views_count ?? 0 }}
+                                <i class="fas fa-eye me-1"></i> {{ $gallery->views_count ?? 0 }}
                             </small>
-                            <small class="text-muted ms-2">
-                                <i class="fas fa-heart me-1 text-danger"></i> {{ $album->likes_count ?? 0 }}
+                            <small class="text-muted">
+                                <i class="fas fa-heart me-1 text-danger"></i> {{ $gallery->likes_count ?? 0 }}
                             </small>
                         </div>
-                        <div>
-                            <a href="{{ route('admin.gallery.edit', $album) }}" class="btn btn-sm btn-warning">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form action="{{ route('admin.gallery.destroy', $album) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer cet album ?')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <div class="btn-group w-100" role="group">
+                        <a href="{{ route('admin.gallery.show', $gallery) }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye me-1"></i> Voir
+                        </a>
+                        <a href="{{ route('admin.gallery.edit', $gallery) }}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form action="{{ route('admin.gallery.toggle-publish', $gallery) }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-{{ $gallery->is_published ? 'secondary' : 'success' }} btn-sm" 
+                                    title="{{ $gallery->is_published ? 'Dépublier' : 'Publier' }}">
+                                <i class="fas fa-{{ $gallery->is_published ? 'eye-slash' : 'eye' }}"></i>
+                            </button>
+                        </form>
+                        <form action="{{ route('admin.gallery.destroy', $gallery) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cette galerie ?')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -143,10 +220,10 @@
         <div class="col-12">
             <div class="text-center py-5">
                 <i class="fas fa-images fa-4x text-muted mb-3"></i>
-                <h4>Aucun album</h4>
-                <p class="text-muted">Créez votre premier album photo</p>
+                <h4>Aucune galerie trouvée</h4>
+                <p class="text-muted">Commencez par créer une nouvelle galerie.</p>
                 <a href="{{ route('admin.gallery.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus me-2"></i> Créer un album
+                    <i class="fas fa-plus me-2"></i> Créer une galerie
                 </a>
             </div>
         </div>
@@ -154,10 +231,11 @@
     </div>
 
     <div class="mt-4">
-        {{ $albums->links() }}
+        {{ $galleries->links() }}
     </div>
 </div>
 
+@push('styles')
 <style>
     .hover-shadow {
         transition: all 0.3s ease;
@@ -170,4 +248,5 @@
         transition: all 0.3s ease;
     }
 </style>
+@endpush
 @endsection

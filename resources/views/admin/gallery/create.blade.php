@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
-@section('title', 'Ajouter une photo')
+@section('title', 'Créer une galerie')
 
-@section('page-title', 'Ajouter une photo')
-@section('page-subtitle', 'Ajouter une nouvelle photo à la galerie')
+@section('page-title', 'Créer une galerie')
+@section('page-subtitle', 'Créer un nouvel album photo')
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ route('admin.gallery.index') }}">Galerie</a></li>
-    <li class="breadcrumb-item active">Ajouter</li>
+    <li class="breadcrumb-item active">Créer</li>
 @endsection
 
 @section('content')
@@ -14,7 +14,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0">
             <i class="fas fa-plus-circle me-2 text-primary"></i>
-            Ajouter une photo
+            Créer une galerie
         </h1>
         <a href="{{ route('admin.gallery.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left me-2"></i> Retour
@@ -62,11 +62,11 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Fichier *</label>
-                            <input type="file" name="file" class="form-control @error('file') is-invalid @enderror" 
-                                   accept="image/*,video/*" required>
-                            <small class="text-muted">Formats acceptés : JPG, PNG, GIF, WEBP, MP4. Taille max : 10MB</small>
-                            @error('file')
+                            <label class="form-label fw-semibold">Image de couverture</label>
+                            <input type="file" name="cover_image" class="form-control @error('cover_image') is-invalid @enderror" 
+                                   accept="image/*">
+                            <small class="text-muted">JPG, PNG, WEBP (max 5MB)</small>
+                            @error('cover_image')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -91,15 +91,19 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold">Type</label>
-                                    <select name="type" class="form-select @error('type') is-invalid @enderror">
-                                        @foreach($types as $key => $label)
-                                            <option value="{{ $key }}" {{ old('type') == $key ? 'selected' : '' }}>
-                                                {{ $label }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('type')
+                                    <label class="form-label fw-semibold">Date de l'événement</label>
+                                    <input type="date" name="event_date" class="form-control @error('event_date') is-invalid @enderror" 
+                                           value="{{ old('event_date') }}">
+                                    @error('event_date')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Lieu</label>
+                                    <input type="text" name="location" class="form-control @error('location') is-invalid @enderror" 
+                                           value="{{ old('location') }}" placeholder="Lieu de l'événement">
+                                    @error('location')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -113,24 +117,13 @@
                                     @enderror
                                 </div>
 
-                                <div class="mb-3">
-                                    <div class="form-check form-switch">
-                                        <input type="hidden" name="is_published" value="0">
-                                        <input type="checkbox" class="form-check-input" id="is_published" 
-                                               name="is_published" value="1" {{ old('is_published', true) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_published">
-                                            <i class="fas fa-eye me-1"></i> Publié
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">Texte alternatif</label>
-                                    <input type="text" name="alt_text" class="form-control @error('alt_text') is-invalid @enderror" 
-                                           value="{{ old('alt_text') }}" placeholder="Description SEO">
-                                    @error('alt_text')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                <div class="form-check form-switch">
+                                    <input type="hidden" name="is_published" value="0">
+                                    <input type="checkbox" class="form-check-input" id="is_published" 
+                                           name="is_published" value="1" {{ old('is_published', true) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_published">
+                                        <i class="fas fa-eye me-1"></i> Publié
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -142,7 +135,7 @@
                         <i class="fas fa-times me-2"></i> Annuler
                     </a>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i> Enregistrer
+                        <i class="fas fa-save me-2"></i> Créer la galerie
                     </button>
                 </div>
             </form>
