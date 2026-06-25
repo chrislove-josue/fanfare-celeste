@@ -11,6 +11,7 @@ use App\Models\CommitteeMember;
 use App\Models\Member;
 use App\Models\Page;
 use App\Models\Partner;
+use App\Models\Carousel; // Ajout du modèle Carousel
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -22,6 +23,9 @@ class HomeController extends Controller
      */
     public function index()
     {
+        // Récupérer les carousels actifs pour la hero section
+        $carousels = Carousel::active()->ordered()->get();
+
         $upcomingEvents = Event::upcoming()->take(3)->get();
 
         $membersTotal = Member::query()->count();
@@ -71,6 +75,7 @@ class HomeController extends Controller
         $homePage = Page::where('slug', 'accueil')->where('is_published', true)->first();
         
         return view('home', compact(
+            'carousels', // Ajout des carousels
             'upcomingEvents', 
             'latestNews', 
             'recentGalleries',
@@ -216,7 +221,7 @@ class HomeController extends Controller
     }
 
     /**
-     * Envoi du formulaire de contact
+     * Envoi du formulaire de contact (déprécié - utiliser ContactController)
      */
     public function sendContact(Request $request)
     {

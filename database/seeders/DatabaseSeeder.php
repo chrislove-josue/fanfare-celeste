@@ -29,6 +29,8 @@ class DatabaseSeeder extends Seeder
             GallerySeeder::class,
             
             PartnerSeeder::class,
+
+            CarouselSeeder::class,
         ]);
     }
 }

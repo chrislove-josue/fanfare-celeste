@@ -50,31 +50,44 @@ class CarouselController extends Controller
     }
 
     public function update(Request $request, Carousel $carousel)
-    {
-        $validated = $request->validate([
-            'title' => 'nullable|string|max:255',
-            'subtitle' => 'nullable|string|max:255',
-            'image' => 'nullable|image|max:2048',
-            'link' => 'nullable|url',
-            'link_text' => 'nullable|string|max:255',
-            'order' => 'integer',
-            'is_active' => 'boolean',
-        ]);
+{
+    $validated = $request->validate([
+        'title' => 'nullable|string|max:255',
+        'subtitle' => 'nullable|string|max:255',
+        'image' => 'nullable|image|max:2048',
+        'link' => 'nullable|url',
+        'link_text' => 'nullable|string|max:255',
+        'order' => 'integer',
+        'is_active' => 'boolean',
+    ]);
 
-        if ($request->hasFile('image')) {
-            // Supprimer l'ancienne image
-            if ($carousel->image) {
-                Storage::disk('public')->delete($carousel->image);
-            }
-            $path = $request->file('image')->storage('carousels', 'public');
-            $validated['image'] = $path;
+    if ($request->hasFile('image')) {
+        if ($carousel->image) {
+            Storage::disk('public')->delete($carousel->image);
         }
-
-        $carousel->update($validated);
-
-        return redirect()->route('admin.carousels.index')
-            ->with('success', 'Slide mis à jour avec succès !');
+        // CORRECTION : store() au lieu de storage()
+        $path = $request->file('image')->store('carousels', 'public');
+        $validated['image'] = $path;
     }
+
+    $carousel->update($validated);
+
+    return redirect()->route('admin.carousels.index')
+        ->with('success', 'Slide mis à jour avec succès !');
+}
+
+    /**
+ * Basculer le statut actif/inactif
+ */
+public function toggle(Carousel $carousel)
+{
+    $carousel->is_active = !$carousel->is_active;
+    $carousel->save();
+
+    $status = $carousel->is_active ? 'activé' : 'désactivé';
+    return redirect()->route('admin.carousels.index')
+        ->with('success', "Slide {$status} avec succès !");
+}
 
     public function destroy(Carousel $carousel)
     {

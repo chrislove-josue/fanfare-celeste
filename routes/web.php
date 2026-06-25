@@ -73,6 +73,14 @@ Route::get('/membership/apply', [MembershipController::class, 'applyForm'])->nam
 Route::post('/membership/apply', [MembershipController::class, 'submitApplication'])->name('membership.submit');
 Route::get('/membership/thankyou', [MembershipController::class, 'thankYou'])->name('membership.thankyou');
 
+
+// Dans routes/web.php
+
+// Routes publiques pour les carousels (optionnel)
+Route::get('/api/carousels', [PublicCarouselController::class, 'index']);
+Route::get('/api/carousels/hero', [PublicCarouselController::class, 'getHeroSlides']);
+Route::get('/api/carousels/{id}', [PublicCarouselController::class, 'show']);
+
 // ============================================
 // ESPACE PERSONNEL (Utilisateur connecté)
 // ============================================
@@ -169,8 +177,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('/pages/{page}/unpublish', [PageController::class, 'unpublish'])->name('pages.unpublish');
     
     Route::resource('carousels', CarouselController::class);
-    Route::post('/carousels/{carousel}/toggle', [CarouselController::class, 'toggle'])->name('carousels.toggle');
-    
+    /*Route::post('/carousels/{carousel}/toggle', [CarouselController::class, 'toggle'])->name('carousels.toggle');*/
+    // Dans routes/web.php, dans le groupe admin
+Route::post('/carousels/{carousel}/toggle', [\App\Http\Controllers\Admin\CarouselController::class, 'toggle'])->name('carousels.toggle');
     Route::resource('testimonials', TestimonialController::class);
     Route::post('/testimonials/{testimonial}/approve', [TestimonialController::class, 'approve'])->name('testimonials.approve');
     Route::post('/testimonials/{testimonial}/toggle', [TestimonialController::class, 'toggle'])->name('testimonials.toggle');

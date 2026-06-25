@@ -4,56 +4,18 @@
 
 @section('content')
 <!-- Hero Section -->
-<section class="hero-section" style="background: linear-gradient(135deg, #1a237e, #283593); color: white; padding: 100px 0; position: relative; overflow: hidden;">
-    <div class="container position-relative" style="z-index: 2;">
+<section class="hero-section" style="background: linear-gradient(135deg, #1a237e, #283593); min-height: 100vh; display: flex; align-items: center; position: relative; overflow: hidden;">
+    <div class="container position-relative" style="z-index: 2; padding: 60px 0;">
         <div class="row align-items-center">
-            <!-- Slide - En haut sur mobile, à droite sur desktop -->
-            <div class="col-lg-6 order-first order-lg-last" data-aos="fade-left">
-                <div class="hero-slider-wrapper" style="position: relative; overflow: hidden; border-radius: 12px; background: rgba(255,255,255,0.05); padding: 20px 0;">
-                    <div class="hero-slider" style="display: flex; animation: slideHero 15s linear infinite; width: max-content;">
-                        <!-- Première série -->
-                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
-                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
-                        </div>
-                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
-                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
-                        </div>
-                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
-                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
-                        </div>
-                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
-                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
-                        </div>
-                        <!-- Deuxième série pour l'effet infini -->
-                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
-                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
-                        </div>
-                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
-                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
-                        </div>
-                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
-                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
-                        </div>
-                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
-                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
-                        </div>
-                    </div>
-                    
-                    <!-- Gradient overlay -->
-                    <div style="position: absolute; top: 0; left: 0; width: 60px; height: 100%; background: linear-gradient(to right, #1a237e, transparent); pointer-events: none; z-index: 2;"></div>
-                    <div style="position: absolute; top: 0; right: 0; width: 60px; height: 100%; background: linear-gradient(to left, #1a237e, transparent); pointer-events: none; z-index: 2;"></div>
-                </div>
-            </div>
-            
-            <!-- Texte - En bas sur mobile, à gauche sur desktop -->
+            <!-- ===== TEXTE - À GAUCHE ===== -->
             <div class="col-lg-6 order-last order-lg-first fade-in-up">
                 <div class="mb-3">
                     <span class="badge bg-warning text-dark px-3 py-2" style="font-size: 0.9rem;">
-                        <i class="fas fa-music me-2"></i> Événement à venir
+                        <i class="fas fa-music me-2"></i> Fanfare Céleste
                     </span>
                 </div>
-                <h1 class="display-4 mb-4 fw-bold">Fanfare Céleste<br>La Trompette de Dieu de l'Atlantique</h1>
-                <p class="lead mb-4">Une fanfare au service de Dieu, animée par la passion de la musique et l'excellence. Rejoignez-nous pour vivre une expérience musicale unique.</p>
+                <h1 class="display-4 mb-4 fw-bold text-white">Fanfare Céleste<br>La Trompette de Dieu de l'Atlantique</h1>
+                <p class="lead mb-4 text-white-50">Une fanfare au service de Dieu, animée par la passion de la musique et l'excellence. Rejoignez-nous pour vivre une expérience musicale unique.</p>
                 <div class="d-flex flex-wrap gap-3">
                     <a href="{{ route('membership.apply') }}" class="btn btn-light btn-lg px-4">
                         <i class="fas fa-hand-peace me-2"></i> Adhérer maintenant
@@ -66,8 +28,75 @@
                     </a>
                 </div>
             </div>
+
+            <!-- ===== DROITE - CAROUSEL OU IMAGE STATIQUE ===== -->
+            <div class="col-lg-6 order-first order-lg-last" data-aos="fade-left">
+                @if(isset($carousels) && $carousels->count() > 0)
+                    <!-- ===== CAROUSEL ===== -->
+                    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000" style="border-radius: 12px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                        <div class="carousel-indicators">
+                            @foreach($carousels as $index => $slide)
+                                <button type="button" data-bs-target="#heroCarousel" 
+                                        data-bs-slide-to="{{ $index }}" 
+                                        class="{{ $index === 0 ? 'active' : '' }}" 
+                                        aria-label="Slide {{ $index + 1 }}"></button>
+                            @endforeach
+                        </div>
+                        <div class="carousel-inner">
+                            @foreach($carousels as $index => $slide)
+                                <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                    <div class="carousel-slide" style="position: relative; height: 500px; overflow: hidden;">
+                                        <img src="{{ asset('storage/' . $slide->image) }}" 
+                                             alt="{{ $slide->title ?? 'Slide' }}" 
+                                             style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+                                        @if($slide->title || $slide->subtitle)
+                                            <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 30px 20px; background: linear-gradient(transparent, rgba(0,0,0,0.7));">
+                                                @if($slide->title)
+                                                    <h3 class="text-white fw-bold mb-1">{{ $slide->title }}</h3>
+                                                @endif
+                                                @if($slide->subtitle)
+                                                    <p class="text-white-50 mb-0">{{ $slide->subtitle }}</p>
+                                                @endif
+                                                @if($slide->link)
+                                                    <a href="{{ $slide->link }}" class="btn btn-sm btn-light mt-2">
+                                                        {{ $slide->link_text ?? 'En savoir plus' }}
+                                                        <i class="fas fa-arrow-right ms-1"></i>
+                                                    </a>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        @if($carousels->count() > 1)
+                            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Précédent</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Suivant</span>
+                            </button>
+                        @endif
+                    </div>
+                @else
+                    <!-- ===== IMAGE STATIQUE ===== -->
+                    <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); height: 500px; position: relative;">
+                        <img src="{{ asset('storage/img/logo.jpeg') }}" 
+                             alt="Fanfare Céleste" 
+                             style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 30px 20px; background: linear-gradient(transparent, rgba(0,0,0,0.7));">
+                            <h3 class="text-white fw-bold mb-1">Fanfare Céleste</h3>
+                            <p class="text-white-50 mb-0">La Trompette de Dieu de l'Atlantique</p>
+                        </div>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
+    
+    <!-- Décorations -->
     <div style="position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
     <div style="position: absolute; bottom: -150px; left: -150px; width: 500px; height: 500px; background: rgba(255,255,255,0.02); border-radius: 50%;"></div>
 </section>
@@ -446,7 +475,6 @@
         @if(isset($partners) && $partners->count() > 0)
         <div class="partner-slider-wrapper" style="position: relative; overflow: hidden;">
             <div class="partner-slider" style="display: flex; animation: slidePartners 20s linear infinite; width: max-content;">
-                <!-- Première série -->
                 @foreach($partners as $partner)
                 <div class="partner-item text-center" style="min-width: 150px; padding: 0 15px;">
                     <div class="p-3 bg-white rounded shadow-sm hover-shadow transition" style="height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
@@ -464,7 +492,6 @@
                     </div>
                 </div>
                 @endforeach
-                <!-- Deuxième série pour l'effet infini -->
                 @foreach($partners as $partner)
                 <div class="partner-item text-center" style="min-width: 150px; padding: 0 15px;">
                     <div class="p-3 bg-white rounded shadow-sm hover-shadow transition" style="height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
@@ -483,8 +510,6 @@
                 </div>
                 @endforeach
             </div>
-            
-            <!-- Gradient overlay pour l'effet de fondu -->
             <div style="position: absolute; top: 0; left: 0; width: 80px; height: 100%; background: linear-gradient(to right, #f8f9fa, transparent); pointer-events: none; z-index: 2;"></div>
             <div style="position: absolute; top: 0; right: 0; width: 80px; height: 100%; background: linear-gradient(to left, #f8f9fa, transparent); pointer-events: none; z-index: 2;"></div>
         </div>
@@ -604,46 +629,36 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
     }
 
-    /* Animation slide infini du hero */
-    @keyframes slideHero {
-        0% {
-            transform: translateX(0);
-        }
-        100% {
-            transform: translateX(-50%);
-        }
+    /* Carousel styles */
+    .carousel-item {
+        transition: transform 0.6s ease;
+    }
+    
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-color: rgba(0,0,0,0.3);
+        border-radius: 50%;
+        padding: 20px;
+        width: 40px;
+        height: 40px;
+        background-size: 50%;
+    }
+    
+    .carousel-indicators button {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin: 0 5px;
+        border: 2px solid rgba(255,255,255,0.5);
+    }
+    
+    .carousel-indicators .active {
+        background-color: #fff;
+        border-color: #fff;
     }
 
-    .hero-slider {
-        display: flex;
-        animation: slideHero 12s linear infinite;
-        width: max-content;
-    }
-
-    .hero-slider:hover {
-        animation-play-state: paused;
-    }
-
-    .hero-slide-item {
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .hero-slide-item img {
-        transition: all 0.3s ease;
-    }
-
-    .hero-slide-item:hover img {
-        transform: scale(1.02);
-        filter: brightness(1.1);
-    }
-
-    .hero-slider-wrapper {
-        background: rgba(255,255,255,0.05);
-        border-radius: 12px;
-        padding: 10px 0;
+    .carousel-slide {
+        height: 500px;
     }
 
     /* Ordre des colonnes sur mobile */
@@ -654,29 +669,67 @@
         .order-last {
             order: 1 !important;
         }
-        .hero-slide-item img {
-            max-height: 180px !important;
-        }
-        .hero-section {
-            padding: 60px 0 !important;
+        .carousel-slide {
+            height: 500px !important;
         }
         .display-4 {
             font-size: 2.2rem !important;
         }
     }
 
-    @media (max-width: 575.98px) {
-        .hero-slide-item img {
-            max-height: 150px !important;
+    @media (max-width: 768px) {
+        .carousel-slide {
+            height: 450px !important;
         }
-        .hero-slider-wrapper {
-            padding: 10px 0;
-        }
-        .display-4 {
-            font-size: 1.8rem !important;
+        .display-3 {
+            font-size: 2rem !important;
         }
         .lead {
-            font-size: 1rem !important;
+            font-size: 0.95rem !important;
+        }
+        .btn-lg {
+            font-size: 0.85rem !important;
+            padding: 0.5rem 1rem !important;
+        }
+        .hero-section {
+            padding: 40px 0 !important;
+        }
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            width: 30px !important;
+            height: 30px !important;
+            padding: 10px !important;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .carousel-slide {
+            height: 420px !important;
+        }
+        .display-3 {
+            font-size: 1.6rem !important;
+        }
+        .lead {
+            font-size: 0.85rem !important;
+        }
+        .btn-lg {
+            font-size: 0.8rem !important;
+            padding: 0.4rem 0.8rem !important;
+        }
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
     }
 </style>
@@ -749,18 +802,16 @@
         }
     });
 
-    // Pause du slide du hero au survol
-    document.querySelector('.hero-slider-wrapper')?.addEventListener('mouseenter', function() {
-        const slider = this.querySelector('.hero-slider');
-        if (slider) {
-            slider.style.animationPlayState = 'paused';
-        }
-    });
-
-    document.querySelector('.hero-slider-wrapper')?.addEventListener('mouseleave', function() {
-        const slider = this.querySelector('.hero-slider');
-        if (slider) {
-            slider.style.animationPlayState = 'running';
+    // Initialisation du carousel
+    document.addEventListener('DOMContentLoaded', function() {
+        var myCarousel = document.querySelector('#heroCarousel');
+        if (myCarousel) {
+            var carousel = new bootstrap.Carousel(myCarousel, {
+                interval: 5000,
+                ride: 'carousel',
+                pause: 'hover',
+                wrap: true
+            });
         }
     });
 </script>
