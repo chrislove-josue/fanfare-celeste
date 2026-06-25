@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('title', 'Accueil - Fanfare Céleste')
@@ -8,7 +7,46 @@
 <section class="hero-section" style="background: linear-gradient(135deg, #1a237e, #283593); color: white; padding: 100px 0; position: relative; overflow: hidden;">
     <div class="container position-relative" style="z-index: 2;">
         <div class="row align-items-center">
-            <div class="col-lg-6 fade-in-up">
+            <!-- Slide - En haut sur mobile, à droite sur desktop -->
+            <div class="col-lg-6 order-first order-lg-last" data-aos="fade-left">
+                <div class="hero-slider-wrapper" style="position: relative; overflow: hidden; border-radius: 12px; background: rgba(255,255,255,0.05); padding: 20px 0;">
+                    <div class="hero-slider" style="display: flex; animation: slideHero 15s linear infinite; width: max-content;">
+                        <!-- Première série -->
+                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
+                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
+                        </div>
+                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
+                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
+                        </div>
+                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
+                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
+                        </div>
+                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
+                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
+                        </div>
+                        <!-- Deuxième série pour l'effet infini -->
+                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
+                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
+                        </div>
+                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
+                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
+                        </div>
+                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
+                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
+                        </div>
+                        <div class="hero-slide-item" style="min-width: 280px; padding: 0 15px; display: flex; align-items: center; justify-content: center;">
+                            <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" style="max-height: 250px; width: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
+                        </div>
+                    </div>
+                    
+                    <!-- Gradient overlay -->
+                    <div style="position: absolute; top: 0; left: 0; width: 60px; height: 100%; background: linear-gradient(to right, #1a237e, transparent); pointer-events: none; z-index: 2;"></div>
+                    <div style="position: absolute; top: 0; right: 0; width: 60px; height: 100%; background: linear-gradient(to left, #1a237e, transparent); pointer-events: none; z-index: 2;"></div>
+                </div>
+            </div>
+            
+            <!-- Texte - En bas sur mobile, à gauche sur desktop -->
+            <div class="col-lg-6 order-last order-lg-first fade-in-up">
                 <div class="mb-3">
                     <span class="badge bg-warning text-dark px-3 py-2" style="font-size: 0.9rem;">
                         <i class="fas fa-music me-2"></i> Événement à venir
@@ -27,9 +65,6 @@
                         <i class="fas fa-images me-2"></i> Galerie
                     </a>
                 </div>
-            </div>
-            <div class="col-lg-6 text-center" data-aos="fade-left">
-                <img src="{{ asset('storage/img/logo.jpeg') }}" alt="Fanfare Céleste" class="img-fluid" style="max-height: 400px; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
             </div>
         </div>
     </div>
@@ -568,6 +603,82 @@
         transform: translateY(-3px);
         box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
     }
+
+    /* Animation slide infini du hero */
+    @keyframes slideHero {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    .hero-slider {
+        display: flex;
+        animation: slideHero 12s linear infinite;
+        width: max-content;
+    }
+
+    .hero-slider:hover {
+        animation-play-state: paused;
+    }
+
+    .hero-slide-item {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hero-slide-item img {
+        transition: all 0.3s ease;
+    }
+
+    .hero-slide-item:hover img {
+        transform: scale(1.02);
+        filter: brightness(1.1);
+    }
+
+    .hero-slider-wrapper {
+        background: rgba(255,255,255,0.05);
+        border-radius: 12px;
+        padding: 10px 0;
+    }
+
+    /* Ordre des colonnes sur mobile */
+    @media (max-width: 991.98px) {
+        .order-first {
+            order: -1 !important;
+        }
+        .order-last {
+            order: 1 !important;
+        }
+        .hero-slide-item img {
+            max-height: 180px !important;
+        }
+        .hero-section {
+            padding: 60px 0 !important;
+        }
+        .display-4 {
+            font-size: 2.2rem !important;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .hero-slide-item img {
+            max-height: 150px !important;
+        }
+        .hero-slider-wrapper {
+            padding: 10px 0;
+        }
+        .display-4 {
+            font-size: 1.8rem !important;
+        }
+        .lead {
+            font-size: 1rem !important;
+        }
+    }
 </style>
 @endpush
 
@@ -633,6 +744,21 @@
 
     document.querySelector('.partner-slider-wrapper')?.addEventListener('mouseleave', function() {
         const slider = this.querySelector('.partner-slider');
+        if (slider) {
+            slider.style.animationPlayState = 'running';
+        }
+    });
+
+    // Pause du slide du hero au survol
+    document.querySelector('.hero-slider-wrapper')?.addEventListener('mouseenter', function() {
+        const slider = this.querySelector('.hero-slider');
+        if (slider) {
+            slider.style.animationPlayState = 'paused';
+        }
+    });
+
+    document.querySelector('.hero-slider-wrapper')?.addEventListener('mouseleave', function() {
+        const slider = this.querySelector('.hero-slider');
         if (slider) {
             slider.style.animationPlayState = 'running';
         }
