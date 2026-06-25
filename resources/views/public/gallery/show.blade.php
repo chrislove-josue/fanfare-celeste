@@ -133,88 +133,154 @@
                 </div>
             </div>
 
-            <!-- Colonne de droite : Autres médias -->
+            <!-- Colonne de droite -->
             <div class="col-lg-4">
-                <div class="side-gallery">
-                    <h5 class="fw-bold mb-3">
-                        <i class="fas fa-images me-2 text-primary"></i>
-                        Autres médias
-                    </h5>
-                    <div class="row g-2">
-                        @foreach($media as $item)
-                            @if(!$item->is_cover && $item->id != ($mainMedia->id ?? 0))
-                                <div class="col-6" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
-                                    <div class="side-media-item position-relative rounded overflow-hidden shadow-sm hover-shadow transition" 
-                                         style="cursor: pointer;"
-                                         data-bs-toggle="modal" 
-                                         data-bs-target="#mediaModal{{ $item->id }}">
-                                        @if($item->type == 'photo')
-                                            <img src="{{ $item->file_url }}" 
-                                                 alt="{{ $item->title ?? $gallery->title }}" 
-                                                 class="img-fluid w-100" 
-                                                 style="height: 150px; object-fit: cover;">
-                                        @else
-                                            <video src="{{ $item->file_url }}" 
-                                                   class="img-fluid w-100" 
-                                                   style="height: 150px; object-fit: cover;"
-                                                   muted></video>
-                                            <div class="position-absolute top-50 start-50 translate-middle">
-                                                <i class="fas fa-play-circle fa-2x text-white opacity-75"></i>
-                                            </div>
-                                        @endif
-                                        <div class="position-absolute top-0 end-0 m-1">
-                                            <span class="badge bg-dark bg-opacity-75">
-                                                <i class="fas fa-{{ $item->type_icon }}"></i>
-                                            </span>
-                                        </div>
-                                        @if($item->title)
-                                            <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-1">
-                                                <small class="d-block text-truncate" style="font-size: 0.7rem;">{{ $item->title }}</small>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endif
-                        @endforeach
-                    </div>
-
-                    @if($media->count() <= 1)
-                        <div class="text-center py-4 text-muted">
-                            <i class="fas fa-photo-video fa-2x mb-2 d-block"></i>
-                            <small>Aucun autre média</small>
-                        </div>
-                    @endif
-                </div>
-
-                <!-- Albums similaires -->
-                @if($related->count() > 0)
-                    <div class="related-albums mt-4">
+                <div class="d-flex flex-column" style="position: sticky; top: 20px;">
+                    <!-- Autres médias -->
+                    <div class="side-gallery mb-4">
                         <h5 class="fw-bold mb-3">
                             <i class="fas fa-images me-2 text-primary"></i>
-                            Albums similaires
+                            Autres médias
                         </h5>
-                        @foreach($related as $item)
-                            <a href="{{ route('public.gallery.show', $item) }}" class="text-decoration-none">
-                                <div class="related-item d-flex align-items-center gap-2 p-2 bg-white rounded shadow-sm mb-2 hover-shadow transition">
-                                    @if($item->cover_image_url)
-                                        <img src="{{ $item->cover_image_url }}" 
-                                             alt="{{ $item->title }}" 
-                                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;">
-                                    @else
-                                        <div style="width: 60px; height: 60px; background: #e9ecef; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="fas fa-images text-muted"></i>
+                        <div class="row g-2">
+                            @php
+                                $otherMedia = $media->where('is_cover', false)->where('id', '!=', ($mainMedia->id ?? 0));
+                                $displayMedia = $otherMedia->take(6);
+                            @endphp
+                            @if($displayMedia->count() > 0)
+                                @foreach($displayMedia as $item)
+                                    <div class="col-6" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
+                                        <div class="side-media-item position-relative rounded overflow-hidden shadow-sm hover-shadow transition" 
+                                             style="cursor: pointer;"
+                                             data-bs-toggle="modal" 
+                                             data-bs-target="#mediaModal{{ $item->id }}">
+                                            @if($item->type == 'photo')
+                                                <img src="{{ $item->file_url }}" 
+                                                     alt="{{ $item->title ?? $gallery->title }}" 
+                                                     class="img-fluid w-100" 
+                                                     style="height: 150px; object-fit: cover;">
+                                            @else
+                                                <video src="{{ $item->file_url }}" 
+                                                       class="img-fluid w-100" 
+                                                       style="height: 150px; object-fit: cover;"
+                                                       muted></video>
+                                                <div class="position-absolute top-50 start-50 translate-middle">
+                                                    <i class="fas fa-play-circle fa-2x text-white opacity-75"></i>
+                                                </div>
+                                            @endif
+                                            <div class="position-absolute top-0 end-0 m-1">
+                                                <span class="badge bg-dark bg-opacity-75">
+                                                    <i class="fas fa-{{ $item->type_icon }}"></i>
+                                                </span>
+                                            </div>
+                                            @if($item->title)
+                                                <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-1">
+                                                    <small class="d-block text-truncate" style="font-size: 0.7rem;">{{ $item->title }}</small>
+                                                </div>
+                                            @endif
                                         </div>
-                                    @endif
-                                    <div class="flex-grow-1">
-                                        <small class="d-block text-dark fw-semibold text-truncate">{{ $item->title }}</small>
-                                        <small class="text-muted">{{ $item->media_count }} médias</small>
                                     </div>
-                                    <i class="fas fa-chevron-right text-muted"></i>
+                                @endforeach
+                            @else
+                                <div class="text-center py-4 text-muted col-12">
+                                    <i class="fas fa-photo-video fa-2x mb-2 d-block"></i>
+                                    <small>Aucun autre média</small>
                                 </div>
-                            </a>
-                        @endforeach
+                            @endif
+                        </div>
+
+                        @if($otherMedia->count() > 6)
+                            <div class="text-center mt-2">
+                                <button class="btn btn-sm btn-outline-primary" onclick="document.getElementById('more-media').classList.toggle('d-none')">
+                                    <i class="fas fa-plus-circle me-1"></i> Voir plus de médias
+                                </button>
+                            </div>
+                            <div id="more-media" class="row g-2 mt-2 d-none">
+                                @foreach($otherMedia->skip(6) as $item)
+                                    <div class="col-6" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
+                                        <div class="side-media-item position-relative rounded overflow-hidden shadow-sm hover-shadow transition" 
+                                             style="cursor: pointer;"
+                                             data-bs-toggle="modal" 
+                                             data-bs-target="#mediaModal{{ $item->id }}">
+                                            @if($item->type == 'photo')
+                                                <img src="{{ $item->file_url }}" 
+                                                     alt="{{ $item->title ?? $gallery->title }}" 
+                                                     class="img-fluid w-100" 
+                                                     style="height: 150px; object-fit: cover;">
+                                            @else
+                                                <video src="{{ $item->file_url }}" 
+                                                       class="img-fluid w-100" 
+                                                       style="height: 150px; object-fit: cover;"
+                                                       muted></video>
+                                                <div class="position-absolute top-50 start-50 translate-middle">
+                                                    <i class="fas fa-play-circle fa-2x text-white opacity-75"></i>
+                                                </div>
+                                            @endif
+                                            <div class="position-absolute top-0 end-0 m-1">
+                                                <span class="badge bg-dark bg-opacity-75">
+                                                    <i class="fas fa-{{ $item->type_icon }}"></i>
+                                                </span>
+                                            </div>
+                                            @if($item->title)
+                                                <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-1">
+                                                    <small class="d-block text-truncate" style="font-size: 0.7rem;">{{ $item->title }}</small>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
-                @endif
+
+                    <!-- Séparateur -->
+                    <hr>
+
+                    <!-- Albums similaires - FIXÉ EN BAS -->
+                    @if($related->count() > 0)
+                        <div class="related-albums">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-images me-2 text-primary" style="font-size: 1.2rem;"></i>
+                                <h5 class="fw-bold mb-0">Albums similaires</h5>
+                                <span class="badge bg-primary ms-2">{{ $related->count() }}</span>
+                            </div>
+                            @foreach($related as $item)
+                                <a href="{{ route('public.gallery.show', $item) }}" class="text-decoration-none">
+                                    <div class="related-item d-flex align-items-center gap-3 p-3 bg-white rounded shadow-sm mb-2 hover-shadow transition">
+                                        @if($item->cover_image_url)
+                                            <img src="{{ $item->cover_image_url }}" 
+                                                 alt="{{ $item->title }}" 
+                                                 style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px;">
+                                        @else
+                                            <div style="width: 70px; height: 70px; background: #e9ecef; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-images text-muted fa-2x"></i>
+                                            </div>
+                                        @endif
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold text-dark text-truncate">{{ $item->title }}</div>
+                                            <div class="d-flex gap-3">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-photo-video me-1"></i> {{ $item->media_count }} médias
+                                                </small>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-eye me-1"></i> {{ $item->views_count ?? 0 }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-muted"></i>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <!-- Retour à la galerie -->
+                    <div class="mt-4">
+                        <a href="{{ route('public.gallery.index') }}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-arrow-left me-2"></i> Retour à la galerie
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -295,16 +361,33 @@
     .breadcrumb-item.active {
         color: #6c757d;
     }
-    .side-gallery {
+
+    /* Fixer la colonne de droite */
+    .col-lg-4 > div {
         position: sticky;
         top: 20px;
     }
+
+    /* Style des albums similaires */
     .related-item {
         transition: all 0.3s ease;
+        border-left: 3px solid transparent;
     }
     .related-item:hover {
-        background-color: #f8f9fa !important;
+        background-color: #f0f2f8 !important;
         transform: translateX(5px);
+        border-left-color: #3946B2;
+    }
+    
+    .related-albums {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 15px;
+        border: 1px solid #e9ecef;
+    }
+
+    #more-media {
+        transition: all 0.3s ease;
     }
 </style>
 @endpush
