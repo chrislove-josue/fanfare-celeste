@@ -23,6 +23,8 @@ use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\PublicNewsController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\VideoController;
+
 use Illuminate\Support\Facades\Route;
 
 // ============================================
@@ -38,6 +40,11 @@ Route::get('/events/{event}', [PublicEventController::class, 'show'])->name('pub
 Route::get('/events/{event}/participate', [PublicEventController::class, 'participateForm'])->name('public.events.participate');
 Route::post('/events/{event}/participate', [PublicEventController::class, 'participate'])->name('public.events.participate.submit');
 Route::get('/events/{event}/participate-form', [PublicEventController::class, 'participateForm'])->name('public.events.participate.form');
+
+// Routes pour les vidéos
+Route::get('/videos', [VideoController::class, 'index'])->name('videos.index');
+Route::get('/videos/{videoId}', [VideoController::class, 'show'])->name('videos.show');
+
 
 // Actualités publiques
 Route::get('/actualites', [PublicNewsController::class, 'index'])->name('public.news.index');

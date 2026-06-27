@@ -48,6 +48,10 @@ class PublicGalleryController extends Controller
             ->take(6)
             ->get();
 
+        // ========== 🎬 RÉCUPÉRATION DES VIDÉOS YOUTUBE ==========
+        $videoController = new VideoController();
+        $videos = $videoController->getVideosList();
+
         return view('public.gallery.index', compact(
             'galleries',
             'categories',
@@ -56,7 +60,8 @@ class PublicGalleryController extends Controller
             'totalPhotos',
             'totalVideos',
             'featuredGalleries',
-            'recentGalleries'
+            'recentGalleries',
+            'videos' // ✅ Passage des vidéos à la vue
         ));
     }
 
