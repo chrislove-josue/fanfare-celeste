@@ -44,7 +44,8 @@
                         @endif
 
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                            <a href="{{ route('public.events.participate.form', ['event' => $event->id]) }}" class="btn btn-primary me-2">
+                            {{-- ✅ CORRECTION : Utilisation de la bonne route --}}
+                            <a href="{{ route('public.events.participate', ['event' => $event->id]) }}" class="btn btn-primary me-2">
                                 <i class="fas fa-user-plus"></i> S’inscrire à l’événement
                             </a>
                             <a href="{{ route('public.events.index') }}" class="btn btn-outline-primary">
@@ -123,7 +124,6 @@
             border-top-left-radius: 15px;
             border-top-right-radius: 15px;
         }
-        /* Pour que l'image garde ses proportions */
         .card-img-top-wrapper img {
             width: 100%;
             height: 210px;
@@ -134,7 +134,6 @@
             max-width: 100%;
             height: auto;
         }
-        /* Effet hover sur l'image */
         .card:hover .card-img-top-wrapper img {
             transform: scale(1.03);
             transition: transform 0.3s ease;
