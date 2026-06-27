@@ -43,7 +43,8 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <form method="POST" action="{{ route('admin.members.update', $member) }}" enctype="multipart/form-data">
+            <!-- ✅ Ajout d'un ID unique au formulaire -->
+            <form id="editMemberForm" method="POST" action="{{ route('admin.members.update', $member) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -109,7 +110,7 @@
                         @enderror
                     </div>
 
-                    <!-- Email (lecture seule) -->
+                    <!-- Email -->
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Email *</label>
                         <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" 
@@ -284,41 +285,75 @@
                     </div>
 
                     <!-- ===== COMPTE UTILISATEUR ===== -->
-<div class="col-md-12 mt-3">
-    <h6 class="border-bottom pb-2">
-        <i class="fas fa-user me-2 text-primary"></i>
-        Compte utilisateur
-    </h6>
-    <div class="d-flex align-items-center gap-3 flex-wrap">
-        @if($member->user)
-            <span class="badge bg-success">
-                <i class="fas fa-check-circle me-1"></i> 
-                Lié à : {{ $member->user->email }}
-            </span>
-            <span class="text-muted small">
-                (Utilisateur ID: #{{ $member->user->id }})
-            </span>
-            <button type="button" class="btn btn-warning btn-sm" 
-                    data-bs-toggle="modal" data-bs-target="#resetPasswordModal{{ $member->id }}">
-                <i class="fas fa-key me-1"></i> Réinitialiser
-            </button>
-            <a href="{{ route('my.card') }}" target="_blank" class="btn btn-info btn-sm">
-                <i class="fas fa-id-card me-1"></i> Voir carte
-            </a>
-        @else
-            <span class="badge bg-secondary">
-                <i class="fas fa-times-circle me-1"></i> Aucun compte utilisateur
-            </span>
-            <button type="button" class="btn btn-success btn-sm" 
-                    data-bs-toggle="modal" data-bs-target="#createUserModal{{ $member->id }}">
-                <i class="fas fa-user-plus me-1"></i> Créer un compte
-            </button>
-        @endif
+                    <div class="col-md-12 mt-3">
+                        <h6 class="border-bottom pb-2">
+                            <i class="fas fa-user me-2 text-primary"></i>
+                            Compte utilisateur
+                        </h6>
+                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                            @if($member->user)
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i> 
+                                    Lié à : {{ $member->user->email }}
+                                </span>
+                                <span class="text-muted small">
+                                    (Utilisateur ID: #{{ $member->user->id }})
+                                </span>
+                                <button type="button" class="btn btn-warning btn-sm" 
+                                        data-bs-toggle="modal" data-bs-target="#resetPasswordModal{{ $member->id }}">
+                                    <i class="fas fa-key me-1"></i> Réinitialiser
+                                </button>
+                            @else
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-times-circle me-1"></i> Aucun compte utilisateur
+                                </span>
+                                <button type="button" class="btn btn-success btn-sm" 
+                                        data-bs-toggle="modal" data-bs-target="#createUserModal{{ $member->id }}">
+                                    <i class="fas fa-user-plus me-1"></i> Créer un compte
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Informations système -->
+                    <div class="col-md-12 mt-3">
+                        <hr>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="fw-semibold">Créé le</label>
+                                <p class="mb-0 text-muted">{{ $member->created_at->format('d/m/Y à H:i') }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="fw-semibold">Dernière modification</label>
+                                <p class="mb-0 text-muted">{{ $member->updated_at->format('d/m/Y à H:i') }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="fw-semibold">ID</label>
+                                <p class="mb-0 text-muted">#{{ $member->id }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                    <a href="{{ route('admin.members.show', $member) }}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i> Annuler
+                    </a>
+                    <!-- ✅ Bouton de soumission avec type="submit" -->
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-save me-2"></i> Mettre à jour
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
+<!-- ===== MODALES ===== -->
+
 <!-- Modal Créer un compte utilisateur -->
-<div class="modal fade" id="createUserModal{{ $member->id }}" tabindex="-1">
+<div class="modal fade" id="createUserModal{{ $member->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ route('admin.members.create-user', $member) }}" method="POST">
@@ -378,7 +413,7 @@
 </div>
 
 <!-- Modal Réinitialiser mot de passe -->
-<div class="modal fade" id="resetPasswordModal{{ $member->id }}" tabindex="-1">
+<div class="modal fade" id="resetPasswordModal{{ $member->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ route('admin.members.reset-password', $member) }}" method="POST">
@@ -428,42 +463,9 @@
     </div>
 </div>
 
-                    <!-- Informations système -->
-                    <div class="col-md-12 mt-3">
-                        <hr>
-                        <div class="row g-2">
-                            <div class="col-md-4">
-                                <label class="fw-semibold">Créé le</label>
-                                <p class="mb-0 text-muted">{{ $member->created_at->format('d/m/Y à H:i') }}</p>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="fw-semibold">Dernière modification</label>
-                                <p class="mb-0 text-muted">{{ $member->updated_at->format('d/m/Y à H:i') }}</p>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="fw-semibold">ID</label>
-                                <p class="mb-0 text-muted">#{{ $member->id }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Actions -->
-                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-                    <a href="{{ route('admin.members.show', $member) }}" class="btn btn-secondary">
-                        <i class="fas fa-times me-2"></i> Annuler
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i> Mettre à jour
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 @push('scripts')
 <script>
+    // ✅ Fonctions pour les mots de passe
     function generateEditPassword(memberId) {
         const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
         let password = '';
@@ -508,8 +510,9 @@
         }
     }
 
-    // Afficher les mots de passe générés automatiquement dans les modales
+    // ✅ Afficher les mots de passe générés dans les modales
     document.addEventListener('DOMContentLoaded', function() {
+        // Pour la modale de création
         document.querySelectorAll('[id^="createUserModal"]').forEach(function(modal) {
             modal.addEventListener('shown.bs.modal', function() {
                 const id = this.id.replace('createUserModal', '');
@@ -520,6 +523,7 @@
             });
         });
 
+        // Pour la modale de réinitialisation
         document.querySelectorAll('[id^="resetPasswordModal"]').forEach(function(modal) {
             modal.addEventListener('shown.bs.modal', function() {
                 const id = this.id.replace('resetPasswordModal', '');
@@ -529,6 +533,28 @@
                 }
             });
         });
+
+        // ✅ Vérifier que le formulaire se soumet bien
+        const form = document.getElementById('editMemberForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                console.log('Formulaire soumis !');
+                // Le formulaire se soumettra normalement
+            });
+        }
+    });
+
+    // ✅ Diagnostic : vérifier si le bouton est bien un type="submit"
+    document.addEventListener('DOMContentLoaded', function() {
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) {
+            console.log('Bouton trouvé :', submitBtn);
+            console.log('Type du bouton :', submitBtn.type);
+            if (submitBtn.type !== 'submit') {
+                console.warn('⚠️ Le bouton n\'est pas de type "submit" !');
+                submitBtn.type = 'submit';
+            }
+        }
     });
 </script>
 @endpush
