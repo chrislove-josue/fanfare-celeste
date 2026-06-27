@@ -104,30 +104,6 @@
                                     <i class="fas fa-heart me-1"></i> J'aime ({{ $gallery->likes_count ?? 0 }})
                                 </button>
                             </form>
-                            <button onclick="window.print()" class="btn btn-outline-secondary btn-sm">
-                                <i class="fas fa-print me-1"></i> Imprimer
-                            </button>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" 
-                               target="_blank" 
-                               class="btn btn-outline-primary btn-sm">
-                                <i class="fab fa-facebook"></i>
-                            </a>
-                            <a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode($gallery->title) }}" 
-                               target="_blank" 
-                               class="btn btn-outline-info btn-sm">
-                                <i class="fab fa-twitter"></i>
-                            </a>
-                            <a href="https://wa.me/?text={{ urlencode($gallery->title . ' - ' . url()->current()) }}" 
-                               target="_blank" 
-                               class="btn btn-outline-success btn-sm">
-                                <i class="fab fa-whatsapp"></i>
-                            </a>
-                            <a href="mailto:?subject={{ urlencode($gallery->title) }}&body={{ urlencode(url()->current()) }}" 
-                               class="btn btn-outline-secondary btn-sm">
-                                <i class="fas fa-envelope"></i>
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -308,19 +284,6 @@
                         @if($item->description)
                             <p class="mt-3 text-muted">{{ $item->description }}</p>
                         @endif
-                        <div class="d-flex justify-content-center gap-3 mt-3 flex-wrap">
-                            <a href="{{ $item->file_url }}" download="{{ $item->file_name }}" class="btn btn-outline-primary btn-sm">
-                                <i class="fas fa-download me-2"></i> Télécharger
-                            </a>
-                            <button onclick="window.print()" class="btn btn-outline-secondary btn-sm">
-                                <i class="fas fa-print me-2"></i> Imprimer
-                            </button>
-                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" 
-                               target="_blank" 
-                               class="btn btn-outline-primary btn-sm">
-                                <i class="fab fa-facebook me-2"></i> Partager
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>

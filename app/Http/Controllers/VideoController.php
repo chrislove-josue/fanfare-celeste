@@ -15,49 +15,83 @@ class VideoController extends Controller
     {
         // ⚠️ REMPLACEZ LES IDs PAR LES VRAIS IDs DES VIDÉOS
         return [
+            
             [
-                'id' => 'NqUqx8xAEOE', // Exemple: ABC123XYZ
+                'id' => 'ZhshH7mBWSU',
+                'title' => 'FANFARE CELESTE LA TROMPETTE DE DIEU ( Gigo twé tin to mimin)',
+                'thumbnail' => 'https://img.youtube.com/vi/ZhshH7mBWSU/mqdefault.jpg'
+            ],
+            [
+                'id' => 'Z-srI1QfO7g',
+                'title' => 'FANFARE CELESTE LA TROMPETTE DE DIEU (collection cantique)',
+                'thumbnail' => 'https://img.youtube.com/vi/Z-srI1QfO7g/mqdefault.jpg'
+            ],
+            [
+                'id' => 'SoExyglPc1M',
+                'title' => 'FANFARE CELESTE LA TROMPETTE DE DIEU Ali jiyewhé gbon/ to onou',
+                'thumbnail' => 'https://img.youtube.com/vi/SoExyglPc1M/mqdefault.jpg'
+            ],
+            [
+                'id' => '_oaF8p9GyF4',
+                'title' => 'FANFARE CELESTE LA TROMPETTE DE DIEU(Ijo mimo)',
+                'thumbnail' => 'https://img.youtube.com/vi/_oaF8p9GyF4/mqdefault.jpg'
+            ],
+            [
+                'id' => 'NqUqx8xAEOE',
                 'title' => 'FANFARE LA TROMPETTE DE DIEU extrait To onou hélé godo',
-                'views' => '136 vues',
-                'date' => 'il y a 4 ans',
                 'thumbnail' => 'https://img.youtube.com/vi/NqUqx8xAEOE/mqdefault.jpg'
             ],
             [
-                'id' => 'VIDEO_ID_2',
-                'title' => 'FANFARE CÉLESTE BLA TROMPETTE DE DIEU Cantiques 306 whenu algoo',
-                'views' => '2,2 k vues',
-                'date' => 'il y a 4 ans',
-                'thumbnail' => 'https://img.youtube.com/vi/VIDEO_ID_2/mqdefault.jpg'
+                'id' => '5pRVZTz6W7s',
+                'title' => "Fanfare Céleste la Trompette de Dieu de l'Atlantique était au Nigeria",
+                'thumbnail' => 'https://img.youtube.com/vi/5pRVZTz6W7s/mqdefault.jpg'
             ],
             [
-                'id' => 'VIDEO_ID_3',
-                'title' => 'Fanfare la trompette de dieu',
-                'views' => '101 vues',
-                'date' => 'il y a 4 ans',
-                'thumbnail' => 'https://img.youtube.com/vi/VIDEO_ID_3/mqdefault.jpg'
+                'id' => 'TanJH6grYZ4',
+                'title' => 'fanfare la trompette de dieu Mi na Mian jio',
+                'thumbnail' => 'https://img.youtube.com/vi/TanJH6grYZ4/mqdefault.jpg'
             ],
             [
-                'id' => 'VIDEO_ID_4',
-                'title' => 'ALT JIYEWHE GBNO/TO ON',
-                'views' => 'vues',
-                'date' => 'il y a 4 ans',
-                'thumbnail' => 'https://img.youtube.com/vi/VIDEO_ID_4/mqdefault.jpg'
+                'id' => 'I3ni9GMyCtM',
+                'title' => 'Fanfare FCTD ATLANTIQUE ( BENIN était au NIGERIA)',
+                'thumbnail' => 'https://img.youtube.com/vi/I3ni9GMyCtM/mqdefault.jpg'
             ],
             [
-                'id' => 'VIDEO_ID_5',
-                'title' => 'ljo mimo eko fayo',
-                'views' => 'vues',
-                'date' => 'il y a 4 ans',
-                'thumbnail' => 'https://img.youtube.com/vi/VIDEO_ID_5/mqdefault.jpg'
+                'id' => 'g8ZKx2Ghz58',
+                'title' => 'FANFARE CELESTE LA TROMPETTE DE DIEU ( Mon âme)',
+                'thumbnail' => 'https://img.youtube.com/vi/g8ZKx2Ghz58/mqdefault.jpg'
             ],
             [
-                'id' => 'VIDEO_ID_6',
-                'title' => 'Cantique Collection',
-                'views' => 'vues',
-                'date' => 'il y a 4 ans',
-                'thumbnail' => 'https://img.youtube.com/vi/VIDEO_ID_6/mqdefault.jpg'
+                'id' => 'EUCxunR5beY',
+                'title' => 'FANFARE CELESTE LA TROMPETTE DE DIEU (Tipinti)',
+                'thumbnail' => 'https://img.youtube.com/vi/EUCxunR5beY/mqdefault.jpg'
             ],
-            // Ajoutez les autres vidéos ici...
+            [
+                'id' => 'ZhshH7mBWSU',
+                'title' => 'FANFARE CELESTE LA TROMPETTE DE DIEU ( Gigo twé tin to mimin)',
+                'thumbnail' => 'https://img.youtube.com/vi/ZhshH7mBWSU/mqdefault.jpg'
+            ],
+            [
+                'id' => 'tL-9NeB0IxE',
+                'title' => 'FANFARE CELESTE LA TROMPETTE DE DIEU ( Halef)',
+                'thumbnail' => 'https://img.youtube.com/vi/tL-9NeB0IxE/mqdefault.jpg'
+            ],
+            [
+                'id' => 'Z-srI1QfO7g',
+                'title' => 'FANFARE CELESTE LA TROMPETTE DE DIEU (collection cantique)',
+                'thumbnail' => 'https://img.youtube.com/vi/Z-srI1QfO7g/mqdefault.jpg'
+            ],
+            [
+                'id' => 'SoExyglPc1M',
+                'title' => 'FANFARE CELESTE LA TROMPETTE DE DIEU Ali jiyewhé gbon/ to onou',
+                'thumbnail' => 'https://img.youtube.com/vi/SoExyglPc1M/mqdefault.jpg'
+            ],
+            [
+                'id' => '_oaF8p9GyF4',
+                'title' => 'FANFARE CELESTE LA TROMPETTE DE DIEU(Ijo mimo)',
+                'thumbnail' => 'https://img.youtube.com/vi/_oaF8p9GyF4/mqdefault.jpg'
+            ],
+            
         ];
     }
 
