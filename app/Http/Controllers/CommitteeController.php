@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/CommitteeController.php
 
 namespace App\Http\Controllers;
 
@@ -9,130 +10,201 @@ use Illuminate\Support\Facades\DB;
 
 class CommitteeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view committee')->only(['index', 'show']);
+        $this->middleware('permission:manage committee')->only(['create', 'store', 'edit', 'update', 'destroy', 'endMandate']);
+    }
+
     /**
-     * Affiche la liste des membres du bureau
+     * Affiche la liste des membres du comité
      */
     public function index()
     {
         $committeeMembers = CommitteeMember::with('member')
             ->orderBy('position_order')
-            ->orderBy('start_date', 'desc')
-            ->paginate(20);
-        
-        $positions = CommitteeMember::getPositions();
-        $currentCommittee = CommitteeMember::with('member')
-            ->where('is_current', true)
-            ->orderBy('position_order')
             ->get();
         
-        return view('committee.index', compact('committeeMembers', 'positions', 'currentCommittee'));
+        $totalMembers = Member::active()->count();
+        $positions = CommitteeMember::getPositions();
+        
+        return view('admin.committee.index', compact(
+            'committeeMembers',
+            'totalMembers',
+            'positions'
+        ));
     }
 
     /**
-     * Affiche le formulaire de création
+     * Affiche le formulaire d'ajout
      */
     public function create()
     {
-        $members = Member::where('status', 'active')->orderBy('first_name')->get();
-        $positions = CommitteeMember::getPositions();
+        $committeeMemberIds = CommitteeMember::where('is_current', true)
+            ->pluck('member_id')
+            ->toArray();
         
-        return view('committee.create', compact('members', 'positions'));
+        $availableMembers = Member::active()
+            ->whereNotIn('id', $committeeMemberIds)
+            ->get();
+        
+        $positions = CommitteeMember::getPositions();
+        $nextOrder = CommitteeMember::max('position_order') + 1;
+        
+        return view('admin.committee.create', compact(
+            'availableMembers',
+            'positions',
+            'nextOrder'
+        ));
     }
 
     /**
-     * Enregistre un nouveau membre du bureau
+     * Enregistre un nouveau membre dans le comité
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'member_id' => 'required|exists:members,id',
-            'position' => 'required|string',
+            'position' => 'required|string|in:' . implode(',', array_keys(CommitteeMember::getPositions())),
             'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after:start_date',
+            'position_order' => 'nullable|integer|min:1|max:99',
             'responsibilities' => 'nullable|string',
+            'is_current' => 'boolean',
         ]);
 
-        // Vérifier si le membre est déjà dans le bureau actuel
-        $existing = CommitteeMember::where('member_id', $request->member_id)
-            ->where('is_current', true)
-            ->first();
+        DB::beginTransaction();
+        
+        try {
+            $exists = CommitteeMember::where('member_id', $validated['member_id'])
+                ->where('is_current', true)
+                ->exists();
             
-        if ($existing) {
-            return back()->with('error', 'Ce membre est déjà en fonction dans le bureau');
+            if ($exists) {
+                return back()->with('error', 'Ce membre est déjà dans le comité actif.')
+                             ->withInput();
+            }
+
+            $validated['is_current'] = $request->has('is_current');
+            
+            if (empty($validated['position_order'])) {
+                $validated['position_order'] = CommitteeMember::max('position_order') + 1;
+            }
+
+            CommitteeMember::create($validated);
+            
+            DB::commit();
+
+            return redirect()->route('admin.committee.index')
+                ->with('success', 'Membre ajouté au comité avec succès.');
+                
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Erreur lors de l\'ajout: ' . $e->getMessage())
+                         ->withInput();
         }
-
-        // Définir l'ordre
-        $lastOrder = CommitteeMember::max('position_order') ?? 0;
-        $validated['position_order'] = $lastOrder + 1;
-        $validated['is_current'] = true;
-
-        CommitteeMember::create($validated);
-
-        return redirect()->route('admin.committee.index')
-            ->with('success', 'Membre du bureau ajouté avec succès');
     }
 
     /**
-     * Affiche les détails d'un membre du bureau
+     * Affiche les détails d'un membre du comité
      */
-    public function show(CommitteeMember $committee)
+    public function show($id)
     {
-        return view('committee.show', compact('committee'));
+        $committeeMember = CommitteeMember::with('member')->findOrFail($id);
+        $positions = CommitteeMember::getPositions();
+        
+        return view('admin.committee.show', compact('committeeMember', 'positions'));
     }
 
     /**
      * Affiche le formulaire d'édition
      */
-    public function edit(CommitteeMember $committee)
+    public function edit($id)
     {
-        $members = Member::where('status', 'active')->orderBy('first_name')->get();
+        $committeeMember = CommitteeMember::with('member')->findOrFail($id);
         $positions = CommitteeMember::getPositions();
         
-        return view('committee.edit', compact('committee', 'members', 'positions'));
+        return view('admin.committee.edit', compact('committeeMember', 'positions'));
     }
 
     /**
-     * Met à jour un membre du bureau
+     * Met à jour un membre du comité
      */
-    public function update(Request $request, CommitteeMember $committee)
+    public function update(Request $request, $id)
     {
+        $committeeMember = CommitteeMember::findOrFail($id);
+        
         $validated = $request->validate([
-            'position' => 'required|string',
+            'position' => 'required|string|in:' . implode(',', array_keys(CommitteeMember::getPositions())),
             'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after:start_date',
+            'position_order' => 'nullable|integer|min:1|max:99',
             'responsibilities' => 'nullable|string',
-            'achievements' => 'nullable|string',
             'is_current' => 'boolean',
         ]);
 
-        $committee->update($validated);
+        DB::beginTransaction();
+        
+        try {
+            $validated['is_current'] = $request->has('is_current');
+            
+            $committeeMember->update($validated);
+            
+            DB::commit();
 
-        return redirect()->route('admin.committee.show', $committee)
-            ->with('success', 'Membre du bureau mis à jour avec succès');
+            return redirect()->route('admin.committee.index')
+                ->with('success', 'Membre du comité mis à jour avec succès.');
+                
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Erreur lors de la mise à jour: ' . $e->getMessage());
+        }
     }
 
     /**
-     * Supprime un membre du bureau
+     * Supprime un membre du comité
      */
-    public function destroy(CommitteeMember $committee)
+    public function destroy($id)
     {
-        $committee->delete();
+        $committeeMember = CommitteeMember::findOrFail($id);
+        
+        DB::beginTransaction();
+        
+        try {
+            $committeeMember->delete();
+            
+            DB::commit();
 
-        return redirect()->route('admin.committee.index')
-            ->with('success', 'Membre du bureau supprimé avec succès');
+            return redirect()->route('admin.committee.index')
+                ->with('success', 'Membre retiré du comité avec succès.');
+                
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Erreur lors de la suppression: ' . $e->getMessage());
+        }
     }
 
     /**
-     * Termine le mandat d'un membre du bureau
+     * Termine le mandat d'un membre
      */
-    public function endMandate(CommitteeMember $committee)
+    public function endMandate($id)
     {
-        $committee->update([
-            'end_date' => now(),
-            'is_current' => false
-        ]);
+        $committeeMember = CommitteeMember::findOrFail($id);
+        
+        DB::beginTransaction();
+        
+        try {
+            $committeeMember->update([
+                'is_current' => false,
+                'end_date' => now(),
+            ]);
+            
+            DB::commit();
 
-        return redirect()->route('admin.committee.show', $committee)
-            ->with('success', 'Mandat terminé avec succès');
+            return redirect()->route('admin.committee.index')
+                ->with('success', 'Mandat terminé avec succès.');
+                
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Erreur lors de la fin du mandat: ' . $e->getMessage());
+        }
     }
 }

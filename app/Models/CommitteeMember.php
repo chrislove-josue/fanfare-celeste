@@ -1,4 +1,5 @@
 <?php
+// app/Models/CommitteeMember.php
 
 namespace App\Models;
 
@@ -25,7 +26,7 @@ class CommitteeMember extends Model
         return $this->belongsTo(Member::class);
     }
 
-    public static function getPositions()
+    public static function getPositions(): array
     {
         return [
             'president' => 'Président',
@@ -43,7 +44,7 @@ class CommitteeMember extends Model
         ];
     }
 
-    public function endMandate()
+    public function endMandate(): void
     {
         $this->update([
             'end_date' => now(),

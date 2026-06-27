@@ -39,7 +39,6 @@ Route::get('/events', [PublicEventController::class, 'index'])->name('public.eve
 Route::get('/events/{event}', [PublicEventController::class, 'show'])->name('public.events.show');
 Route::get('/events/{event}/participate', [PublicEventController::class, 'participateForm'])->name('public.events.participate');
 Route::post('/events/{event}/participate', [PublicEventController::class, 'participate'])->name('public.events.participate.submit');
-Route::get('/events/{event}/participate-form', [PublicEventController::class, 'participateForm'])->name('public.events.participate.form');
 
 // Routes pour les vidéos
 Route::get('/videos', [VideoController::class, 'index'])->name('videos.index');
@@ -118,9 +117,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('/members/{member}/create-user', [MemberController::class, 'createUser'])->name('members.create-user');
     Route::post('/members/{member}/reset-password', [MemberController::class, 'resetPassword'])->name('members.reset-password');
 
-    // ============================================================
-    // ⭐ GESTION DES RÔLES (AJOUTÉ)
-    // ============================================================
+    // ===== GESTION DES RÔLES =====
     Route::get('/members/{member}/roles', [MemberController::class, 'manageRoles'])->name('members.roles');
     Route::post('/members/{member}/assign-role', [MemberController::class, 'assignRole'])->name('members.assign-role');
     Route::post('/members/{member}/remove-role', [MemberController::class, 'removeRole'])->name('members.remove-role');
@@ -190,9 +187,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('/testimonials/{testimonial}/approve', [TestimonialController::class, 'approve'])->name('testimonials.approve');
     Route::post('/testimonials/{testimonial}/toggle', [TestimonialController::class, 'toggle'])->name('testimonials.toggle');
     
+    // ✅ Actualités - Resource uniquement (crée toutes les routes CRUD)
     Route::resource('news', NewsController::class);
+    // ✅ Route supplémentaire pour la publication (non incluse dans resource)
     Route::post('/news/{news}/publish', [NewsController::class, 'publish'])->name('news.publish');
-    Route::get('/news/{news}/show', [NewsController::class, 'show'])->name('news.show');
 
     // ===== GESTION DES PARTENAIRES =====
     Route::resource('partners', PartnerController::class);
