@@ -1,97 +1,162 @@
 @extends('layouts.app')
 
-@section('title', 'Inscription - ' . ($event->title ?? 'Événement'))
+@section('title', 'S\'inscrire à l\'événement - ' . $event->title)
 
 @section('content')
 <section class="py-5">
     <div class="container">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <a href="{{ route('public.events.show', $event) }}" class="btn btn-outline-primary">
-                <i class="fas fa-arrow-left"></i> Retour
-            </a>
-            <div>
-                <span class="badge bg-primary"><i class="fas fa-user-plus me-1"></i> Inscription</span>
-            </div>
-        </div>
-
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                <div class="card shadow-sm" style="border-radius: 15px; overflow: hidden;">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h4 class="mb-0">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Inscription à l'événement
+                        </h4>
                     </div>
-                @endif
-
-                <div class="card shadow-sm" style="border-radius: 15px;">
-                    <div class="card-header bg-transparent">
-                        <h4 class="mb-0">{{ $event->title }}</h4>
-                        <div class="text-muted mt-1">
-                            {{ optional($event->start_date)->format('d/m/Y H:i') }}
-                            @if($event->location)
-                                • {{ $event->location }}
-                            @endif
+                    <div class="card-body p-4">
+                        <!-- Informations de l'événement -->
+                        <div class="alert alert-info">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-calendar-alt fa-2x me-3"></i>
+                                <div>
+                                    <h5 class="mb-1">{{ $event->title }}</h5>
+                                    <p class="mb-0 text-muted">
+                                        <i class="far fa-calendar-alt me-1"></i>
+                                        {{ optional($event->start_date)->format('d/m/Y à H:i') }}
+                                        @if($event->end_date)
+                                            <span class="mx-2">→</span>
+                                            {{ optional($event->end_date)->format('d/m/Y à H:i') }}
+                                        @endif
+                                    </p>
+                                    @if($event->location)
+                                        <p class="mb-0 text-muted">
+                                            <i class="fas fa-map-marker-alt me-1"></i>
+                                            {{ $event->location }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-12">
-                                <div class="alert alert-info mb-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="flex-shrink-0">
-                                            <img
-                                                src="{{ $avatarUrl }}"
-                                                alt="Avatar"
-                                                class="rounded-circle"
-                                                style="width:56px;height:56px;object-fit:cover;">
+                        <!-- Formulaire -->
+                        <form action="{{ route('public.events.participate.submit', $event) }}" method="POST">
+                            @csrf
+
+                            <div class="row g-3">
+                                <!-- Prénom -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-user me-1 text-primary"></i>
+                                        Prénom *
+                                    </label>
+                                    <input type="text" 
+                                           name="first_name" 
+                                           class="form-control @error('first_name') is-invalid @enderror" 
+                                           value="{{ old('first_name', $prefilledData['first_name'] ?? '') }}"
+                                           placeholder="Votre prénom"
+                                           required>
+                                    @error('first_name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <!-- Nom -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-user me-1 text-primary"></i>
+                                        Nom *
+                                    </label>
+                                    <input type="text" 
+                                           name="last_name" 
+                                           class="form-control @error('last_name') is-invalid @enderror" 
+                                           value="{{ old('last_name', $prefilledData['last_name'] ?? '') }}"
+                                           placeholder="Votre nom"
+                                           required>
+                                    @error('last_name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <!-- Téléphone -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-phone me-1 text-primary"></i>
+                                        Téléphone *
+                                    </label>
+                                    <input type="tel" 
+                                           name="phone" 
+                                           class="form-control @error('phone') is-invalid @enderror" 
+                                           value="{{ old('phone', $prefilledData['phone'] ?? '') }}"
+                                           placeholder="+229 97 00 00 00"
+                                           required>
+                                    @error('phone')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <!-- WhatsApp (optionnel) -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fab fa-whatsapp me-1 text-success"></i>
+                                        WhatsApp
+                                    </label>
+                                    <input type="tel" 
+                                           name="whatsapp" 
+                                           class="form-control @error('whatsapp') is-invalid @enderror" 
+                                           value="{{ old('whatsapp', $prefilledData['whatsapp'] ?? '') }}"
+                                           placeholder="+229 97 00 00 00">
+                                    @error('whatsapp')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">Optionnel</small>
+                                </div>
+
+                                <!-- Message d'information si connecté -->
+                                @auth
+                                    <div class="col-12">
+                                        <div class="alert alert-success mb-0">
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            <strong>Vous êtes connecté(e) !</strong>
+                                            Vos informations ont été pré-remplies.
                                         </div>
-                                        <div>
-                                            <div class="fw-semibold">Votre identité</div>
-                                            <div class="text-muted">Nom, e-mail et quartier alimentent votre demande.</div>
+                                    </div>
+                                @else
+                                    <div class="col-12">
+                                        <div class="alert alert-warning mb-0">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            <strong>Vous n'êtes pas connecté(e).</strong>
+                                            <a href="{{ route('login') }}" class="alert-link">Connectez-vous</a> 
+                                            ou <a href="{{ route('register') }}" class="alert-link">créez un compte</a> 
+                                            pour remplir automatiquement vos informations.
                                         </div>
+                                    </div>
+                                @endauth
+
+                                <!-- Boutons -->
+                                <div class="col-12 mt-3">
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            Confirmer mon inscription
+                                        </button>
+                                        <a href="{{ route('public.events.show', $event) }}" class="btn btn-outline-secondary btn-lg">
+                                            <i class="fas fa-times me-2"></i>
+                                            Annuler
+                                        </a>
                                     </div>
                                 </div>
                             </div>
-
-                            <form method="POST" action="{{ route('public.events.participate', $event) }}">
-                                @csrf
-
-                                <div class="col-md-6">
-                                    <label class="form-label">Nom</label>
-                                    <input type="text" name="last_name" class="form-control" value="{{ old('last_name', $profile->last_name ?? '') }}" required>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">Prénom</label>
-                                    <input type="text" name="first_name" class="form-control" value="{{ old('first_name', $profile->first_name ?? '') }}" required>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" name="email" class="form-control" value="{{ old('email', $profile->email ?? '') }}" required>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">Téléphone</label>
-                                    <input type="text" name="phone" class="form-control" value="{{ old('phone', $profile->phone ?? '') }}" required>
-                                </div>
-                                <div class="col-12 d-flex justify-content-end mt-2">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-paper-plane me-1"></i> Envoyer ma demande
-                                    </button>
-                                </div>
-                            </form>
-
-                        </div>
+                        </form>
                     </div>
                 </div>
 
-                <div class="text-muted mt-3" style="font-size: 0.95rem;">
-                    En envoyant, vous inscrivez votre participation à cet événement.
+                <!-- Retour -->
+                <div class="mt-4 text-center">
+                    <a href="{{ route('public.events.show', $event) }}" class="text-decoration-none">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Retour à l'événement
+                    </a>
                 </div>
             </div>
         </div>
@@ -99,3 +164,30 @@
 </section>
 @endsection
 
+@push('styles')
+<style>
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    .card-header {
+        border-radius: 0;
+    }
+    .form-control:focus {
+        border-color: #3946B2;
+        box-shadow: 0 0 0 0.2rem rgba(57, 70, 178, 0.15);
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #3946B2, #283593);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(26,35,126,0.3);
+    }
+    .alert {
+        border-radius: 10px;
+    }
+</style>
+@endpush

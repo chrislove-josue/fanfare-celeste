@@ -46,6 +46,7 @@
                             @foreach($carousels as $index => $slide)
                                 <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                                     <div class="carousel-slide" style="position: relative; height: 500px; overflow: hidden;">
+                                        <!-- ✅ CORRECTION ICI : Utilisation de asset() -->
                                         <img src="{{ asset('storage/' . $slide->image) }}" 
                                              alt="{{ $slide->title ?? 'Slide' }}" 
                                              style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
@@ -193,6 +194,7 @@
     </div>
 </section>
 
+
 <!-- Événements à venir -->
 <section class="events-section py-5">
     <div class="container">
@@ -212,11 +214,17 @@
             <div class="col-md-4 col-lg-4" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
                 <div class="card h-100 shadow-sm hover-shadow transition">
                     <div class="position-relative">
+                        <!-- ✅ CORRECTION : Utiliser asset() correctement -->
                         @if($event->featured_image)
                             <img src="{{ asset('storage/' . $event->featured_image) }}" 
                                  alt="{{ $event->title }}" 
                                  class="card-img-top" 
-                                 style="height: 200px; object-fit: cover;">
+                                 style="height: 200px; width: 100%; object-fit: cover;">
+                        @elseif($event->poster_path)
+                            <img src="{{ asset('storage/' . $event->poster_path) }}" 
+                                 alt="{{ $event->title }}" 
+                                 class="card-img-top" 
+                                 style="height: 200px; width: 100%; object-fit: cover;">
                         @else
                             <div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
                                 <i class="fas fa-calendar-alt fa-4x text-white opacity-50"></i>
@@ -337,7 +345,7 @@
     </div>
 </section>
 
-<!-- Galerie -->
+<!-- Galerie - SECTION CORRIGÉE -->
 <section class="gallery-section py-5">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-5" data-aos="fade-up">
@@ -356,8 +364,9 @@
             <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
                 <a href="{{ route('public.gallery.show', $gallery) }}" class="text-decoration-none">
                     <div class="gallery-item position-relative overflow-hidden rounded shadow-sm">
-                        @if($gallery->cover_image_url)
-                            <img src="{{ $gallery->cover_image_url }}" 
+                        <!-- ✅ CORRECTION ICI : Utilisation de asset() avec vérification -->
+                        @if($gallery->cover_image)
+                            <img src="{{ asset('storage/' . $gallery->cover_image) }}" 
                                  alt="{{ $gallery->title }}" 
                                  style="height: 200px; width: 100%; object-fit: cover; transition: transform 0.3s ease;">
                         @else
@@ -391,16 +400,21 @@
             @foreach($recentMedia as $media)
             <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
                 <div class="gallery-item position-relative overflow-hidden rounded shadow-sm">
-                    @if($media->type == 'photo')
-                        <img src="{{ $media->file_url }}" 
+                    <!-- ✅ CORRECTION ICI : Utilisation de asset() avec vérification -->
+                    @if($media->type == 'photo' && $media->file_path)
+                        <img src="{{ asset('storage/' . $media->file_path) }}" 
                              alt="{{ $media->title }}" 
                              style="height: 200px; width: 100%; object-fit: cover; transition: transform 0.3s ease;">
-                    @else
-                        <video src="{{ $media->file_url }}" 
+                    @elseif($media->type == 'video' && $media->file_path)
+                        <video src="{{ asset('storage/' . $media->file_path) }}" 
                                style="height: 200px; width: 100%; object-fit: cover;"
                                muted></video>
                         <div class="position-absolute top-50 start-50 translate-middle">
                             <i class="fas fa-play-circle fa-2x text-white opacity-75"></i>
+                        </div>
+                    @else
+                        <div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-image fa-3x text-white opacity-50"></i>
                         </div>
                     @endif
                     <div class="overlay position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-2">
@@ -478,8 +492,9 @@
                 @foreach($partners as $partner)
                 <div class="partner-item text-center" style="min-width: 150px; padding: 0 15px;">
                     <div class="p-3 bg-white rounded shadow-sm hover-shadow transition" style="height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        @if($partner->logo_url)
-                            <img src="{{ $partner->logo_url }}" 
+                        <!-- ✅ CORRECTION ICI : Utilisation de asset() pour le logo -->
+                        @if($partner->logo)
+                            <img src="{{ asset('storage/' . $partner->logo) }}" 
                                  alt="{{ $partner->name }}" 
                                  class="img-fluid" 
                                  style="max-height: 50px; object-fit: contain; filter: grayscale(0); transition: filter 0.3s ease;">
@@ -495,8 +510,9 @@
                 @foreach($partners as $partner)
                 <div class="partner-item text-center" style="min-width: 150px; padding: 0 15px;">
                     <div class="p-3 bg-white rounded shadow-sm hover-shadow transition" style="height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        @if($partner->logo_url)
-                            <img src="{{ $partner->logo_url }}" 
+                        <!-- ✅ CORRECTION ICI : Utilisation de asset() pour le logo -->
+                        @if($partner->logo)
+                            <img src="{{ asset('storage/' . $partner->logo) }}" 
                                  alt="{{ $partner->name }}" 
                                  class="img-fluid" 
                                  style="max-height: 50px; object-fit: contain; filter: grayscale(0); transition: filter 0.3s ease;">
@@ -540,26 +556,6 @@
                 <i class="fas fa-envelope me-2"></i> Nous contacter
             </a>
         </div>
-    </div>
-</section>
-
-<!-- Newsletter -->
-<section class="newsletter-section py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-    <div class="container text-center">
-        <h3 class="fw-bold">Restez informé</h3>
-        <p class="mb-4">Abonnez-vous à notre newsletter pour recevoir nos actualités et événements</p>
-        <form action="{{ route('newsletter.subscribe') }}" method="POST" class="row justify-content-center">
-            @csrf
-            <div class="col-md-6 col-lg-5">
-                <div class="input-group">
-                    <input type="email" name="email" class="form-control form-control-lg" placeholder="Votre email" required>
-                    <button type="submit" class="btn btn-light btn-lg">
-                        <i class="fas fa-paper-plane me-2"></i> S'abonner
-                    </button>
-                </div>
-                <small class="d-block mt-2 opacity-75">Recevez nos actualités et ne manquez aucun événement</small>
-            </div>
-        </form>
     </div>
 </section>
 

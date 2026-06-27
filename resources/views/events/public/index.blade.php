@@ -17,7 +17,10 @@
                 <div class="col-md-6 col-lg-4" data-aos="fade-up">
                     <div class="card h-100">
                         @if(!empty($event->poster_url))
-                            <img src="{{ $event->poster_url }}" class="card-img-top" alt="{{ $event->title }}" style="height: 210px; object-fit: cover;">
+                            <div class="card-img-top-wrapper" style="position: relative; overflow: hidden; background: #f8f9fa;">
+                                <img src="{{ $event->poster_url }}" class="card-img-top" alt="{{ $event->title }}" 
+                                     style="width: 100%; height: 210px; object-fit: cover; object-position: center;">
+                            </div>
                         @else
                             <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 210px; background: #f3f4f6; color:#6b7280;">
                                 <i class="fas fa-calendar-alt" style="font-size: 2rem;"></i>
@@ -33,9 +36,7 @@
                             <h5 class="card-title">{{ $event->title }}</h5>
 
                             <p class="card-text text-muted" style="line-height: 1.5;">
-                                {{ 
-                                    Str::limit($event->description, 130)
-                                }}
+                                {{ Str::limit($event->description, 130) }}
                             </p>
 
                             <div class="mt-auto">
@@ -45,7 +46,7 @@
                                         {{ $event->location }}
                                     </small>
                                 </div>
-<div class="d-flex gap-2 mt-2">
+                                <div class="d-flex gap-2 mt-2">
                                     <a href="{{ route('public.events.show', $event) }}" class="btn btn-sm btn-outline-secondary stretched-link" style="text-decoration:none;">
                                         <i class="fas fa-book-open me-1"></i> Lire l’article
                                     </a>
@@ -73,8 +74,22 @@
 
 @push('styles')
     <style>
-        .card-img-top { border-top-left-radius: 15px; border-top-right-radius: 15px; }
-        .card { border-radius: 15px; }
+        .card-img-top { 
+            border-top-left-radius: 15px; 
+            border-top-right-radius: 15px; 
+        }
+        .card { 
+            border-radius: 15px; 
+            overflow: hidden;
+        }
+        .card-img-top-wrapper {
+            background: #f8f9fa;
+        }
+        .card-img-top-wrapper img {
+            transition: transform 0.3s ease;
+        }
+        .card:hover .card-img-top-wrapper img {
+            transform: scale(1.03);
+        }
     </style>
 @endpush
-

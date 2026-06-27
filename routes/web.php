@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\PartnerController;
+use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\PublicNewsController;
 use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
@@ -72,14 +73,6 @@ Route::post('/newsletter/subscribe', [HomeController::class, 'newsletterSubscrib
 Route::get('/membership/apply', [MembershipController::class, 'applyForm'])->name('membership.apply');
 Route::post('/membership/apply', [MembershipController::class, 'submitApplication'])->name('membership.submit');
 Route::get('/membership/thankyou', [MembershipController::class, 'thankYou'])->name('membership.thankyou');
-
-
-// Dans routes/web.php
-
-// Routes publiques pour les carousels (optionnel)
-Route::get('/api/carousels', [PublicCarouselController::class, 'index']);
-Route::get('/api/carousels/hero', [PublicCarouselController::class, 'getHeroSlides']);
-Route::get('/api/carousels/{id}', [PublicCarouselController::class, 'show']);
 
 // ============================================
 // ESPACE PERSONNEL (Utilisateur connecté)
@@ -177,9 +170,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('/pages/{page}/unpublish', [PageController::class, 'unpublish'])->name('pages.unpublish');
     
     Route::resource('carousels', CarouselController::class);
-    /*Route::post('/carousels/{carousel}/toggle', [CarouselController::class, 'toggle'])->name('carousels.toggle');*/
-    // Dans routes/web.php, dans le groupe admin
-Route::post('/carousels/{carousel}/toggle', [\App\Http\Controllers\Admin\CarouselController::class, 'toggle'])->name('carousels.toggle');
+    Route::post('/carousels/{carousel}/toggle', [CarouselController::class, 'toggle'])->name('carousels.toggle');
+    
     Route::resource('testimonials', TestimonialController::class);
     Route::post('/testimonials/{testimonial}/approve', [TestimonialController::class, 'approve'])->name('testimonials.approve');
     Route::post('/testimonials/{testimonial}/toggle', [TestimonialController::class, 'toggle'])->name('testimonials.toggle');
@@ -192,8 +184,8 @@ Route::post('/carousels/{carousel}/toggle', [\App\Http\Controllers\Admin\Carouse
     Route::resource('partners', PartnerController::class);
     Route::post('/partners/{partner}/toggle-active', [PartnerController::class, 'toggleActive'])->name('partners.toggle-active');
 
-    // Admin - Gestion des messages de contact
-    Route::resource('contact-messages', \App\Http\Controllers\Admin\ContactMessageController::class);
+    // ===== GESTION DES MESSAGES DE CONTACT =====
+    Route::resource('contact-messages', ContactMessageController::class);
 
     // ===== PARAMÈTRES =====
     Route::get('/settings', [SettingController::class, 'index'])->name('settings');

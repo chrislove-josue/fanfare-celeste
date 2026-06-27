@@ -6,23 +6,41 @@ use App\Models\Event;
 use App\Models\Member;
 use App\Models\EventPublicRegistration;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PublicEventController extends Controller
 {
     public function participateForm(Event $event)
     {
-        $profile = auth()->check() ? auth()->user() : null;
-        $avatarUrl = null;
-        if ($profile && !empty($profile->photo)) {
-            $avatarUrl = asset('storage/' . $profile->photo);
-        } elseif ($profile && property_exists($profile, 'avatar_url') && $profile->avatar_url) {
-            $avatarUrl = $profile->avatar_url;
+        $user = Auth::user();
+        $prefilledData = [];
+        
+        if ($user) {
+            // Récupérer les informations du membre lié à l'utilisateur
+            $member = $user->member;
+            
+            if ($member) {
+                // Pré-remplir avec les données du membre
+                $prefilledData = [
+                    'first_name' => $member->first_name ?? '',
+                    'last_name' => $member->last_name ?? '',
+                    'phone' => $member->phone ?? '',
+                    'whatsapp' => $member->whatsapp ?? '',
+                ];
+            } else {
+                // Si l'utilisateur n'a pas de membre associé, utiliser les données de l'utilisateur
+                $prefilledData = [
+                    'first_name' => explode(' ', $user->name)[0] ?? '',
+                    'last_name' => explode(' ', $user->name)[1] ?? '',
+                    'phone' => '',
+                    'whatsapp' => '',
+                ];
+            }
         }
-
+        
         return view('events.public.participate', [
             'event' => $event,
-            'profile' => $profile,
-            'avatarUrl' => $avatarUrl ?: asset('https://www.gravatar.com/avatar/?d=mp&f=y'),
+            'prefilledData' => $prefilledData,
         ]);
     }
 
@@ -32,20 +50,31 @@ class PublicEventController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'phone' => 'required|string|max:30',
+            'whatsapp' => 'nullable|string|max:30',
         ]);
 
-        // Une soumission = une nouvelle inscription publique (auto-incrément id)
-        \App\Models\EventPublicRegistration::create([
+        // Vérifier si l'utilisateur est déjà inscrit avec ce numéro de téléphone
+        $existingRegistration = EventPublicRegistration::where('event_id', $event->id)
+            ->where('phone', $validated['phone'])
+            ->first();
+
+        if ($existingRegistration) {
+            return back()->with('error', 'Ce numéro de téléphone est déjà inscrit à cet événement.')
+                         ->withInput();
+        }
+
+        // Créer l'inscription
+        EventPublicRegistration::create([
             'event_id' => $event->id,
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
-            'whatsapp_number' => $validated['phone'],
             'phone' => $validated['phone'],
+            'whatsapp_number' => $validated['whatsapp'] ?? $validated['phone'],
             'status' => 'confirmed',
         ]);
 
         return redirect()->route('public.events.show', $event)
-            ->with('success', 'Votre demande d’inscription a été envoyée. Merci !');
+            ->with('success', 'Votre inscription a été enregistrée avec succès. Merci !');
     }
 
     public function index()
@@ -60,16 +89,13 @@ class PublicEventController extends Controller
 
     public function show(Event $event)
     {
-        // Tous les membres du club sont considérés comme participants
-        // (inscriptions internes gérées par admin + membres du club)
-        $membersTotal = \App\Models\Member::query()->count();
+        $membersTotal = Member::query()->count();
 
-        // Liste des participants internes (ceux ajoutés par admin)
         $participants = $event->participants()
             ->orderByRaw("CONCAT(members.first_name, ' ', members.last_name) ASC")
             ->get();
 
-        $publicRegistrationsCount = \App\Models\EventPublicRegistration::query()
+        $publicRegistrationsCount = EventPublicRegistration::query()
             ->where('event_id', $event->id)
             ->count();
 
@@ -78,4 +104,3 @@ class PublicEventController extends Controller
         return view('events.public.show', compact('event', 'participants', 'publicRegistrationsCount', 'totalParticipants', 'membersTotal'));
     }
 }
-
