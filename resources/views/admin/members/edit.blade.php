@@ -1,31 +1,157 @@
+{{-- resources/views/admin/members/edit.blade.php --}}
+
 @extends('layouts.admin')
 
-@section('title', 'Modifier le membre')
+@section('title', 'Modifier le membre - ' . $member->full_name)
 
 @section('page-title', 'Modifier le membre')
-@section('page-subtitle', 'Modifier les informations du membre')
+@section('page-subtitle', $member->full_name . ' - ' . $member->member_number)
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ route('admin.members.index') }}">Membres</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('admin.members.show', $member) }}">{{ $member->full_name }}</a></li>
     <li class="breadcrumb-item active">Modifier</li>
 @endsection
 
 @section('content')
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">
-            <i class="fas fa-edit me-2 text-warning"></i>
-            Modifier le membre
-        </h1>
-        <div>
-            <a href="{{ route('admin.members.show', $member) }}" class="btn btn-secondary me-2">
-                <i class="fas fa-arrow-left me-2"></i> Retour
-            </a>
-            <a href="{{ route('admin.members.card', $member) }}" class="btn btn-primary">
-                <i class="fas fa-id-card me-2"></i> Carte
-            </a>
-        </div>
-    </div>
+<style>
+    .form-section {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+    
+    .form-section .section-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #1a1a2e;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #f1f3f5;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .form-section .section-title i {
+        color: #3946B2;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        font-size: 0.85rem;
+        color: #374151;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #3946B2;
+        box-shadow: 0 0 0 3px rgba(57, 70, 178, 0.1);
+    }
+    
+    .form-control.is-invalid, .form-select.is-invalid {
+        border-color: #dc2626;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+    
+    .invalid-feedback {
+        font-size: 0.8rem;
+        color: #dc2626;
+    }
+    
+    .photo-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #fff;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .photo-preview-placeholder {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: #f1f3f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: #6b7280;
+        border: 4px solid #fff;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-action {
+        padding: 0.6rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    .badge-status {
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .badge-status.active {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+    
+    .badge-status.pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    .badge-status.inactive {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .badge-status.suspended {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    .badge-status.withdrawn {
+        background: #e5e7eb;
+        color: #6b7280;
+    }
+    
+    .badge-status.deceased {
+        background: #1f2937;
+        color: #fff;
+    }
+    
+    .badge-status.training {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+</style>
 
+<div class="container-fluid py-4">
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show">
             <h5 class="alert-heading">
@@ -41,318 +167,363 @@
         </div>
     @endif
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <!-- ✅ Ajout d'un ID unique au formulaire -->
-            <form id="editMemberForm" method="POST" action="{{ route('admin.members.update', $member) }}" enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
+    <form method="POST" action="{{ route('admin.members.update', $member) }}" enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
 
-                <div class="row g-3">
-                    <!-- Photo -->
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Photo</label>
-                        <input type="file" name="photo" class="form-control @error('photo') is-invalid @enderror" accept="image/*">
-                        <small class="text-muted">Format : JPG, PNG | Taille max : 2MB</small>
-                        @if($member->photo_url)
-                            <div class="mt-2">
-                                <img src="{{ $member->photo_url }}" 
-                                     class="rounded-circle" 
-                                     width="100" height="100" 
-                                     style="object-fit: cover; border: 3px solid #3946B2;" 
-                                     alt="Photo membre">
+        <!-- ========================================== -->
+        <!-- SECTION 1 : INFORMATIONS PERSONNELLES       -->
+        <!-- ========================================== -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-user-circle"></i>
+                Informations personnelles
+            </div>
+            <div class="row g-3">
+                <!-- Photo -->
+                <div class="col-md-3 text-center">
+                    <label class="form-label">Photo</label>
+                    <div class="mb-2">
+                        @if($member->photo)
+                            <img src="{{ asset('storage/' . $member->photo) }}" class="photo-preview" alt="{{ $member->full_name }}">
+                        @else
+                            <div class="photo-preview-placeholder">
+                                <i class="fas fa-user"></i>
                             </div>
                         @endif
-                        @error('photo')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
-
-                    <!-- Numéro de membre -->
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">N° Membre</label>
-                        <input type="text" class="form-control bg-light" value="{{ $member->member_number }}" disabled readonly>
-                    </div>
-
-                    <!-- Statut -->
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Statut *</label>
-                        <select name="status" class="form-select @error('status') is-invalid @enderror" required>
-                            <option value="">-- Sélectionner --</option>
-                            @foreach($statuses as $key => $label)
-                                <option value="{{ $key }}" {{ old('status', $member->status) === $key ? 'selected' : '' }}>
-                                    {{ $label }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('status')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Prénom -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Prénom *</label>
-                        <input type="text" name="first_name" class="form-control @error('first_name') is-invalid @enderror" 
-                               value="{{ old('first_name', $member->first_name) }}" required>
-                        @error('first_name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Nom -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Nom *</label>
-                        <input type="text" name="last_name" class="form-control @error('last_name') is-invalid @enderror" 
-                               value="{{ old('last_name', $member->last_name) }}" required>
-                        @error('last_name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Email -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Email *</label>
-                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" 
-                               value="{{ old('email', $member->email) }}" required>
-                        @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Téléphone -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Téléphone *</label>
-                        <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" 
-                               value="{{ old('phone', $member->phone) }}" required>
-                        @error('phone')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- WhatsApp -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">WhatsApp</label>
-                        <input type="text" name="whatsapp" class="form-control @error('whatsapp') is-invalid @enderror" 
-                               value="{{ old('whatsapp', $member->whatsapp) }}">
-                        @error('whatsapp')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Section -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Section</label>
-                        <select name="section" class="form-select @error('section') is-invalid @enderror">
-                            <option value="">-- Sélectionner --</option>
-                            @foreach($sections as $key => $label)
-                                <option value="{{ $key }}" {{ old('section', $member->section) === $key ? 'selected' : '' }}>
-                                    {{ $label }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('section')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Rôle dans la section -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Rôle dans la section</label>
-                        <input type="text" name="section_role" class="form-control @error('section_role') is-invalid @enderror" 
-                               value="{{ old('section_role', $member->section_role) }}" placeholder="Responsable, Membre...">
-                        @error('section_role')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Instrument -->
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Instrument</label>
-                        <select name="instrument" class="form-select @error('instrument') is-invalid @enderror">
-                            <option value="">-- Sélectionner --</option>
-                            @foreach($instruments as $key => $label)
-                                <option value="{{ $key }}" {{ old('instrument', $member->instrument) === $key ? 'selected' : '' }}>
-                                    {{ $label }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('instrument')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Niveau instrument -->
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Niveau instrument</label>
-                        <select name="instrument_level" class="form-select @error('instrument_level') is-invalid @enderror">
-                            <option value="">-- Sélectionner --</option>
-                            @foreach($instrumentLevels as $key => $label)
-                                <option value="{{ $key }}" {{ old('instrument_level', $member->instrument_level) === $key ? 'selected' : '' }}>
-                                    {{ $label }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('instrument_level')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Date d'entrée -->
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Date d'entrée</label>
-                        <input type="date" name="entry_date" class="form-control @error('entry_date') is-invalid @enderror" 
-                               value="{{ old('entry_date', optional($member->entry_date)->format('Y-m-d')) }}">
-                        @error('entry_date')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Adresse -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Adresse</label>
-                        <textarea name="address" class="form-control @error('address') is-invalid @enderror" rows="2">{{ old('address', $member->address) }}</textarea>
-                        @error('address')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Date de naissance -->
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold">Date de naissance</label>
-                        <input type="date" name="birth_date" class="form-control @error('birth_date') is-invalid @enderror" 
-                               value="{{ old('birth_date', optional($member->birth_date)->format('Y-m-d')) }}">
-                        @error('birth_date')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Lieu de naissance -->
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold">Lieu de naissance</label>
-                        <input type="text" name="birth_place" class="form-control @error('birth_place') is-invalid @enderror" 
-                               value="{{ old('birth_place', $member->birth_place) }}">
-                        @error('birth_place')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Contact d'urgence -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Contact d'urgence (Nom)</label>
-                        <input type="text" name="emergency_contact_name" class="form-control @error('emergency_contact_name') is-invalid @enderror" 
-                               value="{{ old('emergency_contact_name', $member->emergency_contact_name) }}">
-                        @error('emergency_contact_name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Contact d'urgence (Téléphone)</label>
-                        <input type="text" name="emergency_contact_phone" class="form-control @error('emergency_contact_phone') is-invalid @enderror" 
-                               value="{{ old('emergency_contact_phone', $member->emergency_contact_phone) }}">
-                        @error('emergency_contact_phone')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Notes médicales -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Notes médicales</label>
-                        <textarea name="medical_notes" class="form-control @error('medical_notes') is-invalid @enderror" rows="2">{{ old('medical_notes', $member->medical_notes) }}</textarea>
-                        @error('medical_notes')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Compétences -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Compétences</label>
-                        <input type="text" name="skills" class="form-control @error('skills') is-invalid @enderror" 
-                               value="{{ old('skills', $member->skills) }}" placeholder="Séparées par des virgules">
-                        @error('skills')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Notes admin -->
-                    <div class="col-md-12">
-                        <label class="form-label fw-semibold">Notes (Admin)</label>
-                        <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="2">{{ old('notes', $member->notes) }}</textarea>
-                        @error('notes')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- ===== COMPTE UTILISATEUR ===== -->
-                    <div class="col-md-12 mt-3">
-                        <h6 class="border-bottom pb-2">
-                            <i class="fas fa-user me-2 text-primary"></i>
-                            Compte utilisateur
-                        </h6>
-                        <div class="d-flex align-items-center gap-3 flex-wrap">
-                            @if($member->user)
-                                <span class="badge bg-success">
-                                    <i class="fas fa-check-circle me-1"></i> 
-                                    Lié à : {{ $member->user->email }}
-                                </span>
-                                <span class="text-muted small">
-                                    (Utilisateur ID: #{{ $member->user->id }})
-                                </span>
-                                <button type="button" class="btn btn-warning btn-sm" 
-                                        data-bs-toggle="modal" data-bs-target="#resetPasswordModal{{ $member->id }}">
-                                    <i class="fas fa-key me-1"></i> Réinitialiser
-                                </button>
-                            @else
-                                <span class="badge bg-secondary">
-                                    <i class="fas fa-times-circle me-1"></i> Aucun compte utilisateur
-                                </span>
-                                <button type="button" class="btn btn-success btn-sm" 
-                                        data-bs-toggle="modal" data-bs-target="#createUserModal{{ $member->id }}">
-                                    <i class="fas fa-user-plus me-1"></i> Créer un compte
-                                </button>
-                            @endif
-                        </div>
-                    </div>
-
-                    <!-- Informations système -->
-                    <div class="col-md-12 mt-3">
-                        <hr>
-                        <div class="row g-2">
-                            <div class="col-md-4">
-                                <label class="fw-semibold">Créé le</label>
-                                <p class="mb-0 text-muted">{{ $member->created_at->format('d/m/Y à H:i') }}</p>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="fw-semibold">Dernière modification</label>
-                                <p class="mb-0 text-muted">{{ $member->updated_at->format('d/m/Y à H:i') }}</p>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="fw-semibold">ID</label>
-                                <p class="mb-0 text-muted">#{{ $member->id }}</p>
-                            </div>
-                        </div>
-                    </div>
+                    <input type="file" name="photo" class="form-control @error('photo') is-invalid @enderror" accept="image/*">
+                    <small class="text-muted">Format : JPG, PNG | Taille max : 2MB</small>
+                    @error('photo')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
-                <!-- Actions -->
-                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-                    <a href="{{ route('admin.members.show', $member) }}" class="btn btn-secondary">
-                        <i class="fas fa-times me-2"></i> Annuler
-                    </a>
-                    <!-- ✅ Bouton de soumission avec type="submit" -->
-                    <button type="submit" class="btn btn-primary" id="submitBtn">
-                        <i class="fas fa-save me-2"></i> Mettre à jour
-                    </button>
+                <!-- N° Membre -->
+                <div class="col-md-3">
+                    <label class="form-label">N° Membre</label>
+                    <input type="text" class="form-control bg-light" value="{{ $member->member_number }}" disabled readonly>
                 </div>
-            </form>
+
+                <!-- Statut -->
+                <div class="col-md-3">
+                    <label class="form-label">Statut *</label>
+                    <select name="status" class="form-select @error('status') is-invalid @enderror" required>
+                        @foreach($statuses as $key => $label)
+                            <option value="{{ $key }}" {{ old('status', $member->status) === $key ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('status')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Date d'entrée -->
+                <div class="col-md-3">
+                    <label class="form-label">Date d'entrée</label>
+                    <input type="date" name="entry_date" class="form-control @error('entry_date') is-invalid @enderror" 
+                           value="{{ old('entry_date', optional($member->entry_date)->format('Y-m-d')) }}">
+                    @error('entry_date')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Prénom -->
+                <div class="col-md-6">
+                    <label class="form-label">Prénom *</label>
+                    <input type="text" name="first_name" class="form-control @error('first_name') is-invalid @enderror" 
+                           value="{{ old('first_name', $member->first_name) }}" required>
+                    @error('first_name')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Nom -->
+                <div class="col-md-6">
+                    <label class="form-label">Nom *</label>
+                    <input type="text" name="last_name" class="form-control @error('last_name') is-invalid @enderror" 
+                           value="{{ old('last_name', $member->last_name) }}" required>
+                    @error('last_name')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-6">
+                    <label class="form-label">Email *</label>
+                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" 
+                           value="{{ old('email', $member->email) }}" required>
+                    @error('email')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Téléphone -->
+                <div class="col-md-6">
+                    <label class="form-label">Téléphone *</label>
+                    <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" 
+                           value="{{ old('phone', $member->phone) }}" required>
+                    @error('phone')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- WhatsApp -->
+                <div class="col-md-6">
+                    <label class="form-label">WhatsApp</label>
+                    <input type="text" name="whatsapp" class="form-control @error('whatsapp') is-invalid @enderror" 
+                           value="{{ old('whatsapp', $member->whatsapp) }}">
+                    @error('whatsapp')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Adresse -->
+                <div class="col-md-6">
+                    <label class="form-label">Adresse</label>
+                    <textarea name="address" class="form-control @error('address') is-invalid @enderror" rows="2">{{ old('address', $member->address) }}</textarea>
+                    @error('address')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
         </div>
-    </div>
+
+        <!-- ========================================== -->
+        <!-- SECTION 2 : MUSIQUE ET SECTION              -->
+        <!-- ========================================== -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-music"></i>
+                Informations musicales
+            </div>
+            <div class="row g-3">
+                <!-- Section -->
+                <div class="col-md-4">
+                    <label class="form-label">Section</label>
+                    <select name="section" class="form-select @error('section') is-invalid @enderror">
+                        <option value="">-- Sélectionner --</option>
+                        @foreach($sections as $key => $label)
+                            <option value="{{ $key }}" {{ old('section', $member->section) === $key ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('section')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Rôle dans la section -->
+                <div class="col-md-4">
+                    <label class="form-label">Rôle dans la section</label>
+                    <input type="text" name="section_role" class="form-control @error('section_role') is-invalid @enderror" 
+                           value="{{ old('section_role', $member->section_role) }}" placeholder="Responsable, Membre...">
+                    @error('section_role')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Instrument -->
+                <div class="col-md-4">
+                    <label class="form-label">Instrument</label>
+                    <select name="instrument" class="form-select @error('instrument') is-invalid @enderror">
+                        <option value="">-- Sélectionner --</option>
+                        @foreach($instruments as $key => $label)
+                            <option value="{{ $key }}" {{ old('instrument', $member->instrument) === $key ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('instrument')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Niveau instrument -->
+                <div class="col-md-4">
+                    <label class="form-label">Niveau instrument</label>
+                    <select name="instrument_level" class="form-select @error('instrument_level') is-invalid @enderror">
+                        <option value="">-- Sélectionner --</option>
+                        @foreach($instrumentLevels as $key => $label)
+                            <option value="{{ $key }}" {{ old('instrument_level', $member->instrument_level) === $key ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('instrument_level')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Date de naissance -->
+                <div class="col-md-4">
+                    <label class="form-label">Date de naissance</label>
+                    <input type="date" name="birth_date" class="form-control @error('birth_date') is-invalid @enderror" 
+                           value="{{ old('birth_date', optional($member->birth_date)->format('Y-m-d')) }}">
+                    @error('birth_date')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Lieu de naissance -->
+                <div class="col-md-4">
+                    <label class="form-label">Lieu de naissance</label>
+                    <input type="text" name="birth_place" class="form-control @error('birth_place') is-invalid @enderror" 
+                           value="{{ old('birth_place', $member->birth_place) }}">
+                    @error('birth_place')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECTION 3 : URGENCE ET NOTES                -->
+        <!-- ========================================== -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-ambulance"></i>
+                Contact d'urgence et notes
+            </div>
+            <div class="row g-3">
+                <!-- Contact d'urgence (Nom) -->
+                <div class="col-md-6">
+                    <label class="form-label">Contact d'urgence (Nom)</label>
+                    <input type="text" name="emergency_contact_name" class="form-control @error('emergency_contact_name') is-invalid @enderror" 
+                           value="{{ old('emergency_contact_name', $member->emergency_contact_name) }}">
+                    @error('emergency_contact_name')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Contact d'urgence (Téléphone) -->
+                <div class="col-md-6">
+                    <label class="form-label">Contact d'urgence (Téléphone)</label>
+                    <input type="text" name="emergency_contact_phone" class="form-control @error('emergency_contact_phone') is-invalid @enderror" 
+                           value="{{ old('emergency_contact_phone', $member->emergency_contact_phone) }}">
+                    @error('emergency_contact_phone')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Notes médicales -->
+                <div class="col-md-6">
+                    <label class="form-label">Notes médicales</label>
+                    <textarea name="medical_notes" class="form-control @error('medical_notes') is-invalid @enderror" rows="3">{{ old('medical_notes', $member->medical_notes) }}</textarea>
+                    @error('medical_notes')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Compétences -->
+                <div class="col-md-6">
+                    <label class="form-label">Compétences</label>
+                    <input type="text" name="skills" class="form-control @error('skills') is-invalid @enderror" 
+                           value="{{ old('skills', $member->skills) }}" placeholder="Séparées par des virgules">
+                    @error('skills')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Notes admin -->
+                <div class="col-md-12">
+                    <label class="form-label">Notes (Admin)</label>
+                    <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="3">{{ old('notes', $member->notes) }}</textarea>
+                    @error('notes')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECTION 4 : COMPTE UTILISATEUR              -->
+        <!-- ========================================== -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-user"></i>
+                Compte utilisateur
+            </div>
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                @if($member->user)
+                    <span class="badge bg-success">
+                        <i class="fas fa-check-circle me-1"></i> 
+                        Lié à : {{ $member->user->email }}
+                    </span>
+                    <span class="text-muted small">
+                        (Utilisateur ID: #{{ $member->user->id }})
+                    </span>
+                    <span class="badge bg-info">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        Rôles : {{ implode(', ', $member->user->roles->pluck('name')->toArray()) ?: 'Aucun' }}
+                    </span>
+                    <button type="button" class="btn btn-warning btn-sm" 
+                            data-bs-toggle="modal" data-bs-target="#resetPasswordModal{{ $member->id }}">
+                        <i class="fas fa-key me-1"></i> Réinitialiser
+                    </button>
+                    <a href="{{ route('admin.members.roles', $member) }}" class="btn btn-info btn-sm">
+                        <i class="fas fa-shield-alt me-1"></i> Gérer les rôles
+                    </a>
+                @else
+                    <span class="badge bg-secondary">
+                        <i class="fas fa-times-circle me-1"></i> Aucun compte utilisateur
+                    </span>
+                    <button type="button" class="btn btn-success btn-sm" 
+                            data-bs-toggle="modal" data-bs-target="#createUserModal{{ $member->id }}">
+                        <i class="fas fa-user-plus me-1"></i> Créer un compte
+                    </button>
+                @endif
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- INFORMATIONS SYSTÈME                       -->
+        <!-- ========================================== -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-12">
+                <div class="bg-light rounded-3 p-3">
+                    <div class="row g-2">
+                        <div class="col-md-3">
+                            <label class="fw-semibold small text-muted">Créé le</label>
+                            <p class="mb-0">{{ $member->created_at->format('d/m/Y à H:i') }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="fw-semibold small text-muted">Dernière modification</label>
+                            <p class="mb-0">{{ $member->updated_at->format('d/m/Y à H:i') }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="fw-semibold small text-muted">ID Membre</label>
+                            <p class="mb-0">#{{ $member->id }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="fw-semibold small text-muted">N° Membre</label>
+                            <p class="mb-0">{{ $member->member_number }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- BOUTONS D'ACTION                            -->
+        <!-- ========================================== -->
+        <div class="d-flex justify-content-end gap-3">
+            <a href="{{ route('admin.members.show', $member) }}" class="btn btn-secondary btn-action">
+                <i class="fas fa-times me-2"></i> Annuler
+            </a>
+            <button type="submit" class="btn btn-primary btn-action">
+                <i class="fas fa-save me-2"></i> Mettre à jour
+            </button>
+        </div>
+    </form>
 </div>
 
-<!-- ===== MODALES ===== -->
-
-<!-- Modal Créer un compte utilisateur -->
+<!-- ========================================== -->
+<!-- MODAL : CRÉER UN COMPTE                    -->
+<!-- ========================================== -->
 <div class="modal fade" id="createUserModal{{ $member->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -412,7 +583,9 @@
     </div>
 </div>
 
-<!-- Modal Réinitialiser mot de passe -->
+<!-- ========================================== -->
+<!-- MODAL : RÉINITIALISER LE MOT DE PASSE      -->
+<!-- ========================================== -->
 <div class="modal fade" id="resetPasswordModal{{ $member->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -465,7 +638,6 @@
 
 @push('scripts')
 <script>
-    // ✅ Fonctions pour les mots de passe
     function generateEditPassword(memberId) {
         const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
         let password = '';
@@ -510,9 +682,8 @@
         }
     }
 
-    // ✅ Afficher les mots de passe générés dans les modales
+    // Afficher les mots de passe générés automatiquement dans les modales
     document.addEventListener('DOMContentLoaded', function() {
-        // Pour la modale de création
         document.querySelectorAll('[id^="createUserModal"]').forEach(function(modal) {
             modal.addEventListener('shown.bs.modal', function() {
                 const id = this.id.replace('createUserModal', '');
@@ -523,7 +694,6 @@
             });
         });
 
-        // Pour la modale de réinitialisation
         document.querySelectorAll('[id^="resetPasswordModal"]').forEach(function(modal) {
             modal.addEventListener('shown.bs.modal', function() {
                 const id = this.id.replace('resetPasswordModal', '');
@@ -533,28 +703,6 @@
                 }
             });
         });
-
-        // ✅ Vérifier que le formulaire se soumet bien
-        const form = document.getElementById('editMemberForm');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                console.log('Formulaire soumis !');
-                // Le formulaire se soumettra normalement
-            });
-        }
-    });
-
-    // ✅ Diagnostic : vérifier si le bouton est bien un type="submit"
-    document.addEventListener('DOMContentLoaded', function() {
-        const submitBtn = document.getElementById('submitBtn');
-        if (submitBtn) {
-            console.log('Bouton trouvé :', submitBtn);
-            console.log('Type du bouton :', submitBtn.type);
-            if (submitBtn.type !== 'submit') {
-                console.warn('⚠️ Le bouton n\'est pas de type "submit" !');
-                submitBtn.type = 'submit';
-            }
-        }
     });
 </script>
 @endpush

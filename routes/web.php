@@ -45,7 +45,6 @@ Route::get('/events/{event}/participate-form', [PublicEventController::class, 'p
 Route::get('/videos', [VideoController::class, 'index'])->name('videos.index');
 Route::get('/videos/{videoId}', [VideoController::class, 'show'])->name('videos.show');
 
-
 // Actualités publiques
 Route::get('/actualites', [PublicNewsController::class, 'index'])->name('public.news.index');
 Route::get('/actualites/{slug}', [PublicNewsController::class, 'show'])->name('public.news.show');
@@ -118,6 +117,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // ===== GESTION DES COMPTES UTILISATEURS =====
     Route::post('/members/{member}/create-user', [MemberController::class, 'createUser'])->name('members.create-user');
     Route::post('/members/{member}/reset-password', [MemberController::class, 'resetPassword'])->name('members.reset-password');
+
+    // ============================================================
+    // ⭐ GESTION DES RÔLES (AJOUTÉ)
+    // ============================================================
+    Route::get('/members/{member}/roles', [MemberController::class, 'manageRoles'])->name('members.roles');
+    Route::post('/members/{member}/assign-role', [MemberController::class, 'assignRole'])->name('members.assign-role');
+    Route::post('/members/{member}/remove-role', [MemberController::class, 'removeRole'])->name('members.remove-role');
+    Route::post('/members/{member}/sync-roles', [MemberController::class, 'syncRoles'])->name('members.sync-roles');
 
     // ===== GESTION FINANCIÈRE =====
     Route::prefix('financial')->name('financial.')->group(function () {

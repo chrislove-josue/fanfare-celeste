@@ -7,32 +7,41 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Str;
 
 class MemberController extends Controller
 {
+    /**
+     * Constructeur avec permissions
+     */
     public function __construct()
     {
-        $this->middleware('permission:view members')->only(['index', 'show']);
+        $this->middleware('permission:view members')->only(['index', 'show', 'manageRoles']);
         $this->middleware('permission:create members')->only(['create', 'store']);
         $this->middleware('permission:edit members')->only(['edit', 'update']);
         $this->middleware('permission:delete members')->only(['destroy']);
         $this->middleware('permission:approve members')->only(['approve', 'reject']);
     }
 
+    // ==========================================
+    // INDEX - Liste des membres
+    // ==========================================
     public function index(Request $request)
     {
         $query = Member::query();
         
-        // Filtres
+        // 🔍 Filtres
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                   ->orWhere('last_name', 'like', "%{$search}%")
                   ->orWhere('member_number', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
             });
         }
         
@@ -57,59 +66,59 @@ class MemberController extends Controller
             }
         }
         
-        $members = $query->latest()->paginate(15);
+        // Tri
+        $sort = $request->sort ?? 'created_at';
+        $direction = $request->direction ?? 'desc';
+        $query->orderBy($sort, $direction);
         
-        // Statistiques pour le filtre
-        $sections = Member::select('section')->distinct()->whereNotNull('section')->pluck('section');
-        $instruments = Member::select('instrument')->distinct()->whereNotNull('instrument')->pluck('instrument');
-        $statuses = ['pending', 'active', 'suspended', 'withdrawn', 'deceased', 'training'];
+        $members = $query->paginate(15);
         
-        // Statistiques pour les cartes
+        // 📊 Statistiques pour les cartes
         $totalMembers = Member::count();
         $activeMembers = Member::where('status', 'active')->count();
         $pendingMembers = Member::where('status', 'pending')->count();
         $newMembers = Member::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count();
         $usersCount = Member::whereHas('user')->count();
         
+        // 🏷️ Options pour les filtres
+        $sections = Member::select('section')->distinct()->whereNotNull('section')->pluck('section');
+        $instruments = Member::select('instrument')->distinct()->whereNotNull('instrument')->pluck('instrument');
+        $statuses = ['pending', 'active', 'inactive', 'suspended', 'withdrawn', 'deceased', 'training'];
+        
         return view('admin.members.index', compact(
-            'members', 
-            'sections', 
-            'instruments', 
-            'statuses',
+            'members',
             'totalMembers',
             'activeMembers',
             'pendingMembers',
             'newMembers',
-            'usersCount'
+            'usersCount',
+            'sections',
+            'instruments',
+            'statuses'
         ));
     }
 
+    // ==========================================
+    // CREATE - Formulaire de création
+    // ==========================================
     public function create()
     {
-        $sections = [
-            'Trompettes' => 'Trompettes',
-            'Trombones' => 'Trombones',
-            'Saxophones' => 'Saxophones',
-            'Percussions' => 'Percussions',
-            'Clairons' => 'Clairons',
-            'Batterie' => 'Batterie'
-        ];
+        $sections = Member::getSections();
+        $instruments = Member::getInstruments();
+        $instrumentLevels = Member::getInstrumentLevels();
+        $statuses = Member::getStatuses();
         
-        $instruments = [
-            'Trompette' => 'Trompette',
-            'Trombone' => 'Trombone',
-            'Saxophone Alto' => 'Saxophone Alto',
-            'Saxophone Ténor' => 'Saxophone Ténor',
-            'Saxophone Baryton' => 'Saxophone Baryton',
-            'Batterie' => 'Batterie',
-            'Caisse Claire' => 'Caisse Claire',
-            'Grosse Caisse' => 'Grosse Caisse',
-            'Cymbales' => 'Cymbales'
-        ];
-        
-        return view('admin.members.create', compact('sections', 'instruments'));
+        return view('admin.members.create', compact(
+            'sections',
+            'instruments',
+            'instrumentLevels',
+            'statuses'
+        ));
     }
 
+    // ==========================================
+    // STORE - Enregistrement d'un nouveau membre
+    // ==========================================
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -120,37 +129,44 @@ class MemberController extends Controller
             'whatsapp' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'birth_date' => 'nullable|date',
-            'birth_place' => 'nullable|string',
-            'instrument' => 'nullable|string',
+            'birth_place' => 'nullable|string|max:255',
+            'instrument' => 'nullable|string|max:100',
             'instrument_level' => 'nullable|string|in:debutant,intermediaire,avance,expert',
             'entry_date' => 'nullable|date',
-            'section' => 'nullable|string',
-            'section_role' => 'nullable|string',
+            'section' => 'nullable|string|max:100',
+            'section_role' => 'nullable|string|max:100',
             'photo' => 'nullable|image|max:2048',
             'id_document' => 'nullable|file|max:5120',
-            'emergency_contact_name' => 'nullable|string',
-            'emergency_contact_phone' => 'nullable|string',
+            'emergency_contact_name' => 'nullable|string|max:255',
+            'emergency_contact_phone' => 'nullable|string|max:20',
             'medical_notes' => 'nullable|string',
             'skills' => 'nullable|string',
             'notes' => 'nullable|string',
-            'status' => 'nullable|in:active,pending,inactive',
+            'status' => 'nullable|in:active,pending,inactive,suspended,withdrawn,deceased,training',
         ]);
 
         DB::beginTransaction();
         
         try {
+            // Générer le numéro de membre
             $validated['member_number'] = Member::generateMemberNumber();
             $validated['status'] = $request->status ?? 'pending';
 
+            // Gérer la photo
             if ($request->hasFile('photo')) {
                 $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
             }
 
+            // Gérer le document d'identité
             if ($request->hasFile('id_document')) {
                 $validated['id_document'] = $request->file('id_document')->store('members/documents', 'public');
             }
 
+            // Créer le membre
             $member = Member::create($validated);
+
+            // Créer automatiquement un compte utilisateur
+            $this->createUserAccount($member);
 
             DB::commit();
             
@@ -164,67 +180,74 @@ class MemberController extends Controller
         }
     }
 
+    // ==========================================
+    // SHOW - Détails d'un membre
+    // ==========================================
     public function show(Member $member)
     {
-        $contributions = $member->contributions()->latest()->take(6)->get();
-        $events = $member->eventParticipations()->with('event')->latest()->take(6)->get();
-        $transactions = $member->transactions()->latest()->take(6)->get();
+        // 📊 Statistiques du membre
+        // ✅ Utilisation de 'transactions' au lieu de 'financialTransactions'
+        $contributions = $member->transactions()
+            ->where('type', 'income')
+            ->sum('amount');
+            
+        $transactionsCount = $member->transactions()->count();
+        $eventsCount = $member->eventParticipations()->count();
+        
+        // Événements à venir du membre
+        $upcomingEvents = $member->eventParticipations()
+            ->with('event')
+            ->whereHas('event', function($q) {
+                $q->where('start_date', '>=', now());
+            })
+            ->get();
+        
+        // Dernières transactions
+        $recentTransactions = $member->transactions()
+            ->latest('transaction_date')
+            ->take(5)
+            ->get();
+        
+        // Position au bureau
         $committeePosition = $member->currentCommitteePosition;
         
+        // Rôles de l'utilisateur
+        $userRoles = $member->user ? $member->user->roles->pluck('name')->toArray() : [];
+        
         return view('admin.members.show', compact(
-            'member', 
-            'contributions', 
-            'events', 
-            'transactions', 
-            'committeePosition'
+            'member',
+            'contributions',
+            'transactionsCount',
+            'eventsCount',
+            'upcomingEvents',
+            'recentTransactions',
+            'committeePosition',
+            'userRoles'
         ));
     }
 
+    // ==========================================
+    // EDIT - Formulaire de modification
+    // ==========================================
     public function edit(Member $member)
     {
-        $sections = [
-            'Trompettes' => 'Trompettes',
-            'Trombones' => 'Trombones',
-            'Saxophones' => 'Saxophones',
-            'Percussions' => 'Percussions',
-            'Clairons' => 'Clairons',
-            'Batterie' => 'Batterie'
-        ];
-        
-        $instruments = [
-            'Trompette' => 'Trompette',
-            'Trombone' => 'Trombone',
-            'Saxophone Alto' => 'Saxophone Alto',
-            'Saxophone Ténor' => 'Saxophone Ténor',
-            'Saxophone Baryton' => 'Saxophone Baryton',
-            'Batterie' => 'Batterie',
-            'Caisse Claire' => 'Caisse Claire',
-            'Grosse Caisse' => 'Grosse Caisse',
-            'Cymbales' => 'Cymbales'
-        ];
-        
-        $statuses = [
-            'active' => 'Actif',
-            'pending' => 'En attente',
-            'inactive' => 'Inactif'
-        ];
-        
-        $instrumentLevels = [
-            'debutant' => 'Débutant',
-            'intermediaire' => 'Intermédiaire',
-            'avance' => 'Avancé',
-            'expert' => 'Expert'
-        ];
+        $sections = Member::getSections();
+        $instruments = Member::getInstruments();
+        $instrumentLevels = Member::getInstrumentLevels();
+        $statuses = Member::getStatuses();
         
         return view('admin.members.edit', compact(
-            'member', 
-            'sections', 
-            'instruments', 
-            'statuses', 
-            'instrumentLevels'
+            'member',
+            'sections',
+            'instruments',
+            'instrumentLevels',
+            'statuses'
         ));
     }
 
+    // ==========================================
+    // UPDATE - Mise à jour d'un membre
+    // ==========================================
     public function update(Request $request, Member $member)
     {
         $validated = $request->validate([
@@ -235,20 +258,21 @@ class MemberController extends Controller
             'whatsapp' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'birth_date' => 'nullable|date',
-            'birth_place' => 'nullable|string',
-            'instrument' => 'nullable|string',
+            'birth_place' => 'nullable|string|max:255',
+            'instrument' => 'nullable|string|max:100',
             'instrument_level' => 'nullable|string|in:debutant,intermediaire,avance,expert',
             'entry_date' => 'nullable|date',
-            'section' => 'nullable|string',
-            'section_role' => 'nullable|string',
-            'status' => 'required|in:active,pending,inactive',
-            'emergency_contact_name' => 'nullable|string',
-            'emergency_contact_phone' => 'nullable|string',
+            'section' => 'nullable|string|max:100',
+            'section_role' => 'nullable|string|max:100',
+            'status' => 'required|in:active,pending,inactive,suspended,withdrawn,deceased,training',
+            'emergency_contact_name' => 'nullable|string|max:255',
+            'emergency_contact_phone' => 'nullable|string|max:20',
             'medical_notes' => 'nullable|string',
             'skills' => 'nullable|string',
             'notes' => 'nullable|string',
         ]);
 
+        // Gérer la photo
         if ($request->hasFile('photo')) {
             if ($member->photo) {
                 Storage::disk('public')->delete($member->photo);
@@ -256,6 +280,7 @@ class MemberController extends Controller
             $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
         }
 
+        // Gérer le document d'identité
         if ($request->hasFile('id_document')) {
             if ($member->id_document) {
                 Storage::disk('public')->delete($member->id_document);
@@ -277,9 +302,11 @@ class MemberController extends Controller
             ->with('success', 'Membre mis à jour avec succès');
     }
 
+    // ==========================================
+    // DESTROY - Suppression d'un membre
+    // ==========================================
     public function destroy(Member $member)
     {
-        // Supprimer les fichiers associés
         if ($member->photo) {
             Storage::disk('public')->delete($member->photo);
         }
@@ -287,7 +314,6 @@ class MemberController extends Controller
             Storage::disk('public')->delete($member->id_document);
         }
         
-        // Supprimer l'utilisateur associé
         if ($member->user) {
             $member->user->delete();
         }
@@ -298,28 +324,65 @@ class MemberController extends Controller
             ->with('success', 'Membre supprimé avec succès');
     }
 
+    // ==========================================
+    // APPROVE - Approuver un membre en attente
+    // ==========================================
     public function approve(Member $member)
     {
         $member->update(['status' => 'active']);
         
+        if (!$member->user) {
+            $this->createUserAccount($member);
+        }
+        
         return redirect()->route('admin.members.show', $member)
-            ->with('success', 'Membre approuvé avec succès');
+            ->with('success', 'Membre approuvé avec succès. Un compte utilisateur a été créé.');
     }
 
+    // ==========================================
+    // REJECT - Rejeter un membre
+    // ==========================================
     public function reject(Member $member)
     {
         $member->update(['status' => 'inactive']);
         
         return redirect()->route('admin.members.show', $member)
-            ->with('warning', 'Membre rejeté');
+            ->with('warning', 'Membre rejeté avec succès');
     }
 
-    /**
-     * Créer un compte utilisateur pour un membre
-     */
+    // ==========================================
+    // GENERATE CARD - Générer la carte de membre
+    // ==========================================
+    public function generateCard(Member $member)
+    {
+        $qrCode = $member->memberCardQrCode;
+        
+        $pdf = PDF::loadView('admin.members.card', compact('member', 'qrCode'));
+        $pdf->setPaper('a6', 'landscape');
+        
+        return $pdf->download('carte_membre_' . $member->member_number . '.pdf');
+    }
+
+    // ==========================================
+    // EXPORT - Exporter les membres en PDF
+    // ==========================================
+    public function export()
+    {
+        $members = Member::orderBy('last_name')->get();
+        $totalMembers = $members->count();
+        $activeMembers = $members->where('status', 'active')->count();
+        
+        $pdf = PDF::loadView('admin.members.export', compact('members', 'totalMembers', 'activeMembers'));
+        $pdf->setPaper('a4', 'landscape');
+        
+        return $pdf->download('liste_membres_' . date('Y-m-d') . '.pdf');
+    }
+
+    // ==========================================
+    // CREATE USER - Créer un compte utilisateur
+    // ==========================================
     public function createUser(Request $request, Member $member)
     {
-        // Vérifier si le membre a déjà un compte
         if ($member->user) {
             return back()->with('error', 'Ce membre a déjà un compte utilisateur.');
         }
@@ -330,24 +393,22 @@ class MemberController extends Controller
 
         $password = $request->password;
         
-        // Créer l'utilisateur avec member_id lié
         $user = User::create([
             'name' => $member->full_name,
             'email' => $member->email,
             'password' => Hash::make($password),
-            'member_id' => $member->id, // Lier au membre
+            'member_id' => $member->id,
         ]);
         
-        // Assigner le rôle "member"
         $user->assignRole('member');
 
-        return redirect()->route('admin.members.index')
+        return redirect()->route('admin.members.show', $member)
             ->with('success', 'Compte utilisateur créé avec succès pour ' . $member->full_name . '. Mot de passe : ' . $password);
     }
 
-    /**
-     * Réinitialiser le mot de passe d'un membre
-     */
+    // ==========================================
+    // RESET PASSWORD - Réinitialiser le mot de passe
+    // ==========================================
     public function resetPassword(Request $request, Member $member)
     {
         if (!$member->user) {
@@ -360,31 +421,111 @@ class MemberController extends Controller
 
         $password = $request->password;
         
-        // Mettre à jour le mot de passe
         $member->user->update([
             'password' => Hash::make($password),
         ]);
 
-        return redirect()->route('admin.members.index')
+        return redirect()->route('admin.members.show', $member)
             ->with('success', 'Mot de passe réinitialisé avec succès pour ' . $member->full_name . '. Nouveau mot de passe : ' . $password);
     }
 
-    public function generateCard(Member $member)
+    // ==========================================
+    // MANAGE ROLES - Gestion des rôles
+    // ==========================================
+    public function manageRoles(Member $member)
     {
-        $qrCode = $member->memberCardQrCode;
+        if (!$member->user) {
+            return redirect()->route('admin.members.show', $member)
+                ->with('error', 'Ce membre n\'a pas de compte utilisateur. Veuillez d\'abord créer un compte.');
+        }
         
-        $pdf = PDF::loadView('admin.members.card', compact('member', 'qrCode'));
-        $pdf->setPaper('a6', 'landscape');
+        $availableRoles = Role::all();
+        $userRoles = $member->user->roles->pluck('name')->toArray();
         
-        return $pdf->download('carte_membre_' . $member->member_number . '.pdf');
+        return view('admin.members.roles', compact('member', 'availableRoles', 'userRoles'));
     }
 
-    public function export()
+    // ==========================================
+    // ASSIGN ROLE - Assigner un rôle
+    // ==========================================
+    public function assignRole(Request $request, Member $member)
     {
-        $members = Member::all();
-        $pdf = PDF::loadView('admin.members.export', compact('members'));
-        $pdf->setPaper('a4', 'landscape');
+        $request->validate([
+            'role' => 'required|exists:roles,name'
+        ]);
+
+        if (!$member->user) {
+            return back()->with('error', 'Ce membre n\'a pas de compte utilisateur.');
+        }
+
+        $role = Role::findByName($request->role);
+        $member->user->assignRole($role);
         
-        return $pdf->download('liste_membres_' . date('Y-m-d') . '.pdf');
+        return redirect()->route('admin.members.show', $member)
+            ->with('success', 'Rôle "' . $role->name . '" assigné avec succès à ' . $member->full_name);
+    }
+
+    // ==========================================
+    // REMOVE ROLE - Retirer un rôle
+    // ==========================================
+    public function removeRole(Request $request, Member $member)
+    {
+        $request->validate([
+            'role' => 'required|exists:roles,name'
+        ]);
+
+        if (!$member->user) {
+            return back()->with('error', 'Ce membre n\'a pas de compte utilisateur.');
+        }
+
+        $role = Role::findByName($request->role);
+        $member->user->removeRole($role);
+        
+        return redirect()->route('admin.members.show', $member)
+            ->with('success', 'Rôle "' . $role->name . '" retiré avec succès de ' . $member->full_name);
+    }
+
+    // ==========================================
+    // SYNC ROLES - Synchroniser les rôles
+    // ==========================================
+    public function syncRoles(Request $request, Member $member)
+    {
+        $request->validate([
+            'roles' => 'array',
+            'roles.*' => 'exists:roles,name'
+        ]);
+
+        if (!$member->user) {
+            return back()->with('error', 'Ce membre n\'a pas de compte utilisateur.');
+        }
+
+        $roles = Role::whereIn('name', $request->roles ?? [])->get();
+        $member->user->syncRoles($roles);
+        
+        return redirect()->route('admin.members.show', $member)
+            ->with('success', 'Rôles mis à jour avec succès pour ' . $member->full_name);
+    }
+
+    // ==========================================
+    // MÉTHODES PRIVÉES
+    // ==========================================
+
+    /**
+     * Créer un compte utilisateur pour un membre
+     */
+    private function createUserAccount(Member $member): User
+    {
+        $password = Str::random(10);
+        
+        $user = User::create([
+            'name' => $member->full_name,
+            'email' => $member->email,
+            'password' => Hash::make($password),
+            'member_id' => $member->id,
+        ]);
+
+        $user->assignRole('member');
+
+        return $user;
     }
 }

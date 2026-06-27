@@ -25,7 +25,10 @@ class Member extends Model
         'entry_date' => 'date',
     ];
 
-    // Relations
+    // ==========================================
+    // RELATIONS
+    // ==========================================
+
     public function user(): HasOne
     {
         return $this->hasOne(User::class);
@@ -61,7 +64,10 @@ class Member extends Model
         return $this->hasMany(RehearsalAttendance::class);
     }
 
-    // Accesseurs
+    // ==========================================
+    // ACCESSORS
+    // ==========================================
+
     public function getFullNameAttribute(): string
     {
         return "{$this->first_name} {$this->last_name}";
@@ -77,61 +83,61 @@ class Member extends Model
         return strtoupper(substr($this->first_name, 0, 1) . substr($this->last_name, 0, 1));
     }
 
-    public function getAgeAttribute(): int
+    public function getAgeAttribute(): ?int
     {
+        if (!$this->birth_date) {
+            return null;
+        }
         return $this->birth_date->age;
     }
 
-   public function getPhotoUrlAttribute(): ?string
-{
-    if (!$this->photo) return null;
+    public function getPhotoUrlAttribute(): ?string
+    {
+        if (!$this->photo) return null;
 
-    $path = storage_path('app/public/' . $this->photo);
+        $path = storage_path('app/public/' . $this->photo);
 
-    if (!file_exists($path)) return null;
+        if (!file_exists($path)) return null;
 
-    // Recadrage carré centré avec GD (pas besoin d'Imagick)
-    $mime = mime_content_type($path);
+        $mime = mime_content_type($path);
 
-    $src = match($mime) {
-        'image/jpeg', 'image/jpg' => imagecreatefromjpeg($path),
-        'image/png'               => imagecreatefrompng($path),
-        'image/webp'              => imagecreatefromwebp($path),
-        default                   => null,
-    };
+        $src = match($mime) {
+            'image/jpeg', 'image/jpg' => imagecreatefromjpeg($path),
+            'image/png'               => imagecreatefrompng($path),
+            'image/webp'              => imagecreatefromwebp($path),
+            default                   => null,
+        };
 
-    if (!$src) {
-        // Fallback sans recadrage
-        return 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+        if (!$src) {
+            return 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+        }
+
+        $sw = imagesx($src);
+        $sh = imagesy($src);
+        $size = min($sw, $sh);
+        $ox = intval(($sw - $size) / 2);
+        $oy = intval(($sh - $size) / 2);
+
+        $dst = imagecreatetruecolor(68, 68);
+
+        if ($mime === 'image/png') {
+            imagealphablending($dst, false);
+            imagesavealpha($dst, true);
+            $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+            imagefill($dst, 0, 0, $transparent);
+        }
+
+        imagecopyresampled($dst, $src, 0, 0, $ox, $oy, 68, 68, $size, $size);
+
+        ob_start();
+        imagejpeg($dst, null, 90);
+        $data = ob_get_clean();
+
+        imagedestroy($src);
+        imagedestroy($dst);
+
+        return 'data:image/jpeg;base64,' . base64_encode($data);
     }
-
-    $sw = imagesx($src);
-    $sh = imagesy($src);
-    $size = min($sw, $sh);
-    $ox = intval(($sw - $size) / 2);
-    $oy = intval(($sh - $size) / 2);
-
-    $dst = imagecreatetruecolor(68, 68);
-
-    // Fond transparent pour PNG
-    if ($mime === 'image/png') {
-        imagealphablending($dst, false);
-        imagesavealpha($dst, true);
-        $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
-        imagefill($dst, 0, 0, $transparent);
-    }
-
-    imagecopyresampled($dst, $src, 0, 0, $ox, $oy, 68, 68, $size, $size);
-
-    ob_start();
-    imagejpeg($dst, null, 90);
-    $data = ob_get_clean();
-
-    imagedestroy($src);
-    imagedestroy($dst);
-
-    return 'data:image/jpeg;base64,' . base64_encode($data);
-}
 
     public function getMemberCardQrCodeAttribute(): string
     {
@@ -141,14 +147,21 @@ class Member extends Model
             'section' => $this->section,
             'instrument' => $this->instrument
         ]);
-        // Use SVG backend to avoid requiring PHP imagick (GD/SVG works without imagick on most setups)
         return base64_encode(QrCode::format('svg')->size(300)->generate($data));
     }
 
-    // Scopes
+    // ==========================================
+    // SCOPES
+    // ==========================================
+
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
     }
 
     public function scopeBySection($query, $section)
@@ -161,10 +174,28 @@ class Member extends Model
         return $query->where('instrument', $instrument);
     }
 
-    // Méthodes
+    public function scopeByStatus($query, $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    // ==========================================
+    // MÉTHODES
+    // ==========================================
+
     public function isActive(): bool
     {
         return $this->status === 'active';
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    public function hasUser(): bool
+    {
+        return $this->user !== null;
     }
 
     public function canVote(): bool
@@ -189,7 +220,82 @@ class Member extends Model
             ->exists();
     }
 
-    // Générer le numéro de membre
+    // ==========================================
+    // MÉTHODES STATIQUES (pour les formulaires)
+    // ==========================================
+
+    /**
+     * Liste des sections disponibles
+     */
+    public static function getSections(): array
+    {
+        return [
+            'Trompettes' => 'Trompettes',
+            'Trombones' => 'Trombones',
+            'Saxophones' => 'Saxophones',
+            'Percussions' => 'Percussions',
+            'Clairons' => 'Clairons',
+            'Batterie' => 'Batterie',
+            'Clarinettes' => 'Clarinettes',
+            'Flûtes' => 'Flûtes',
+            'Administration' => 'Administration'
+        ];
+    }
+
+    /**
+     * Liste des instruments disponibles
+     */
+    public static function getInstruments(): array
+    {
+        return [
+            'Trompette' => 'Trompette',
+            'Trombone' => 'Trombone',
+            'Saxophone Alto' => 'Saxophone Alto',
+            'Saxophone Ténor' => 'Saxophone Ténor',
+            'Saxophone Baryton' => 'Saxophone Baryton',
+            'Batterie' => 'Batterie',
+            'Caisse Claire' => 'Caisse Claire',
+            'Grosse Caisse' => 'Grosse Caisse',
+            'Cymbales' => 'Cymbales',
+            'Clarinette' => 'Clarinette',
+            'Flûte' => 'Flûte',
+            'Piano' => 'Piano',
+            'Guitare' => 'Guitare'
+        ];
+    }
+
+    /**
+     * Liste des niveaux d'instrument
+     */
+    public static function getInstrumentLevels(): array
+    {
+        return [
+            'debutant' => 'Débutant',
+            'intermediaire' => 'Intermédiaire',
+            'avance' => 'Avancé',
+            'expert' => 'Expert'
+        ];
+    }
+
+    /**
+     * Liste des statuts disponibles
+     */
+    public static function getStatuses(): array
+    {
+        return [
+            'active' => 'Actif',
+            'pending' => 'En attente',
+            'inactive' => 'Inactif',
+            'suspended' => 'Suspendu',
+            'withdrawn' => 'Retiré',
+            'deceased' => 'Décédé',
+            'training' => 'En formation'
+        ];
+    }
+
+    /**
+     * Générer le numéro de membre
+     */
     public static function generateMemberNumber(): string
     {
         $year = date('Y');
