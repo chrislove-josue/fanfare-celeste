@@ -186,7 +186,6 @@ class MemberController extends Controller
     public function show(Member $member)
     {
         // 📊 Statistiques du membre
-        // ✅ Utilisation de 'transactions' au lieu de 'financialTransactions'
         $contributions = $member->transactions()
             ->where('type', 'income')
             ->sum('amount');
@@ -236,12 +235,20 @@ class MemberController extends Controller
         $instrumentLevels = Member::getInstrumentLevels();
         $statuses = Member::getStatuses();
         
+        // ✅ Récupérer tous les rôles disponibles
+        $availableRoles = Role::all();
+        
+        // ✅ Récupérer les rôles de l'utilisateur
+        $userRoles = $member->user ? $member->user->roles->pluck('name')->toArray() : [];
+        
         return view('admin.members.edit', compact(
             'member',
             'sections',
             'instruments',
             'instrumentLevels',
-            'statuses'
+            'statuses',
+            'availableRoles',
+            'userRoles'
         ));
     }
 
@@ -272,34 +279,50 @@ class MemberController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        // Gérer la photo
-        if ($request->hasFile('photo')) {
-            if ($member->photo) {
-                Storage::disk('public')->delete($member->photo);
+        DB::beginTransaction();
+        
+        try {
+            // Gérer la photo
+            if ($request->hasFile('photo')) {
+                if ($member->photo) {
+                    Storage::disk('public')->delete($member->photo);
+                }
+                $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
             }
-            $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
-        }
 
-        // Gérer le document d'identité
-        if ($request->hasFile('id_document')) {
-            if ($member->id_document) {
-                Storage::disk('public')->delete($member->id_document);
+            // Gérer le document d'identité
+            if ($request->hasFile('id_document')) {
+                if ($member->id_document) {
+                    Storage::disk('public')->delete($member->id_document);
+                }
+                $validated['id_document'] = $request->file('id_document')->store('members/documents', 'public');
             }
-            $validated['id_document'] = $request->file('id_document')->store('members/documents', 'public');
+
+            $member->update($validated);
+
+            // Mettre à jour l'utilisateur associé si existant
+            if ($member->user) {
+                $member->user->update([
+                    'name' => $member->full_name,
+                    'email' => $member->email,
+                ]);
+                
+                // ✅ Mettre à jour les rôles
+                if ($request->has('roles')) {
+                    $member->user->syncRoles($request->roles);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('admin.members.show', $member)
+                ->with('success', 'Membre mis à jour avec succès');
+                
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Erreur lors de la mise à jour: ' . $e->getMessage())
+                         ->withInput();
         }
-
-        $member->update($validated);
-
-        // Mettre à jour l'utilisateur associé si existant
-        if ($member->user) {
-            $member->user->update([
-                'name' => $member->full_name,
-                'email' => $member->email,
-            ]);
-        }
-
-        return redirect()->route('admin.members.show', $member)
-            ->with('success', 'Membre mis à jour avec succès');
     }
 
     // ==========================================
@@ -307,21 +330,33 @@ class MemberController extends Controller
     // ==========================================
     public function destroy(Member $member)
     {
-        if ($member->photo) {
-            Storage::disk('public')->delete($member->photo);
-        }
-        if ($member->id_document) {
-            Storage::disk('public')->delete($member->id_document);
-        }
+        DB::beginTransaction();
         
-        if ($member->user) {
-            $member->user->delete();
-        }
-        
-        $member->delete();
+        try {
+            // Supprimer les fichiers associés
+            if ($member->photo) {
+                Storage::disk('public')->delete($member->photo);
+            }
+            if ($member->id_document) {
+                Storage::disk('public')->delete($member->id_document);
+            }
+            
+            // Supprimer l'utilisateur associé
+            if ($member->user) {
+                $member->user->delete();
+            }
+            
+            $member->delete();
+            
+            DB::commit();
 
-        return redirect()->route('admin.members.index')
-            ->with('success', 'Membre supprimé avec succès');
+            return redirect()->route('admin.members.index')
+                ->with('success', 'Membre supprimé avec succès');
+                
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Erreur lors de la suppression: ' . $e->getMessage());
+        }
     }
 
     // ==========================================
@@ -329,14 +364,24 @@ class MemberController extends Controller
     // ==========================================
     public function approve(Member $member)
     {
-        $member->update(['status' => 'active']);
+        DB::beginTransaction();
         
-        if (!$member->user) {
-            $this->createUserAccount($member);
+        try {
+            $member->update(['status' => 'active']);
+            
+            if (!$member->user) {
+                $this->createUserAccount($member);
+            }
+            
+            DB::commit();
+            
+            return redirect()->route('admin.members.show', $member)
+                ->with('success', 'Membre approuvé avec succès. Un compte utilisateur a été créé.');
+                
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Erreur lors de l\'approbation: ' . $e->getMessage());
         }
-        
-        return redirect()->route('admin.members.show', $member)
-            ->with('success', 'Membre approuvé avec succès. Un compte utilisateur a été créé.');
     }
 
     // ==========================================
@@ -357,7 +402,7 @@ class MemberController extends Controller
     {
         $qrCode = $member->memberCardQrCode;
         
-        $pdf = PDF::loadView('admin.members.card', compact('member', 'qrCode'));
+        $pdf = Pdf::loadView('admin.members.card', compact('member', 'qrCode'));
         $pdf->setPaper('a6', 'landscape');
         
         return $pdf->download('carte_membre_' . $member->member_number . '.pdf');
@@ -372,7 +417,7 @@ class MemberController extends Controller
         $totalMembers = $members->count();
         $activeMembers = $members->where('status', 'active')->count();
         
-        $pdf = PDF::loadView('admin.members.export', compact('members', 'totalMembers', 'activeMembers'));
+        $pdf = Pdf::loadView('admin.members.export', compact('members', 'totalMembers', 'activeMembers'));
         $pdf->setPaper('a4', 'landscape');
         
         return $pdf->download('liste_membres_' . date('Y-m-d') . '.pdf');
@@ -391,19 +436,30 @@ class MemberController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
-        $password = $request->password;
+        DB::beginTransaction();
         
-        $user = User::create([
-            'name' => $member->full_name,
-            'email' => $member->email,
-            'password' => Hash::make($password),
-            'member_id' => $member->id,
-        ]);
-        
-        $user->assignRole('member');
+        try {
+            $password = $request->password;
+            
+            $user = User::create([
+                'name' => $member->full_name,
+                'email' => $member->email,
+                'password' => Hash::make($password),
+                'member_id' => $member->id,
+            ]);
+            
+            // Assigner le rôle par défaut "member"
+            $user->assignRole('member');
+            
+            DB::commit();
 
-        return redirect()->route('admin.members.show', $member)
-            ->with('success', 'Compte utilisateur créé avec succès pour ' . $member->full_name . '. Mot de passe : ' . $password);
+            return redirect()->route('admin.members.show', $member)
+                ->with('success', 'Compte utilisateur créé avec succès pour ' . $member->full_name . '. Mot de passe : ' . $password);
+                
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Erreur lors de la création du compte: ' . $e->getMessage());
+        }
     }
 
     // ==========================================
@@ -419,14 +475,24 @@ class MemberController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
-        $password = $request->password;
+        DB::beginTransaction();
         
-        $member->user->update([
-            'password' => Hash::make($password),
-        ]);
+        try {
+            $password = $request->password;
+            
+            $member->user->update([
+                'password' => Hash::make($password),
+            ]);
+            
+            DB::commit();
 
-        return redirect()->route('admin.members.show', $member)
-            ->with('success', 'Mot de passe réinitialisé avec succès pour ' . $member->full_name . '. Nouveau mot de passe : ' . $password);
+            return redirect()->route('admin.members.show', $member)
+                ->with('success', 'Mot de passe réinitialisé avec succès pour ' . $member->full_name . '. Nouveau mot de passe : ' . $password);
+                
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Erreur lors de la réinitialisation: ' . $e->getMessage());
+        }
     }
 
     // ==========================================
@@ -458,11 +524,21 @@ class MemberController extends Controller
             return back()->with('error', 'Ce membre n\'a pas de compte utilisateur.');
         }
 
-        $role = Role::findByName($request->role);
-        $member->user->assignRole($role);
+        DB::beginTransaction();
         
-        return redirect()->route('admin.members.show', $member)
-            ->with('success', 'Rôle "' . $role->name . '" assigné avec succès à ' . $member->full_name);
+        try {
+            $role = Role::findByName($request->role);
+            $member->user->assignRole($role);
+            
+            DB::commit();
+            
+            return redirect()->route('admin.members.show', $member)
+                ->with('success', 'Rôle "' . $role->name . '" assigné avec succès à ' . $member->full_name);
+                
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Erreur lors de l\'assignation: ' . $e->getMessage());
+        }
     }
 
     // ==========================================
@@ -478,11 +554,21 @@ class MemberController extends Controller
             return back()->with('error', 'Ce membre n\'a pas de compte utilisateur.');
         }
 
-        $role = Role::findByName($request->role);
-        $member->user->removeRole($role);
+        DB::beginTransaction();
         
-        return redirect()->route('admin.members.show', $member)
-            ->with('success', 'Rôle "' . $role->name . '" retiré avec succès de ' . $member->full_name);
+        try {
+            $role = Role::findByName($request->role);
+            $member->user->removeRole($role);
+            
+            DB::commit();
+            
+            return redirect()->route('admin.members.show', $member)
+                ->with('success', 'Rôle "' . $role->name . '" retiré avec succès de ' . $member->full_name);
+                
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Erreur lors du retrait: ' . $e->getMessage());
+        }
     }
 
     // ==========================================
@@ -499,11 +585,21 @@ class MemberController extends Controller
             return back()->with('error', 'Ce membre n\'a pas de compte utilisateur.');
         }
 
-        $roles = Role::whereIn('name', $request->roles ?? [])->get();
-        $member->user->syncRoles($roles);
+        DB::beginTransaction();
         
-        return redirect()->route('admin.members.show', $member)
-            ->with('success', 'Rôles mis à jour avec succès pour ' . $member->full_name);
+        try {
+            $roles = Role::whereIn('name', $request->roles ?? [])->get();
+            $member->user->syncRoles($roles);
+            
+            DB::commit();
+            
+            return redirect()->route('admin.members.show', $member)
+                ->with('success', 'Rôles mis à jour avec succès pour ' . $member->full_name);
+                
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Erreur lors de la synchronisation: ' . $e->getMessage());
+        }
     }
 
     // ==========================================
@@ -524,6 +620,7 @@ class MemberController extends Controller
             'member_id' => $member->id,
         ]);
 
+        // Assigner le rôle par défaut
         $user->assignRole('member');
 
         return $user;

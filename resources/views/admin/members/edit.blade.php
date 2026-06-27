@@ -149,6 +149,93 @@
         background: #dbeafe;
         color: #2563eb;
     }
+    
+    /* Styles pour la sélection des rôles */
+    .roles-select-container {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 0.5rem;
+        background: #fafafa;
+    }
+    
+    .roles-select-container::-webkit-scrollbar {
+        width: 5px;
+    }
+    
+    .roles-select-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    
+    .roles-select-container::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+    
+    .role-checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 8px;
+        transition: background 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .role-checkbox-item:hover {
+        background: #eef2ff;
+    }
+    
+    .role-checkbox-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #3946B2;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+    
+    .role-checkbox-item .role-label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #1a1a2e;
+        flex: 1;
+    }
+    
+    .role-checkbox-item .role-badge {
+        font-size: 0.6rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+        background: #e5e7eb;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
+    .role-checkbox-item .role-badge.admin {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .role-checkbox-item .role-badge.manager {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    .role-checkbox-item .role-badge.member {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+    
+    .role-checkbox-item .role-badge.finance {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+    
+    .role-checkbox-item .role-badge.super-admin {
+        background: #fecaca;
+        color: #b91c1c;
+    }
 </style>
 
 <div class="container-fluid py-4">
@@ -440,34 +527,71 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- SECTION 4 : COMPTE UTILISATEUR              -->
+        <!-- SECTION 4 : COMPTE UTILISATEUR ET RÔLES     -->
         <!-- ========================================== -->
         <div class="form-section">
             <div class="section-title">
                 <i class="fas fa-user"></i>
-                Compte utilisateur
+                Compte utilisateur et rôles
             </div>
-            <div class="d-flex align-items-center gap-3 flex-wrap">
-                @if($member->user)
-                    <span class="badge bg-success">
-                        <i class="fas fa-check-circle me-1"></i> 
-                        Lié à : {{ $member->user->email }}
-                    </span>
-                    <span class="text-muted small">
-                        (Utilisateur ID: #{{ $member->user->id }})
-                    </span>
-                    <span class="badge bg-info">
-                        <i class="fas fa-shield-alt me-1"></i>
-                        Rôles : {{ implode(', ', $member->user->roles->pluck('name')->toArray()) ?: 'Aucun' }}
-                    </span>
-                    <button type="button" class="btn btn-warning btn-sm" 
-                            data-bs-toggle="modal" data-bs-target="#resetPasswordModal{{ $member->id }}">
-                        <i class="fas fa-key me-1"></i> Réinitialiser
-                    </button>
-                    <a href="{{ route('admin.members.roles', $member) }}" class="btn btn-info btn-sm">
-                        <i class="fas fa-shield-alt me-1"></i> Gérer les rôles
-                    </a>
-                @else
+            
+            @if($member->user)
+                <div class="row g-3">
+                    <!-- Informations du compte -->
+                    <div class="col-md-6">
+                        <div class="bg-light rounded-3 p-3">
+                            <h6 class="fw-bold mb-2">
+                                <i class="fas fa-info-circle me-1 text-primary"></i>
+                                Informations du compte
+                            </h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i> 
+                                    {{ $member->user->email }}
+                                </span>
+                                <span class="text-muted small">
+                                    (ID: #{{ $member->user->id }})
+                                </span>
+                            </div>
+                            <div class="mt-2 d-flex gap-2">
+                                <button type="button" class="btn btn-warning btn-sm" 
+                                        data-bs-toggle="modal" data-bs-target="#resetPasswordModal{{ $member->id }}">
+                                    <i class="fas fa-key me-1"></i> Réinitialiser
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sélection des rôles -->
+                    <div class="col-md-6">
+                        <div class="bg-light rounded-3 p-3">
+                            <h6 class="fw-bold mb-2">
+                                <i class="fas fa-shield-alt me-1 text-primary"></i>
+                                Rôles
+                            </h6>
+                            <div class="roles-select-container">
+                                @foreach($availableRoles as $role)
+                                    <label class="role-checkbox-item">
+                                        <input type="checkbox" 
+                                               name="roles[]" 
+                                               value="{{ $role->name }}"
+                                               @if(in_array($role->name, $userRoles)) checked @endif>
+                                        <span class="role-label">{{ ucfirst(str_replace('-', ' ', $role->name)) }}</span>
+                                        <span class="role-badge {{ $role->name }}">
+                                            {{ $role->name }}
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                            <small class="text-muted mt-1 d-block">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Sélectionnez un ou plusieurs rôles pour ce membre
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="d-flex align-items-center gap-3 flex-wrap">
                     <span class="badge bg-secondary">
                         <i class="fas fa-times-circle me-1"></i> Aucun compte utilisateur
                     </span>
@@ -475,8 +599,8 @@
                             data-bs-toggle="modal" data-bs-target="#createUserModal{{ $member->id }}">
                         <i class="fas fa-user-plus me-1"></i> Créer un compte
                     </button>
-                @endif
-            </div>
+                </div>
+            @endif
         </div>
 
         <!-- ========================================== -->
