@@ -20,25 +20,30 @@ class FinancialController extends Controller
         $this->middleware('permission:approve transactions')->only(['approve', 'reject']);
     }
 
+    /**
+     * Tableau de bord financier
+     */
     public function dashboard()
     {
         // Solde général
         $totalIncome = FinancialTransaction::where('type', 'income')->where('status', 'approved')->sum('amount');
-        $totalExpenses = FinancialTransaction::where('type', 'expense')->where('status', 'approved')->sum('amount');
-        $balance = $totalIncome - $totalExpenses;
+        $totalExpense = FinancialTransaction::where('type', 'expense')->where('status', 'approved')->sum('amount');
+        $balance = $totalIncome - $totalExpense;
         
         // Situation mensuelle
         $monthlyIncome = FinancialTransaction::where('type', 'income')
             ->where('status', 'approved')
             ->whereMonth('transaction_date', now()->month)
+            ->whereYear('transaction_date', now()->year)
             ->sum('amount');
             
-        $monthlyExpenses = FinancialTransaction::where('type', 'expense')
+        $monthlyExpense = FinancialTransaction::where('type', 'expense')
             ->where('status', 'approved')
             ->whereMonth('transaction_date', now()->month)
+            ->whereYear('transaction_date', now()->year)
             ->sum('amount');
         
-        $monthlyBalance = $monthlyIncome - $monthlyExpenses;
+        $monthlyBalance = $monthlyIncome - $monthlyExpense;
         
         // Transactions en attente
         $pendingTransactions = FinancialTransaction::where('status', 'pending')->count();
@@ -81,16 +86,19 @@ class FinancialController extends Controller
             ->take(10)
             ->get();
         
-        // Statistiques des cotisations
+        // Statistiques des cotisations - CORRIGÉ
         $totalContributions = Contribution::whereYear('payment_date', now()->year)->sum('amount');
+        
+        // ✅ CORRECTION : Utiliser groupByRaw() au lieu de groupBy()
         $monthlyContributions = Contribution::whereYear('payment_date', now()->year)
             ->selectRaw('MONTH(payment_date) as month, SUM(amount) as total')
-            ->groupBy('month')
+            ->groupByRaw('MONTH(payment_date)')
+            ->orderByRaw('MONTH(payment_date)')
             ->get();
         
-        return view('financial.dashboard', compact(
-            'balance', 'totalIncome', 'totalExpenses',
-            'monthlyIncome', 'monthlyExpenses', 'monthlyBalance',
+        return view('admin.financial-dashboard', compact(
+            'balance', 'totalIncome', 'totalExpense',
+            'monthlyIncome', 'monthlyExpense', 'monthlyBalance',
             'pendingTransactions', 'pendingAmount',
             'incomeByCategory', 'expensesByCategory',
             'monthlyEvolution', 'recentTransactions',
@@ -98,24 +106,60 @@ class FinancialController extends Controller
         ));
     }
 
-    public function transactions()
+    /**
+     * Liste des transactions
+     */
+    public function transactions(Request $request)
     {
-        $transactions = FinancialTransaction::with('member', 'approver')
-            ->latest()
-            ->paginate(20);
+        $query = FinancialTransaction::with('member', 'approver');
         
-        return view('financial.transactions', compact('transactions'));
+        // Filtres
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+        
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('description', 'like', "%{$search}%")
+                  ->orWhere('reference', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
+            });
+        }
+        
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('transaction_date', [$request->start_date, $request->end_date]);
+        }
+        
+        $transactions = $query->latest()->paginate(20);
+        
+        // Statistiques pour les filtres
+        $totalIncome = FinancialTransaction::where('type', 'income')->where('status', 'approved')->sum('amount');
+        $totalExpense = FinancialTransaction::where('type', 'expense')->where('status', 'approved')->sum('amount');
+        $balance = $totalIncome - $totalExpense;
+        
+        return view('admin.financial.transactions', compact('transactions', 'totalIncome', 'totalExpense', 'balance'));
     }
 
+    /**
+     * Formulaire de création d'une transaction
+     */
     public function create()
     {
-        $members = Member::where('status', 'active')->get();
+        $members = Member::where('status', 'active')->orderBy('first_name')->get();
         $incomeCategories = FinancialTransaction::getCategories('income');
         $expenseCategories = FinancialTransaction::getCategories('expense');
         
-        return view('financial.create', compact('members', 'incomeCategories', 'expenseCategories'));
+        return view('admin.financial.create', compact('members', 'incomeCategories', 'expenseCategories'));
     }
 
+    /**
+     * Enregistrer une nouvelle transaction
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -142,15 +186,18 @@ class FinancialController extends Controller
 
             DB::commit();
             
-            return redirect()->route('financial.transactions')
-                ->with('success', 'Transaction enregistrée avec succès. En attente d\'approbation.');
+            return redirect()->route('admin.financial.transactions')
+                ->with('success', 'Transaction enregistrée avec succès. Référence: ' . $transaction->reference);
                 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Erreur: ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de l\'enregistrement: ' . $e->getMessage());
         }
     }
 
+    /**
+     * Approuver une transaction
+     */
     public function approve(FinancialTransaction $transaction)
     {
         $transaction->update([
@@ -159,14 +206,17 @@ class FinancialController extends Controller
             'approved_at' => now()
         ]);
 
-        return redirect()->route('financial.transactions')
+        return redirect()->route('admin.financial.transactions')
             ->with('success', 'Transaction approuvée avec succès');
     }
 
+    /**
+     * Rejeter une transaction
+     */
     public function reject(Request $request, FinancialTransaction $transaction)
     {
         $request->validate([
-            'rejection_reason' => 'required|string'
+            'rejection_reason' => 'required|string|max:500'
         ]);
 
         $transaction->update([
@@ -174,10 +224,13 @@ class FinancialController extends Controller
             'rejection_reason' => $request->rejection_reason
         ]);
 
-        return redirect()->route('financial.transactions')
+        return redirect()->route('admin.financial.transactions')
             ->with('warning', 'Transaction rejetée');
     }
 
+    /**
+     * Générer un rapport financier
+     */
     public function report(Request $request)
     {
         $startDate = $request->get('start_date', now()->startOfMonth()->format('Y-m-d'));
@@ -192,15 +245,18 @@ class FinancialController extends Controller
         $totalExpenses = $transactions->where('type', 'expense')->sum('amount');
         $balance = $totalIncome - $totalExpenses;
         
-        $incomeByCategory = $transactions->where('type', 'income')->groupBy('category');
-        $expensesByCategory = $transactions->where('type', 'expense')->groupBy('category');
+        $incomeByCategory = $transactions->where('type', 'income')->groupBy('category')->map->sum('amount');
+        $expensesByCategory = $transactions->where('type', 'expense')->groupBy('category')->map->sum('amount');
         
-        return view('financial.report', compact(
+        return view('admin.financial.report', compact(
             'transactions', 'totalIncome', 'totalExpenses', 'balance',
             'startDate', 'endDate', 'incomeByCategory', 'expensesByCategory'
         ));
     }
 
+    /**
+     * Exporter le rapport en PDF
+     */
     public function exportPdf(Request $request)
     {
         $startDate = $request->get('start_date', now()->startOfMonth()->format('Y-m-d'));
@@ -215,27 +271,41 @@ class FinancialController extends Controller
         $totalExpenses = $transactions->where('type', 'expense')->sum('amount');
         $balance = $totalIncome - $totalExpenses;
         
-        $pdf = PDF::loadView('financial.pdf-report', compact(
+        $pdf = PDF::loadView('admin.financial.pdf-report', compact(
             'transactions', 'totalIncome', 'totalExpenses', 'balance', 'startDate', 'endDate'
         ));
         
         return $pdf->download('rapport_financier_' . now()->format('Y-m-d') . '.pdf');
     }
 
+    /**
+     * Exporter le rapport en Excel
+     */
     public function exportExcel(Request $request)
     {
         $startDate = $request->get('start_date', now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', now()->endOfMonth()->format('Y-m-d'));
         
-        return Excel::download(new FinancialReportExport($startDate, $endDate), 'rapport_financier.xlsx');
+        return Excel::download(new FinancialReportExport($startDate, $endDate), 'rapport_financier_' . now()->format('Y-m-d') . '.xlsx');
     }
 
-    public function contributions()
+    /**
+     * Gestion des cotisations
+     */
+    public function contributions(Request $request)
     {
+        $query = Contribution::with('member');
+        
+        if ($request->filled('member_id')) {
+            $query->where('member_id', $request->member_id);
+        }
+        
+        if ($request->filled('year')) {
+            $query->where('year', $request->year);
+        }
+        
+        $contributions = $query->latest()->paginate(20);
         $members = Member::where('status', 'active')->get();
-        $contributions = Contribution::with('member')
-            ->latest()
-            ->paginate(20);
         
         $currentMonth = now()->month;
         $currentYear = now()->year;
@@ -251,9 +321,29 @@ class FinancialController extends Controller
             ->whereNotIn('id', $paidMembers)
             ->get();
         
-        return view('financial.contributions', compact('members', 'contributions', 'unpaidMembers', 'currentMonth', 'currentYear'));
+        // Statistiques
+        $totalMonthlyContributions = Contribution::where('type', 'monthly')
+            ->where('year', $currentYear)
+            ->sum('amount');
+            
+        $totalSpecialContributions = Contribution::where('type', 'special')
+            ->where('year', $currentYear)
+            ->sum('amount');
+            
+        $totalDonations = Contribution::where('type', 'donation')
+            ->where('year', $currentYear)
+            ->sum('amount');
+        
+        return view('admin.financial.contributions', compact(
+            'contributions', 'members', 'unpaidMembers', 
+            'currentMonth', 'currentYear',
+            'totalMonthlyContributions', 'totalSpecialContributions', 'totalDonations'
+        ));
     }
 
+    /**
+     * Enregistrer une cotisation
+     */
     public function recordContribution(Request $request)
     {
         $validated = $request->validate([
@@ -263,14 +353,106 @@ class FinancialController extends Controller
             'month' => 'required_if:type,monthly|nullable|integer|min:1|max:12',
             'year' => 'required_if:type,monthly|nullable|integer',
             'payment_method' => 'required|string',
-            'payment_date' => 'required|date'
+            'payment_date' => 'required|date',
+            'notes' => 'nullable|string'
         ]);
 
         $validated['receipt_number'] = Contribution::generateReceiptNumber();
+        $validated['status'] = 'paid';
 
         Contribution::create($validated);
 
-        return redirect()->route('financial.contributions')
+        return redirect()->route('admin.financial.contributions')
             ->with('success', 'Cotisation enregistrée avec succès. Reçu N°: ' . $validated['receipt_number']);
+    }
+
+    /**
+     * Supprimer une transaction
+     */
+    public function destroy(FinancialTransaction $transaction)
+    {
+        // Vérifier si la transaction peut être supprimée
+        if ($transaction->status === 'approved') {
+            return back()->with('error', 'Les transactions approuvées ne peuvent pas être supprimées.');
+        }
+        
+        // Supprimer le reçu si existant
+        if ($transaction->receipt_path) {
+            \Storage::disk('public')->delete($transaction->receipt_path);
+        }
+        
+        $transaction->delete();
+        
+        return redirect()->route('admin.financial.transactions')
+            ->with('success', 'Transaction supprimée avec succès');
+    }
+
+    /**
+     * Afficher une transaction
+     */
+    public function show(FinancialTransaction $transaction)
+    {
+        $transaction->load(['member', 'approver']);
+        return view('admin.financial.show', compact('transaction'));
+    }
+
+    /**
+     * Modifier une transaction
+     */
+    public function edit(FinancialTransaction $transaction)
+    {
+        if ($transaction->status === 'approved') {
+            return redirect()->route('admin.financial.transactions.show', $transaction)
+                ->with('error', 'Les transactions approuvées ne peuvent pas être modifiées.');
+        }
+        
+        $members = Member::where('status', 'active')->orderBy('first_name')->get();
+        $incomeCategories = FinancialTransaction::getCategories('income');
+        $expenseCategories = FinancialTransaction::getCategories('expense');
+        
+        return view('admin.financial.edit', compact('transaction', 'members', 'incomeCategories', 'expenseCategories'));
+    }
+
+    /**
+     * Mettre à jour une transaction
+     */
+    public function update(Request $request, FinancialTransaction $transaction)
+    {
+        if ($transaction->status === 'approved') {
+            return redirect()->route('admin.financial.transactions.show', $transaction)
+                ->with('error', 'Les transactions approuvées ne peuvent pas être modifiées.');
+        }
+        
+        $validated = $request->validate([
+            'type' => 'required|in:income,expense',
+            'category' => 'required|string',
+            'amount' => 'required|numeric|min:0',
+            'description' => 'required|string',
+            'transaction_date' => 'required|date',
+            'member_id' => 'nullable|exists:members,id',
+            'receipt' => 'nullable|file|max:2048|mimes:pdf,jpeg,png,jpg'
+        ]);
+
+        DB::beginTransaction();
+        
+        try {
+            if ($request->hasFile('receipt')) {
+                if ($transaction->receipt_path) {
+                    \Storage::disk('public')->delete($transaction->receipt_path);
+                }
+                $validated['receipt_path'] = $request->file('receipt')->store('receipts', 'public');
+            }
+            
+            $transaction->update($validated);
+
+            DB::commit();
+            
+            return redirect()->route('admin.financial.transactions.show', $transaction)
+                ->with('success', 'Transaction mise à jour avec succès');
+                
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Erreur lors de la mise à jour: ' . $e->getMessage());
+        }
     }
 }

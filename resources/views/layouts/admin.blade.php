@@ -592,10 +592,9 @@
         <!-- Brand - Fixe en haut -->
         <div class="sidebar-brand">
             <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center gap-3">
-                
                 <img src="{{ asset('storage/logo/logo-blanc.jpeg') }}" 
-         alt="Fanfare Céleste" 
-         style="height: 60px; width: auto;">
+                     alt="Fanfare Céleste" 
+                     style="height: 60px; width: auto;">
                 <div>
                     <div class="brand-text">Fanfare Céleste</div>
                     <div class="brand-sub">Administration</div>
@@ -662,7 +661,7 @@
             <!-- ===== GESTION FINANCIÈRE ===== -->
             <div class="nav-label">Finances</div>
 
-            @can('manage finances')
+            @can('view finances')
             <a class="nav-link {{ $isActive(['admin.financial.dashboard', 'admin.financial.transactions', 'admin.financial.contributions']) }}" href="{{ route('admin.financial.dashboard') }}">
                 <i class="fas fa-coins"></i>
                 <span>Tableau de bord</span>
@@ -677,7 +676,9 @@
                 <i class="fas fa-hand-holding-heart"></i>
                 <span>Cotisations</span>
             </a>
+            @endcan
 
+            @can('export reports')
             <a class="nav-link {{ $isActive('admin.financial.report') }}" href="{{ route('admin.financial.report') }}">
                 <i class="fas fa-chart-pie"></i>
                 <span>Rapports</span>
@@ -690,21 +691,23 @@
             <!-- ===== GESTION DES ÉVÉNEMENTS ===== -->
             <div class="nav-label">Événements</div>
 
-            @can('manage events')
+            @can('view events')
             <a class="nav-link {{ $isActive(['admin.events.index', 'admin.events.create', 'admin.events.edit', 'admin.events.show']) }}" href="{{ route('admin.events.index') }}">
                 <i class="fas fa-calendar-alt"></i>
                 <span>Tous les événements</span>
                 <span class="badge bg-primary">{{ \App\Models\Event::upcoming()->count() }}</span>
             </a>
 
-            <a class="nav-link {{ $isActive('admin.events.create') }}" href="{{ route('admin.events.create') }}">
-                <i class="fas fa-calendar-plus"></i>
-                <span>Créer un événement</span>
-            </a>
-
             <a class="nav-link {{ $isActive('admin.events.calendar') }}" href="{{ route('admin.events.calendar') }}">
                 <i class="fas fa-calendar-check"></i>
                 <span>Calendrier</span>
+            </a>
+            @endcan
+
+            @can('create events')
+            <a class="nav-link {{ $isActive('admin.events.create') }}" href="{{ route('admin.events.create') }}">
+                <i class="fas fa-calendar-plus"></i>
+                <span>Créer un événement</span>
             </a>
             @endcan
 
@@ -722,7 +725,7 @@
             </a>
             @endcan
 
-            @can('manage documents')
+            @can('view documents')
             <a class="nav-link {{ $isActive(['admin.documents.index', 'admin.documents.create']) }}" href="{{ route('admin.documents.index') }}">
                 <i class="fas fa-file-alt"></i>
                 <span>Documents</span>
@@ -780,17 +783,30 @@
             <!-- ===== DIVIDER ===== -->
             <hr class="sidebar-divider">
 
-            <!-- ===== GESTION ===== -->
-            <div class="nav-label">Gestion</div>
+            <!-- ===== GESTION DU BUREAU ===== -->
+            <div class="nav-label">Bureau</div>
 
-            @can('manage committee')
-            <a class="nav-link {{ $isActive(['admin.committee.index', 'admin.committee.create', 'admin.committee.edit']) }}" href="{{ route('admin.committee.index') }}">
+            @can('view committee')
+            <a class="nav-link {{ $isActive(['admin.committee.index', 'admin.committee.create', 'admin.committee.edit', 'admin.committee.show']) }}" href="{{ route('admin.committee.index') }}">
                 <i class="fas fa-user-tie"></i>
                 <span>Bureau exécutif</span>
             </a>
             @endcan
 
-            @can('view reports')
+            @can('manage committee')
+            <a class="nav-link {{ $isActive('admin.committee.create') }}" href="{{ route('admin.committee.create') }}">
+                <i class="fas fa-user-plus"></i>
+                <span>Ajouter un membre</span>
+            </a>
+            @endcan
+
+            <!-- ===== DIVIDER ===== -->
+            <hr class="sidebar-divider">
+
+            <!-- ===== RAPPORTS ===== -->
+            <div class="nav-label">Rapports</div>
+
+            @can('export reports')
             <a class="nav-link {{ $isActive(['admin.reports.members', 'admin.reports.financial', 'admin.reports.events']) }}" href="{{ route('admin.reports.members') }}">
                 <i class="fas fa-chart-bar"></i>
                 <span>Rapports</span>
@@ -798,7 +814,7 @@
             @endcan
 
             <!-- ===== DIVIDER ===== -->
-            <hr class="sidebar-divider>
+            <hr class="sidebar-divider">
 
             <!-- ===== ESPACE PERSONNEL ===== -->
             <div class="nav-label">Espace personnel</div>
@@ -840,6 +856,22 @@
                 <span>Paramètres</span>
             </a>
             @endcan
+
+            @can('view logs')
+            <a class="nav-link" href="#">
+                <i class="fas fa-history"></i>
+                <span>Logs</span>
+                <span class="badge bg-secondary" style="font-size: 0.5rem;">Bientôt</span>
+            </a>
+            @endcan
+
+            @can('manage roles')
+            <a class="nav-link" href="#">
+                <i class="fas fa-user-shield"></i>
+                <span>Rôles & permissions</span>
+                <span class="badge bg-secondary" style="font-size: 0.5rem;">Bientôt</span>
+            </a>
+            @endcan
         </nav>
 
         <!-- ===== USER INFO - Fixe en bas ===== -->
@@ -856,13 +888,17 @@
                         @elseif(auth()->user()->hasRole('admin'))
                             <i class="fas fa-shield-alt me-1"></i> Administrateur
                         @elseif(auth()->user()->hasRole('president'))
-                            Président
+                            <i class="fas fa-gavel me-1"></i> Président
                         @elseif(auth()->user()->hasRole('treasurer'))
-                            Trésorier
-                        @elseif(auth()->user()->hasRole('manager'))
-                            Gestionnaire
+                            <i class="fas fa-coins me-1"></i> Trésorier
+                        @elseif(auth()->user()->hasRole('secretary'))
+                            <i class="fas fa-pen me-1"></i> Secrétaire
+                        @elseif(auth()->user()->hasRole('conductor'))
+                            <i class="fas fa-music me-1"></i> Chef de fanfare
+                        @elseif(auth()->user()->hasRole('section-leader'))
+                            <i class="fas fa-users me-1"></i> Responsable de section
                         @else
-                            Membre
+                            <i class="fas fa-user me-1"></i> Membre
                         @endif
                     </div>
                 </div>
@@ -914,10 +950,22 @@
                     <div class="user-info d-none d-md-block">
                         <div class="name">{{ auth()->user()->name }}</div>
                         <div class="role">
-                            @if(auth()->user()->hasRole('super-admin')) Super Admin
-                            @elseif(auth()->user()->hasRole('admin')) Administrateur
-                            @elseif(auth()->user()->hasRole('president')) Président
-                            @else Membre
+                            @if(auth()->user()->hasRole('super-admin')) 
+                                Super Admin
+                            @elseif(auth()->user()->hasRole('admin')) 
+                                Administrateur
+                            @elseif(auth()->user()->hasRole('president')) 
+                                Président
+                            @elseif(auth()->user()->hasRole('treasurer')) 
+                                Trésorier
+                            @elseif(auth()->user()->hasRole('secretary')) 
+                                Secrétaire
+                            @elseif(auth()->user()->hasRole('conductor')) 
+                                Chef de fanfare
+                            @elseif(auth()->user()->hasRole('section-leader')) 
+                                Responsable de section
+                            @else 
+                                Membre
                             @endif
                         </div>
                     </div>

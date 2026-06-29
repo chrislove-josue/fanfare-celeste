@@ -24,7 +24,7 @@ use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\PublicNewsController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\VideoController;
-
+use App\Http\Controllers\Admin\GalleryController as AdminGalleryController;
 use Illuminate\Support\Facades\Route;
 
 // ============================================
@@ -129,6 +129,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::get('/transactions', [FinancialController::class, 'transactions'])->name('transactions');
         Route::get('/transactions/create', [FinancialController::class, 'create'])->name('transactions.create');
         Route::post('/transactions', [FinancialController::class, 'store'])->name('transactions.store');
+        Route::get('/transactions/{transaction}', [FinancialController::class, 'show'])->name('transactions.show'); // AJOUTÉ
         Route::get('/transactions/{transaction}/edit', [FinancialController::class, 'edit'])->name('transactions.edit');
         Route::put('/transactions/{transaction}', [FinancialController::class, 'update'])->name('transactions.update');
         Route::delete('/transactions/{transaction}', [FinancialController::class, 'destroy'])->name('transactions.destroy');
@@ -149,12 +150,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('/events/{event}/report', [EventController::class, 'report'])->name('events.report');
 
     // ===== GESTION DE LA GALERIE =====
-    Route::resource('gallery', \App\Http\Controllers\Admin\GalleryController::class);
-    Route::post('/gallery/{gallery}/media', [\App\Http\Controllers\Admin\GalleryController::class, 'addMedia'])->name('gallery.add-media');
-    Route::delete('/gallery/{gallery}/media/{media}', [\App\Http\Controllers\Admin\GalleryController::class, 'deleteMedia'])->name('gallery.delete-media');
-    Route::post('/gallery/{gallery}/reorder', [\App\Http\Controllers\Admin\GalleryController::class, 'reorderMedia'])->name('gallery.reorder');
-    Route::post('/gallery/{gallery}/upload-mass', [\App\Http\Controllers\Admin\GalleryController::class, 'uploadMass'])->name('gallery.upload-mass');
-    Route::post('/gallery/{gallery}/toggle-publish', [\App\Http\Controllers\Admin\GalleryController::class, 'togglePublish'])->name('gallery.toggle-publish');
+    Route::resource('gallery', AdminGalleryController::class);
+    Route::post('/gallery/{gallery}/media', [AdminGalleryController::class, 'addMedia'])->name('gallery.add-media');
+    Route::delete('/gallery/{gallery}/media/{media}', [AdminGalleryController::class, 'deleteMedia'])->name('gallery.delete-media');
+    Route::post('/gallery/{gallery}/reorder', [AdminGalleryController::class, 'reorderMedia'])->name('gallery.reorder');
+    Route::post('/gallery/{gallery}/upload-mass', [AdminGalleryController::class, 'uploadMass'])->name('gallery.upload-mass');
+    Route::post('/gallery/{gallery}/toggle-publish', [AdminGalleryController::class, 'togglePublish'])->name('gallery.toggle-publish');
 
     // ===== GESTION DES DOCUMENTS =====
     Route::resource('documents', DocumentController::class);
@@ -187,9 +188,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('/testimonials/{testimonial}/approve', [TestimonialController::class, 'approve'])->name('testimonials.approve');
     Route::post('/testimonials/{testimonial}/toggle', [TestimonialController::class, 'toggle'])->name('testimonials.toggle');
     
-    // ✅ Actualités - Resource uniquement (crée toutes les routes CRUD)
+    // Actualités
     Route::resource('news', NewsController::class);
-    // ✅ Route supplémentaire pour la publication (non incluse dans resource)
     Route::post('/news/{news}/publish', [NewsController::class, 'publish'])->name('news.publish');
 
     // ===== GESTION DES PARTENAIRES =====
