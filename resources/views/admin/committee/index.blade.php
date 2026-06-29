@@ -365,9 +365,6 @@
         <a href="{{ route('admin.committee.create') }}" class="btn btn-primary">
             <i class="fas fa-plus me-1"></i> Ajouter un membre
         </a>
-        <a href="#" class="btn btn-success" onclick="window.print()">
-            <i class="fas fa-print me-1"></i> Imprimer
-        </a>
     </div>
 </div>
 @endsection

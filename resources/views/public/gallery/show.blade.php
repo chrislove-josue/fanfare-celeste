@@ -149,11 +149,6 @@
                                                     <i class="fas fa-{{ $item->type_icon }}"></i>
                                                 </span>
                                             </div>
-                                            @if($item->title)
-                                                <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-1">
-                                                    <small class="d-block text-truncate" style="font-size: 0.7rem;">{{ $item->title }}</small>
-                                                </div>
-                                            @endif
                                         </div>
                                     </div>
                                 @endforeach
@@ -197,11 +192,6 @@
                                                     <i class="fas fa-{{ $item->type_icon }}"></i>
                                                 </span>
                                             </div>
-                                            @if($item->title)
-                                                <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-1">
-                                                    <small class="d-block text-truncate" style="font-size: 0.7rem;">{{ $item->title }}</small>
-                                                </div>
-                                            @endif
                                         </div>
                                     </div>
                                 @endforeach
@@ -266,10 +256,9 @@
             <div class="modal-dialog modal-xl modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header border-0">
-                        <h5 class="modal-title">{{ $item->title ?? $gallery->title }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body text-center p-4">
+                    <div class="modal-body text-center">
                         @if($item->type == 'photo')
                             <img src="{{ $item->file_url }}" 
                                  alt="{{ $item->title }}" 

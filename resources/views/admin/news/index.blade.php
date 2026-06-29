@@ -16,9 +16,6 @@
             Liste des actualités & événements
         </h5>
         <div>
-            <a href="{{ route('admin.news.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i> Nouvelle actualité
-            </a>
             <a href="{{ route('admin.events.create') }}" class="btn btn-success">
                 <i class="fas fa-calendar-plus me-2"></i> Nouvel événement
             </a>

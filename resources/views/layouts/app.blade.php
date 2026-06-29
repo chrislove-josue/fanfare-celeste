@@ -183,9 +183,8 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">
-                    <h5><i class="fas fa-music"></i> Fanfare Céleste</h5>
-                    <p>La Trompette de Dieu de l'Atlantique<br>
-                    Une fanfare au service de Dieu et de la communauté</p>
+                    <p>Fanfare Céleste La Trompette de Dieu de l'Atlantique,
+                    une fanfare au service de Dieu et de la communauté chrétienne</p>
                 </div>
                 <div class="col-md-4 mb-4">
                     <h5>Contact Rapide</h5>
@@ -207,7 +206,7 @@
             </div>
             <hr class="bg-light">
             <div class="text-center">
-                <p class="mb-0">&copy; {{ date('Y') }} Fanfare Céleste - Tous droits réservés</p>
+                <p class="mb-0">&copy; 2021 - {{ date('Y') }} Fanfare Céleste - Tous droits réservés</p>
             </div>
         </div>
     </footer>

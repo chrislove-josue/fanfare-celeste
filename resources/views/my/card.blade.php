@@ -116,9 +116,6 @@
                         Cette carte est uniquement consultable. Pour toute modification, veuillez contacter l'administration.
                     </p>
                     <div class="d-flex justify-content-center gap-2">
-                        <button onclick="window.print()" class="btn btn-outline-primary">
-                            <i class="fas fa-print me-2"></i> Imprimer
-                        </button>
                         <a href="{{ route('my.profile') }}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left me-2"></i> Retour au profil
                         </a>
@@ -165,11 +162,5 @@
 @endpush
 
 @push('scripts')
-<script>
-    // Fonction pour imprimer la carte
-    document.querySelector('button[onclick="window.print()"]')?.addEventListener('click', function(e) {
-        // Optionnel : Ajouter un événement avant impression
-    });
-</script>
 @endpush
 @endsection
