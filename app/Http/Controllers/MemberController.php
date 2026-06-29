@@ -19,7 +19,7 @@ class MemberController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('permission:view members')->only(['index', 'show', 'manageRoles']);
+        $this->middleware('permission:view members')->only(['index', 'show', 'manageRoles', 'viewDocument']);
         $this->middleware('permission:create members')->only(['create', 'store']);
         $this->middleware('permission:edit members')->only(['edit', 'update']);
         $this->middleware('permission:delete members')->only(['destroy']);
@@ -136,7 +136,7 @@ class MemberController extends Controller
             'section' => 'nullable|string|max:100',
             'section_role' => 'nullable|string|max:100',
             'photo' => 'nullable|image|max:2048',
-            'id_document' => 'nullable|file|max:5120',
+            'id_document' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,pdf,webp',
             'emergency_contact_name' => 'nullable|string|max:255',
             'emergency_contact_phone' => 'nullable|string|max:20',
             'medical_notes' => 'nullable|string',
@@ -152,13 +152,19 @@ class MemberController extends Controller
             $validated['member_number'] = Member::generateMemberNumber();
             $validated['status'] = $request->status ?? 'pending';
 
-            // Gérer la photo
+            // ==========================================
+            // GESTION DE LA PHOTO
+            // ==========================================
             if ($request->hasFile('photo')) {
+                $this->ensureDirectoryExists('members/photos');
                 $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
             }
 
-            // Gérer le document d'identité
+            // ==========================================
+            // GESTION DU DOCUMENT D'IDENTITÉ
+            // ==========================================
             if ($request->hasFile('id_document')) {
+                $this->ensureDirectoryExists('members/documents');
                 $validated['id_document'] = $request->file('id_document')->store('members/documents', 'public');
             }
 
@@ -253,11 +259,12 @@ class MemberController extends Controller
     }
 
     // ==========================================
-    // UPDATE - Mise à jour d'un membre
+    // UPDATE - Mise à jour d'un membre (CORRIGÉ)
     // ==========================================
     public function update(Request $request, Member $member)
     {
-        $validated = $request->validate([
+        // Validation des données - id_document n'est validé que si présent
+        $rules = [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:members,email,' . $member->id,
@@ -277,27 +284,62 @@ class MemberController extends Controller
             'medical_notes' => 'nullable|string',
             'skills' => 'nullable|string',
             'notes' => 'nullable|string',
-        ]);
+            'photo' => 'nullable|image|max:2048',
+        ];
+
+        // Ajouter la validation pour id_document uniquement si un fichier est uploadé
+        if ($request->hasFile('id_document')) {
+            $rules['id_document'] = 'nullable|file|max:5120|mimes:jpg,jpeg,png,pdf,webp';
+        }
+
+        $validated = $request->validate($rules);
 
         DB::beginTransaction();
         
         try {
-            // Gérer la photo
+            // ==========================================
+            // GESTION DE LA PHOTO
+            // ==========================================
             if ($request->hasFile('photo')) {
-                if ($member->photo) {
+                // Supprimer l'ancienne photo si elle existe
+                if ($member->photo && Storage::disk('public')->exists($member->photo)) {
                     Storage::disk('public')->delete($member->photo);
                 }
+                // Créer le dossier s'il n'existe pas
+                $this->ensureDirectoryExists('members/photos');
+                // Stocker la nouvelle photo
                 $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
             }
 
-            // Gérer le document d'identité
-            if ($request->hasFile('id_document')) {
-                if ($member->id_document) {
+            // ==========================================
+            // GESTION DU DOCUMENT D'IDENTITÉ (CORRIGÉ)
+            // ==========================================
+            
+            // 1. Vérifier si on doit supprimer le document
+            if ($request->has('remove_document') && $request->remove_document == '1') {
+                if ($member->id_document && Storage::disk('public')->exists($member->id_document)) {
                     Storage::disk('public')->delete($member->id_document);
                 }
+                $validated['id_document'] = null;
+            }
+            
+            // 2. Vérifier si un nouveau document est uploadé
+            if ($request->hasFile('id_document')) {
+                // Supprimer l'ancien document s'il existe
+                if ($member->id_document && Storage::disk('public')->exists($member->id_document)) {
+                    Storage::disk('public')->delete($member->id_document);
+                }
+                // Créer le dossier s'il n'existe pas
+                $this->ensureDirectoryExists('members/documents');
+                // Stocker le nouveau document
                 $validated['id_document'] = $request->file('id_document')->store('members/documents', 'public');
             }
+            
+            // 3. Si aucun nouveau document n'est uploadé et qu'on ne supprime pas,
+            //    on garde l'ancien document (ne pas toucher à id_document)
+            //    On ne fait rien, la valeur existante reste
 
+            // Mettre à jour le membre avec les données validées
             $member->update($validated);
 
             // Mettre à jour l'utilisateur associé si existant
@@ -307,7 +349,7 @@ class MemberController extends Controller
                     'email' => $member->email,
                 ]);
                 
-                // ✅ Mettre à jour les rôles
+                // Mettre à jour les rôles
                 if ($request->has('roles')) {
                     $member->user->syncRoles($request->roles);
                 }
@@ -334,10 +376,10 @@ class MemberController extends Controller
         
         try {
             // Supprimer les fichiers associés
-            if ($member->photo) {
+            if ($member->photo && Storage::disk('public')->exists($member->photo)) {
                 Storage::disk('public')->delete($member->photo);
             }
-            if ($member->id_document) {
+            if ($member->id_document && Storage::disk('public')->exists($member->id_document)) {
                 Storage::disk('public')->delete($member->id_document);
             }
             
@@ -406,6 +448,40 @@ class MemberController extends Controller
         $pdf->setPaper('a6', 'landscape');
         
         return $pdf->download('carte_membre_' . $member->member_number . '.pdf');
+    }
+
+    // ==========================================
+    // VIEW DOCUMENT - Afficher le document d'identité
+    // ==========================================
+    public function viewDocument(Member $member)
+    {
+        if (!$member->id_document) {
+            return redirect()->route('admin.members.show', $member)
+                ->with('error', 'Ce membre n\'a pas de document d\'identité.');
+        }
+
+        $path = storage_path('app/public/' . $member->id_document);
+        
+        if (!file_exists($path)) {
+            return redirect()->route('admin.members.show', $member)
+                ->with('error', 'Le fichier n\'existe pas.');
+        }
+
+        $mime = mime_content_type($path);
+        $isImage = str_starts_with($mime, 'image/');
+
+        if ($isImage) {
+            $imageData = base64_encode(file_get_contents($path));
+            $imageSrc = 'data:' . $mime . ';base64,' . $imageData;
+            
+            return view('admin.members.document', compact('member', 'imageSrc'));
+        } else {
+            // Pour les PDF et autres types, on les affiche dans le navigateur
+            return response()->file($path, [
+                'Content-Type' => $mime,
+                'Content-Disposition' => 'inline; filename="document_' . $member->member_number . '.' . pathinfo($path, PATHINFO_EXTENSION) . '"'
+            ]);
+        }
     }
 
     // ==========================================
@@ -624,5 +700,20 @@ class MemberController extends Controller
         $user->assignRole('member');
 
         return $user;
+    }
+
+    /**
+     * Vérifier et créer un dossier s'il n'existe pas
+     * 
+     * @param string $path Chemin relatif dans le disque public
+     * @return void
+     */
+    private function ensureDirectoryExists(string $path): void
+    {
+        $fullPath = storage_path('app/public/' . $path);
+        
+        if (!file_exists($fullPath)) {
+            mkdir($fullPath, 0755, true);
+        }
     }
 }

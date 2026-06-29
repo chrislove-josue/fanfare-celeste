@@ -298,6 +298,26 @@
         border-color: #06b6d4;
     }
     
+    .action-buttons .btn-action.document {
+        color: #8b5cf6;
+        background: #ede9fe;
+        border-color: #ede9fe;
+    }
+    
+    .action-buttons .btn-action.document:hover {
+        background: #8b5cf6;
+        color: #fff;
+        border-color: #8b5cf6;
+    }
+    
+    .action-buttons .btn-action.document-disabled {
+        color: #9ca3af;
+        background: #f3f4f6;
+        border-color: #f3f4f6;
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+    
     .action-buttons .btn-action.approve {
         color: #22c55e;
         background: #dcfce7;
@@ -570,7 +590,7 @@
                     <th>Section</th>
                     <th>Statut</th>
                     <th>Compte</th>
-                    <th style="width: 220px; text-align: center;">Actions</th>
+                    <th style="width: 250px; text-align: center;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -622,6 +642,21 @@
                             <a href="{{ route('admin.members.edit', $member) }}" class="btn-action edit" title="Modifier">
                                 <i class="fas fa-edit"></i>
                             </a>
+                            
+                            <!-- ===== BOUTON DOCUMENT D'IDENTITÉ ===== -->
+                            @if($member->id_document)
+                                <a href="{{ route('admin.members.document', $member) }}" 
+                                   class="btn-action document" 
+                                   title="Voir le document d'identité"
+                                   target="_blank">
+                                    <i class="fas fa-id-card"></i>
+                                </a>
+                            @else
+                                <span class="btn-action document-disabled" title="Aucun document">
+                                    <i class="fas fa-id-card"></i>
+                                </span>
+                            @endif
+                            
                             @if($member->user)
                                 <a href="{{ route('admin.members.roles', $member) }}" class="btn-action roles" title="Gérer les rôles">
                                     <i class="fas fa-shield-alt"></i>
@@ -649,7 +684,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="10" class="text-center py-5 text-muted">
+                    <td colspan="11" class="text-center py-5 text-muted">
                         <i class="fas fa-users fa-2x d-block mb-2"></i>
                         <p class="mb-0">Aucun membre trouvé</p>
                         <a href="{{ route('admin.members.create') }}" class="btn btn-sm btn-primary mt-2">

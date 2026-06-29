@@ -97,8 +97,11 @@
     <div class="watermark">FANFARE CÉLESTE la trompette de dieu de l'atlantique</div>
 
     <div class="header">
-        <h1>🎵 Fanfare Céleste</h1>
-        <p>La Trompette de Dieu de l'Atlantique</p>
+        <p>
+    <img src="{{ asset('storage/logo/logo-blanc.jpeg') }}" 
+         alt="Fanfare Céleste" 
+         style="height: 80px; width: 150px;">Fanfare Céleste
+        La Trompette de Dieu de l'Atlantique</p>
         <p style="font-size: 12px; color: #666; margin-top: 5px;">
             Liste des membres - Généré le {{ date('d/m/Y à H:i') }}
         </p>

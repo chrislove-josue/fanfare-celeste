@@ -1,5 +1,3 @@
-{{-- resources/views/admin/members/edit.blade.php --}}
-
 @extends('layouts.admin')
 
 @section('title', 'Modifier le membre - ' . $member->full_name)
@@ -89,6 +87,104 @@
         color: #6b7280;
         border: 4px solid #fff;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Styles pour le document */
+    .document-preview-container {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 2px dashed #e5e7eb;
+        text-align: center;
+        transition: all 0.3s ease;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .document-preview-container.has-document {
+        border: 2px solid #22c55e;
+        background: #f0fdf4;
+    }
+    
+    .document-preview-container .document-icon {
+        font-size: 4rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .document-preview-container .document-name {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #1a1a2e;
+        word-break: break-all;
+    }
+    
+    .document-preview-container .document-size {
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+    
+    .document-preview {
+        max-width: 100%;
+        max-height: 250px;
+        object-fit: contain;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .document-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .document-actions .btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 1rem;
+        border-radius: 8px;
+    }
+    
+    .upload-area {
+        border: 2px dashed #cbd5e1;
+        border-radius: 10px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #fafafa;
+        width: 100%;
+    }
+    
+    .upload-area:hover {
+        border-color: #3946B2;
+        background: #f8fafc;
+    }
+    
+    .upload-area.dragover {
+        border-color: #3946B2;
+        background: #eef2ff;
+    }
+    
+    .upload-area .upload-icon {
+        font-size: 3rem;
+        color: #94a3b8;
+        margin-bottom: 0.5rem;
+    }
+    
+    .upload-area .upload-text {
+        font-size: 0.95rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+    
+    .upload-area .upload-hint {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        margin-top: 0.25rem;
     }
     
     .btn-action {
@@ -235,6 +331,46 @@
     .role-checkbox-item .role-badge.super-admin {
         background: #fecaca;
         color: #b91c1c;
+    }
+    
+    .file-info {
+        background: #f1f5f9;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 0.5rem;
+    }
+    
+    .file-info .file-name {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #1a1a2e;
+    }
+    
+    .file-info .file-size {
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+
+    /* Style pour le bouton "Changer" */
+    .btn-change-document {
+        background: #8b5cf6;
+        color: #fff;
+        border: none;
+        padding: 0.4rem 1rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .btn-change-document:hover {
+        background: #7c3aed;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        color: #fff;
     }
 </style>
 
@@ -468,7 +604,132 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- SECTION 3 : URGENCE ET NOTES                -->
+        <!-- SECTION 3 : DOCUMENT D'IDENTITÉ             -->
+        <!-- ========================================== -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-id-card"></i>
+                Document d'identité
+            </div>
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <div class="document-preview-container {{ $member->id_document ? 'has-document' : '' }}" id="documentPreviewContainer">
+                        @if($member->id_document)
+                            @php
+                                $filePath = storage_path('app/public/' . $member->id_document);
+                                $fileExists = file_exists($filePath);
+                                $fileSize = $fileExists ? filesize($filePath) : 0;
+                                $fileSizeFormatted = $fileSize > 0 ? number_format($fileSize / 1024, 1) . ' KB' : 'N/A';
+                                $extension = pathinfo($member->id_document, PATHINFO_EXTENSION);
+                                $isImage = in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+                            @endphp
+                            
+                            <!-- État actuel : Document existant -->
+                            <div id="documentCurrentState">
+                                @if($isImage && $fileExists)
+                                    <img src="{{ asset('storage/' . $member->id_document) }}" 
+                                         alt="Document d'identité" 
+                                         class="document-preview">
+                                @else
+                                    <div class="document-icon">
+                                        <i class="fas fa-file-{{ $extension === 'pdf' ? 'pdf' : 'alt' }} text-{{ $extension === 'pdf' ? 'danger' : 'primary' }}"></i>
+                                    </div>
+                                @endif
+                                
+                                <div class="document-name">
+                                    <i class="fas fa-file me-1"></i>
+                                    {{ basename($member->id_document) }}
+                                </div>
+                                <div class="document-size">
+                                    <i class="fas fa-weight-hanging me-1"></i>
+                                    {{ $fileSizeFormatted }}
+                                </div>
+                                
+                                <div class="document-actions">
+                                    <a href="{{ route('admin.members.document', $member) }}" target="_blank" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye me-1"></i> Voir
+                                    </a>
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="showDocumentUpload()">
+                                        <i class="fas fa-exchange-alt me-1"></i> Changer
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeDocument()">
+                                        <i class="fas fa-trash me-1"></i> Supprimer
+                                    </button>
+                                </div>
+                                
+                                <input type="hidden" name="remove_document" id="removeDocument" value="0">
+                            </div>
+                            
+                            <!-- État de sélection de nouveau fichier (caché par défaut) -->
+                            <div id="documentUploadState" style="display: none; width: 100%;">
+                                <div class="upload-area" id="uploadArea">
+                                    <div class="upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <div class="upload-text">
+                                        Cliquez ou glissez-déposez pour remplacer le document
+                                    </div>
+                                    <div class="upload-hint">
+                                        Formats acceptés : JPG, PNG, PDF, WebP | Taille max : 5MB
+                                    </div>
+                                </div>
+                                <input type="file" name="id_document" id="id_document" 
+                                       class="form-control @error('id_document') is-invalid @enderror" 
+                                       accept=".jpg,.jpeg,.png,.pdf,.webp" style="display: none;">
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="hideDocumentUpload()">
+                                        <i class="fas fa-times me-1"></i> Annuler
+                                    </button>
+                                </div>
+                                @error('id_document')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        @else
+                            <!-- Pas de document : afficher la zone d'upload -->
+                            <div id="documentUploadState" style="width: 100%;">
+                                <div class="upload-area" id="uploadArea">
+                                    <div class="upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <div class="upload-text">
+                                        Cliquez ou glissez-déposez pour ajouter un document
+                                    </div>
+                                    <div class="upload-hint">
+                                        Formats acceptés : JPG, PNG, PDF, WebP | Taille max : 5MB
+                                    </div>
+                                </div>
+                                <input type="file" name="id_document" id="id_document" 
+                                       class="form-control @error('id_document') is-invalid @enderror" 
+                                       accept=".jpg,.jpeg,.png,.pdf,.webp" style="display: none;">
+                                @error('id_document')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <!-- Affichage du fichier sélectionné -->
+                    <div id="selectedFileInfo" style="display: none;" class="mt-2">
+                        <div class="file-info">
+                            <span>
+                                <i class="fas fa-file me-2 text-primary"></i>
+                                <span class="file-name" id="selectedFileName"></span>
+                            </span>
+                            <span>
+                                <span class="file-size" id="selectedFileSize"></span>
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="clearSelectedFile()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECTION 4 : URGENCE ET NOTES                -->
         <!-- ========================================== -->
         <div class="form-section">
             <div class="section-title">
@@ -527,7 +788,7 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- SECTION 4 : COMPTE UTILISATEUR ET RÔLES     -->
+        <!-- SECTION 5 : COMPTE UTILISATEUR ET RÔLES     -->
         <!-- ========================================== -->
         <div class="form-section">
             <div class="section-title">
@@ -762,6 +1023,230 @@
 
 @push('scripts')
 <script>
+    // ==========================================
+    // GESTION DU DOCUMENT D'IDENTITÉ
+    // ==========================================
+    
+    let selectedFile = null;
+    
+    // Afficher la zone d'upload pour remplacer le document
+    function showDocumentUpload() {
+        document.getElementById('documentCurrentState').style.display = 'none';
+        document.getElementById('documentUploadState').style.display = 'block';
+        // Réinitialiser les événements
+        initUploadArea();
+    }
+    
+    // Cacher la zone d'upload et revenir à l'état actuel
+    function hideDocumentUpload() {
+        document.getElementById('documentCurrentState').style.display = 'block';
+        document.getElementById('documentUploadState').style.display = 'none';
+        // Cacher les infos du fichier sélectionné
+        document.getElementById('selectedFileInfo').style.display = 'none';
+        // Réinitialiser l'input file
+        const fileInput = document.getElementById('id_document');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+    }
+    
+    // Supprimer le document existant
+    function removeDocument() {
+        if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
+            document.getElementById('removeDocument').value = '1';
+            
+            // Cacher l'état actuel et afficher la zone d'upload
+            const container = document.getElementById('documentPreviewContainer');
+            container.innerHTML = `
+                <div id="documentUploadState" style="width: 100%;">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">
+                            Cliquez ou glissez-déposez pour ajouter un document
+                        </div>
+                        <div class="upload-hint">
+                            Formats acceptés : JPG, PNG, PDF, WebP | Taille max : 5MB
+                        </div>
+                    </div>
+                    <input type="file" name="id_document" id="id_document" 
+                           class="form-control @error('id_document') is-invalid @enderror" 
+                           accept=".jpg,.jpeg,.png,.pdf,.webp" style="display: none;">
+                </div>
+            `;
+            container.classList.remove('has-document');
+            
+            // Cacher les infos du fichier sélectionné
+            document.getElementById('selectedFileInfo').style.display = 'none';
+            
+            // Réinitialiser les événements
+            initUploadArea();
+        }
+    }
+    
+    // Initialiser la zone de drop
+    function initUploadArea() {
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('id_document');
+        
+        if (uploadArea && fileInput) {
+            // Click pour ouvrir le sélecteur de fichiers
+            uploadArea.addEventListener('click', function(e) {
+                e.preventDefault();
+                fileInput.click();
+            });
+            
+            // Drag & Drop
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    if (validateFile(file)) {
+                        fileInput.files = e.dataTransfer.files;
+                        handleFileSelect(file);
+                    }
+                }
+            });
+            
+            // Changement de fichier via l'input
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    const file = this.files[0];
+                    if (validateFile(file)) {
+                        handleFileSelect(file);
+                    } else {
+                        this.value = '';
+                    }
+                }
+            });
+        }
+    }
+    
+    // Valider le fichier
+    function validateFile(file) {
+        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        
+        if (!validTypes.includes(file.type)) {
+            alert('❌ Format de fichier non supporté. Utilisez JPG, PNG, WebP ou PDF.');
+            return false;
+        }
+        
+        if (file.size > maxSize) {
+            alert('❌ Le fichier est trop volumineux. Taille max : 5MB.');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    // Gérer la sélection de fichier
+    function handleFileSelect(file) {
+        selectedFile = file;
+        
+        // Afficher les informations du fichier sélectionné
+        const fileInfo = document.getElementById('selectedFileInfo');
+        const fileName = document.getElementById('selectedFileName');
+        const fileSize = document.getElementById('selectedFileSize');
+        
+        fileInfo.style.display = 'block';
+        fileName.textContent = file.name;
+        fileSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+        
+        // Mettre à jour le conteneur
+        const container = document.getElementById('documentPreviewContainer');
+        container.classList.add('has-document');
+        
+        // Si on a un état actuel, on le cache
+        const currentState = document.getElementById('documentCurrentState');
+        if (currentState) {
+            currentState.style.display = 'none';
+        }
+        
+        // Si c'est une image, afficher un aperçu
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                container.innerHTML = `
+                    <img src="${e.target.result}" alt="Aperçu du document" class="document-preview">
+                    <div class="document-name">
+                        <i class="fas fa-file me-1"></i>
+                        ${file.name}
+                    </div>
+                    <div class="document-size">
+                        <i class="fas fa-weight-hanging me-1"></i>
+                        ${(file.size / 1024).toFixed(1)} KB
+                    </div>
+                    <div class="document-actions">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="clearSelectedFile()">
+                            <i class="fas fa-times me-1"></i> Annuler
+                        </button>
+                    </div>
+                    <input type="hidden" name="id_document" value="${file.name}">
+                `;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            container.innerHTML = `
+                <div class="document-icon">
+                    <i class="fas fa-file-pdf text-danger"></i>
+                </div>
+                <div class="document-name">
+                    <i class="fas fa-file me-1"></i>
+                    ${file.name}
+                </div>
+                <div class="document-size">
+                    <i class="fas fa-weight-hanging me-1"></i>
+                    ${(file.size / 1024).toFixed(1)} KB
+                </div>
+                <div class="document-actions">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="clearSelectedFile()">
+                        <i class="fas fa-times me-1"></i> Annuler
+                    </button>
+                </div>
+                <input type="hidden" name="id_document" value="${file.name}">
+            `;
+        }
+        
+        // Cacher la zone d'upload si elle existe
+        const uploadState = document.getElementById('documentUploadState');
+        if (uploadState) {
+            uploadState.style.display = 'none';
+        }
+    }
+    
+    // Annuler la sélection de fichier
+    function clearSelectedFile() {
+        const fileInput = document.getElementById('id_document');
+        const fileInfo = document.getElementById('selectedFileInfo');
+        
+        if (fileInput) {
+            fileInput.value = '';
+        }
+        fileInfo.style.display = 'none';
+        selectedFile = null;
+        
+        // Recharger la page pour revenir à l'état initial
+        location.reload();
+    }
+    
+    // ==========================================
+    // GESTION DES MOTS DE PASSE
+    // ==========================================
+    
     function generateEditPassword(memberId) {
         const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
         let password = '';
@@ -806,8 +1291,18 @@
         }
     }
 
-    // Afficher les mots de passe générés automatiquement dans les modales
+    // ==========================================
+    // INITIALISATION
+    // ==========================================
+    
     document.addEventListener('DOMContentLoaded', function() {
+        // Initialiser la zone de drop si elle existe
+        const uploadArea = document.getElementById('uploadArea');
+        if (uploadArea) {
+            initUploadArea();
+        }
+        
+        // Afficher les mots de passe générés automatiquement dans les modales
         document.querySelectorAll('[id^="createUserModal"]').forEach(function(modal) {
             modal.addEventListener('shown.bs.modal', function() {
                 const id = this.id.replace('createUserModal', '');

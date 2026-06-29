@@ -112,6 +112,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('/members/{member}/reject', [MemberController::class, 'reject'])->name('members.reject');
     Route::get('/members/{member}/card', [MemberController::class, 'generateCard'])->name('members.card');
     Route::get('/members/export/all', [MemberController::class, 'export'])->name('members.export');
+    Route::get('/members/{member}/document', [MemberController::class, 'viewDocument'])->name('members.document'); // NOUVEAU
     
     // ===== GESTION DES COMPTES UTILISATEURS =====
     Route::post('/members/{member}/create-user', [MemberController::class, 'createUser'])->name('members.create-user');
@@ -129,7 +130,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::get('/transactions', [FinancialController::class, 'transactions'])->name('transactions');
         Route::get('/transactions/create', [FinancialController::class, 'create'])->name('transactions.create');
         Route::post('/transactions', [FinancialController::class, 'store'])->name('transactions.store');
-        Route::get('/transactions/{transaction}', [FinancialController::class, 'show'])->name('transactions.show'); // AJOUTÉ
+        Route::get('/transactions/{transaction}', [FinancialController::class, 'show'])->name('transactions.show');
         Route::get('/transactions/{transaction}/edit', [FinancialController::class, 'edit'])->name('transactions.edit');
         Route::put('/transactions/{transaction}', [FinancialController::class, 'update'])->name('transactions.update');
         Route::delete('/transactions/{transaction}', [FinancialController::class, 'destroy'])->name('transactions.destroy');
