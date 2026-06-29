@@ -112,7 +112,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('/members/{member}/reject', [MemberController::class, 'reject'])->name('members.reject');
     Route::get('/members/{member}/card', [MemberController::class, 'generateCard'])->name('members.card');
     Route::get('/members/export/all', [MemberController::class, 'export'])->name('members.export');
-    Route::get('/members/{member}/document', [MemberController::class, 'viewDocument'])->name('members.document'); // NOUVEAU
+    Route::get('/members/{member}/document', [MemberController::class, 'viewDocument'])->name('members.document');
     
     // ===== GESTION DES COMPTES UTILISATEURS =====
     Route::post('/members/{member}/create-user', [MemberController::class, 'createUser'])->name('members.create-user');

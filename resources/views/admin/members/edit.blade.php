@@ -89,7 +89,6 @@
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     }
     
-    /* Styles pour le document */
     .document-preview-container {
         background: #f8fafc;
         border-radius: 12px;
@@ -246,7 +245,6 @@
         color: #2563eb;
     }
     
-    /* Styles pour la sélection des rôles */
     .roles-select-container {
         max-height: 200px;
         overflow-y: auto;
@@ -353,25 +351,6 @@
         font-size: 0.8rem;
         color: #6b7280;
     }
-
-    /* Style pour le bouton "Changer" */
-    .btn-change-document {
-        background: #8b5cf6;
-        color: #fff;
-        border: none;
-        padding: 0.4rem 1rem;
-        border-radius: 8px;
-        font-size: 0.8rem;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    
-    .btn-change-document:hover {
-        background: #7c3aed;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-        color: #fff;
-    }
 </style>
 
 <div class="container-fluid py-4">
@@ -394,16 +373,13 @@
         @csrf
         @method('PUT')
 
-        <!-- ========================================== -->
-        <!-- SECTION 1 : INFORMATIONS PERSONNELLES       -->
-        <!-- ========================================== -->
+        <!-- SECTION 1 : INFORMATIONS PERSONNELLES -->
         <div class="form-section">
             <div class="section-title">
                 <i class="fas fa-user-circle"></i>
                 Informations personnelles
             </div>
             <div class="row g-3">
-                <!-- Photo -->
                 <div class="col-md-3 text-center">
                     <label class="form-label">Photo</label>
                     <div class="mb-2">
@@ -422,13 +398,11 @@
                     @enderror
                 </div>
 
-                <!-- N° Membre -->
                 <div class="col-md-3">
                     <label class="form-label">N° Membre</label>
                     <input type="text" class="form-control bg-light" value="{{ $member->member_number }}" disabled readonly>
                 </div>
 
-                <!-- Statut -->
                 <div class="col-md-3">
                     <label class="form-label">Statut *</label>
                     <select name="status" class="form-select @error('status') is-invalid @enderror" required>
@@ -443,7 +417,6 @@
                     @enderror
                 </div>
 
-                <!-- Date d'entrée -->
                 <div class="col-md-3">
                     <label class="form-label">Date d'entrée</label>
                     <input type="date" name="entry_date" class="form-control @error('entry_date') is-invalid @enderror" 
@@ -453,7 +426,6 @@
                     @enderror
                 </div>
 
-                <!-- Prénom -->
                 <div class="col-md-6">
                     <label class="form-label">Prénom *</label>
                     <input type="text" name="first_name" class="form-control @error('first_name') is-invalid @enderror" 
@@ -463,7 +435,6 @@
                     @enderror
                 </div>
 
-                <!-- Nom -->
                 <div class="col-md-6">
                     <label class="form-label">Nom *</label>
                     <input type="text" name="last_name" class="form-control @error('last_name') is-invalid @enderror" 
@@ -473,7 +444,6 @@
                     @enderror
                 </div>
 
-                <!-- Email -->
                 <div class="col-md-6">
                     <label class="form-label">Email *</label>
                     <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" 
@@ -483,7 +453,6 @@
                     @enderror
                 </div>
 
-                <!-- Téléphone -->
                 <div class="col-md-6">
                     <label class="form-label">Téléphone *</label>
                     <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" 
@@ -493,7 +462,6 @@
                     @enderror
                 </div>
 
-                <!-- WhatsApp -->
                 <div class="col-md-6">
                     <label class="form-label">WhatsApp</label>
                     <input type="text" name="whatsapp" class="form-control @error('whatsapp') is-invalid @enderror" 
@@ -503,7 +471,6 @@
                     @enderror
                 </div>
 
-                <!-- Adresse -->
                 <div class="col-md-6">
                     <label class="form-label">Adresse</label>
                     <textarea name="address" class="form-control @error('address') is-invalid @enderror" rows="2">{{ old('address', $member->address) }}</textarea>
@@ -514,16 +481,13 @@
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- SECTION 2 : MUSIQUE ET SECTION              -->
-        <!-- ========================================== -->
+        <!-- SECTION 2 : MUSIQUE ET SECTION -->
         <div class="form-section">
             <div class="section-title">
                 <i class="fas fa-music"></i>
                 Informations musicales
             </div>
             <div class="row g-3">
-                <!-- Section -->
                 <div class="col-md-4">
                     <label class="form-label">Section</label>
                     <select name="section" class="form-select @error('section') is-invalid @enderror">
@@ -539,7 +503,6 @@
                     @enderror
                 </div>
 
-                <!-- Rôle dans la section -->
                 <div class="col-md-4">
                     <label class="form-label">Rôle dans la section</label>
                     <input type="text" name="section_role" class="form-control @error('section_role') is-invalid @enderror" 
@@ -549,7 +512,6 @@
                     @enderror
                 </div>
 
-                <!-- Instrument -->
                 <div class="col-md-4">
                     <label class="form-label">Instrument</label>
                     <select name="instrument" class="form-select @error('instrument') is-invalid @enderror">
@@ -565,7 +527,6 @@
                     @enderror
                 </div>
 
-                <!-- Niveau instrument -->
                 <div class="col-md-4">
                     <label class="form-label">Niveau instrument</label>
                     <select name="instrument_level" class="form-select @error('instrument_level') is-invalid @enderror">
@@ -581,7 +542,6 @@
                     @enderror
                 </div>
 
-                <!-- Date de naissance -->
                 <div class="col-md-4">
                     <label class="form-label">Date de naissance</label>
                     <input type="date" name="birth_date" class="form-control @error('birth_date') is-invalid @enderror" 
@@ -591,7 +551,6 @@
                     @enderror
                 </div>
 
-                <!-- Lieu de naissance -->
                 <div class="col-md-4">
                     <label class="form-label">Lieu de naissance</label>
                     <input type="text" name="birth_place" class="form-control @error('birth_place') is-invalid @enderror" 
@@ -603,9 +562,7 @@
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- SECTION 3 : DOCUMENT D'IDENTITÉ             -->
-        <!-- ========================================== -->
+        <!-- SECTION 3 : DOCUMENT D'IDENTITÉ -->
         <div class="form-section">
             <div class="section-title">
                 <i class="fas fa-id-card"></i>
@@ -613,103 +570,69 @@
             </div>
             <div class="row g-3">
                 <div class="col-md-12">
-                    <div class="document-preview-container {{ $member->id_document ? 'has-document' : '' }}" id="documentPreviewContainer">
-                        @if($member->id_document)
-                            @php
-                                $filePath = storage_path('app/public/' . $member->id_document);
-                                $fileExists = file_exists($filePath);
-                                $fileSize = $fileExists ? filesize($filePath) : 0;
-                                $fileSizeFormatted = $fileSize > 0 ? number_format($fileSize / 1024, 1) . ' KB' : 'N/A';
-                                $extension = pathinfo($member->id_document, PATHINFO_EXTENSION);
-                                $isImage = in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp']);
-                            @endphp
+                    @if($member->id_document)
+                        @php
+                            $filePath = storage_path('app/public/' . $member->id_document);
+                            $fileExists = file_exists($filePath);
+                            $fileSize = $fileExists ? filesize($filePath) : 0;
+                            $fileSizeFormatted = $fileSize > 0 ? number_format($fileSize / 1024, 1) . ' KB' : 'N/A';
+                            $extension = pathinfo($member->id_document, PATHINFO_EXTENSION);
+                            $isImage = in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+                        @endphp
+                        
+                        <div class="document-preview-container has-document mb-3">
+                            @if($isImage && $fileExists)
+                                <img src="{{ asset('storage/' . $member->id_document) }}" 
+                                     alt="Document d'identité" 
+                                     class="document-preview">
+                            @else
+                                <div class="document-icon">
+                                    <i class="fas fa-file-{{ $extension === 'pdf' ? 'pdf' : 'alt' }} text-{{ $extension === 'pdf' ? 'danger' : 'primary' }}"></i>
+                                </div>
+                            @endif
                             
-                            <!-- État actuel : Document existant -->
-                            <div id="documentCurrentState">
-                                @if($isImage && $fileExists)
-                                    <img src="{{ asset('storage/' . $member->id_document) }}" 
-                                         alt="Document d'identité" 
-                                         class="document-preview">
-                                @else
-                                    <div class="document-icon">
-                                        <i class="fas fa-file-{{ $extension === 'pdf' ? 'pdf' : 'alt' }} text-{{ $extension === 'pdf' ? 'danger' : 'primary' }}"></i>
-                                    </div>
-                                @endif
-                                
-                                <div class="document-name">
-                                    <i class="fas fa-file me-1"></i>
-                                    {{ basename($member->id_document) }}
-                                </div>
-                                <div class="document-size">
-                                    <i class="fas fa-weight-hanging me-1"></i>
-                                    {{ $fileSizeFormatted }}
-                                </div>
-                                
-                                <div class="document-actions">
-                                    <a href="{{ route('admin.members.document', $member) }}" target="_blank" class="btn btn-info btn-sm">
-                                        <i class="fas fa-eye me-1"></i> Voir
-                                    </a>
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="showDocumentUpload()">
-                                        <i class="fas fa-exchange-alt me-1"></i> Changer
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeDocument()">
-                                        <i class="fas fa-trash me-1"></i> Supprimer
-                                    </button>
-                                </div>
-                                
-                                <input type="hidden" name="remove_document" id="removeDocument" value="0">
+                            <div class="document-name">
+                                <i class="fas fa-file me-1"></i>
+                                {{ basename($member->id_document) }}
+                            </div>
+                            <div class="document-size">
+                                <i class="fas fa-weight-hanging me-1"></i>
+                                {{ $fileSizeFormatted }}
                             </div>
                             
-                            <!-- État de sélection de nouveau fichier (caché par défaut) -->
-                            <div id="documentUploadState" style="display: none; width: 100%;">
-                                <div class="upload-area" id="uploadArea">
-                                    <div class="upload-icon">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                    </div>
-                                    <div class="upload-text">
-                                        Cliquez ou glissez-déposez pour remplacer le document
-                                    </div>
-                                    <div class="upload-hint">
-                                        Formats acceptés : JPG, PNG, PDF, WebP | Taille max : 5MB
-                                    </div>
-                                </div>
-                                <input type="file" name="id_document" id="id_document" 
-                                       class="form-control @error('id_document') is-invalid @enderror" 
-                                       accept=".jpg,.jpeg,.png,.pdf,.webp" style="display: none;">
-                                <div class="mt-2">
-                                    <button type="button" class="btn btn-secondary btn-sm" onclick="hideDocumentUpload()">
-                                        <i class="fas fa-times me-1"></i> Annuler
-                                    </button>
-                                </div>
-                                @error('id_document')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                            <div class="document-actions">
+                                <a href="{{ route('admin.members.document', $member) }}" target="_blank" class="btn btn-info btn-sm">
+                                    <i class="fas fa-eye me-1"></i> Voir
+                                </a>
                             </div>
-                        @else
-                            <!-- Pas de document : afficher la zone d'upload -->
-                            <div id="documentUploadState" style="width: 100%;">
-                                <div class="upload-area" id="uploadArea">
-                                    <div class="upload-icon">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                    </div>
-                                    <div class="upload-text">
-                                        Cliquez ou glissez-déposez pour ajouter un document
-                                    </div>
-                                    <div class="upload-hint">
-                                        Formats acceptés : JPG, PNG, PDF, WebP | Taille max : 5MB
-                                    </div>
-                                </div>
-                                <input type="file" name="id_document" id="id_document" 
-                                       class="form-control @error('id_document') is-invalid @enderror" 
-                                       accept=".jpg,.jpeg,.png,.pdf,.webp" style="display: none;">
-                                @error('id_document')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        @endif
-                    </div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="remove_document" id="removeDocument" value="1">
+                            <label class="form-check-label text-danger" for="removeDocument">
+                                <i class="fas fa-trash me-1"></i> Supprimer le document actuel
+                            </label>
+                        </div>
+                    @endif
                     
-                    <!-- Affichage du fichier sélectionné -->
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">
+                            {{ $member->id_document ? 'Cliquez pour remplacer le document' : 'Cliquez ou glissez-déposez pour ajouter un document' }}
+                        </div>
+                        <div class="upload-hint">
+                            Formats acceptés : JPG, PNG, PDF, WebP | Taille max : 5MB
+                        </div>
+                    </div>
+                    <input type="file" name="id_document" id="id_document" 
+                           class="form-control @error('id_document') is-invalid @enderror" 
+                           accept=".jpg,.jpeg,.png,.pdf,.webp" style="display: none;">
+                    @error('id_document')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    
                     <div id="selectedFileInfo" style="display: none;" class="mt-2">
                         <div class="file-info">
                             <span>
@@ -728,16 +651,13 @@
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- SECTION 4 : URGENCE ET NOTES                -->
-        <!-- ========================================== -->
+        <!-- SECTION 4 : URGENCE ET NOTES -->
         <div class="form-section">
             <div class="section-title">
                 <i class="fas fa-ambulance"></i>
                 Contact d'urgence et notes
             </div>
             <div class="row g-3">
-                <!-- Contact d'urgence (Nom) -->
                 <div class="col-md-6">
                     <label class="form-label">Contact d'urgence (Nom)</label>
                     <input type="text" name="emergency_contact_name" class="form-control @error('emergency_contact_name') is-invalid @enderror" 
@@ -747,7 +667,6 @@
                     @enderror
                 </div>
 
-                <!-- Contact d'urgence (Téléphone) -->
                 <div class="col-md-6">
                     <label class="form-label">Contact d'urgence (Téléphone)</label>
                     <input type="text" name="emergency_contact_phone" class="form-control @error('emergency_contact_phone') is-invalid @enderror" 
@@ -757,7 +676,6 @@
                     @enderror
                 </div>
 
-                <!-- Notes médicales -->
                 <div class="col-md-6">
                     <label class="form-label">Notes médicales</label>
                     <textarea name="medical_notes" class="form-control @error('medical_notes') is-invalid @enderror" rows="3">{{ old('medical_notes', $member->medical_notes) }}</textarea>
@@ -766,7 +684,6 @@
                     @enderror
                 </div>
 
-                <!-- Compétences -->
                 <div class="col-md-6">
                     <label class="form-label">Compétences</label>
                     <input type="text" name="skills" class="form-control @error('skills') is-invalid @enderror" 
@@ -776,7 +693,6 @@
                     @enderror
                 </div>
 
-                <!-- Notes admin -->
                 <div class="col-md-12">
                     <label class="form-label">Notes (Admin)</label>
                     <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="3">{{ old('notes', $member->notes) }}</textarea>
@@ -787,9 +703,7 @@
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- SECTION 5 : COMPTE UTILISATEUR ET RÔLES     -->
-        <!-- ========================================== -->
+        <!-- SECTION 5 : COMPTE UTILISATEUR ET RÔLES -->
         <div class="form-section">
             <div class="section-title">
                 <i class="fas fa-user"></i>
@@ -798,7 +712,6 @@
             
             @if($member->user)
                 <div class="row g-3">
-                    <!-- Informations du compte -->
                     <div class="col-md-6">
                         <div class="bg-light rounded-3 p-3">
                             <h6 class="fw-bold mb-2">
@@ -823,7 +736,6 @@
                         </div>
                     </div>
 
-                    <!-- Sélection des rôles -->
                     <div class="col-md-6">
                         <div class="bg-light rounded-3 p-3">
                             <h6 class="fw-bold mb-2">
@@ -864,9 +776,7 @@
             @endif
         </div>
 
-        <!-- ========================================== -->
-        <!-- INFORMATIONS SYSTÈME                       -->
-        <!-- ========================================== -->
+        <!-- INFORMATIONS SYSTÈME -->
         <div class="row g-3 mb-4">
             <div class="col-md-12">
                 <div class="bg-light rounded-3 p-3">
@@ -892,9 +802,7 @@
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- BOUTONS D'ACTION                            -->
-        <!-- ========================================== -->
+        <!-- BOUTONS D'ACTION -->
         <div class="d-flex justify-content-end gap-3">
             <a href="{{ route('admin.members.show', $member) }}" class="btn btn-secondary btn-action">
                 <i class="fas fa-times me-2"></i> Annuler
@@ -906,9 +814,7 @@
     </form>
 </div>
 
-<!-- ========================================== -->
-<!-- MODAL : CRÉER UN COMPTE                    -->
-<!-- ========================================== -->
+<!-- MODAL : CRÉER UN COMPTE -->
 <div class="modal fade" id="createUserModal{{ $member->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -968,9 +874,7 @@
     </div>
 </div>
 
-<!-- ========================================== -->
-<!-- MODAL : RÉINITIALISER LE MOT DE PASSE      -->
-<!-- ========================================== -->
+<!-- MODAL : RÉINITIALISER LE MOT DE PASSE -->
 <div class="modal fade" id="resetPasswordModal{{ $member->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -1026,78 +930,17 @@
     // ==========================================
     // GESTION DU DOCUMENT D'IDENTITÉ
     // ==========================================
-    
-    let selectedFile = null;
-    
-    // Afficher la zone d'upload pour remplacer le document
-    function showDocumentUpload() {
-        document.getElementById('documentCurrentState').style.display = 'none';
-        document.getElementById('documentUploadState').style.display = 'block';
-        // Réinitialiser les événements
-        initUploadArea();
-    }
-    
-    // Cacher la zone d'upload et revenir à l'état actuel
-    function hideDocumentUpload() {
-        document.getElementById('documentCurrentState').style.display = 'block';
-        document.getElementById('documentUploadState').style.display = 'none';
-        // Cacher les infos du fichier sélectionné
-        document.getElementById('selectedFileInfo').style.display = 'none';
-        // Réinitialiser l'input file
-        const fileInput = document.getElementById('id_document');
-        if (fileInput) {
-            fileInput.value = '';
-        }
-    }
-    
-    // Supprimer le document existant
-    function removeDocument() {
-        if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
-            document.getElementById('removeDocument').value = '1';
-            
-            // Cacher l'état actuel et afficher la zone d'upload
-            const container = document.getElementById('documentPreviewContainer');
-            container.innerHTML = `
-                <div id="documentUploadState" style="width: 100%;">
-                    <div class="upload-area" id="uploadArea">
-                        <div class="upload-icon">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                        </div>
-                        <div class="upload-text">
-                            Cliquez ou glissez-déposez pour ajouter un document
-                        </div>
-                        <div class="upload-hint">
-                            Formats acceptés : JPG, PNG, PDF, WebP | Taille max : 5MB
-                        </div>
-                    </div>
-                    <input type="file" name="id_document" id="id_document" 
-                           class="form-control @error('id_document') is-invalid @enderror" 
-                           accept=".jpg,.jpeg,.png,.pdf,.webp" style="display: none;">
-                </div>
-            `;
-            container.classList.remove('has-document');
-            
-            // Cacher les infos du fichier sélectionné
-            document.getElementById('selectedFileInfo').style.display = 'none';
-            
-            // Réinitialiser les événements
-            initUploadArea();
-        }
-    }
-    
-    // Initialiser la zone de drop
+
     function initUploadArea() {
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('id_document');
         
         if (uploadArea && fileInput) {
-            // Click pour ouvrir le sélecteur de fichiers
             uploadArea.addEventListener('click', function(e) {
                 e.preventDefault();
                 fileInput.click();
             });
             
-            // Drag & Drop
             uploadArea.addEventListener('dragover', function(e) {
                 e.preventDefault();
                 this.classList.add('dragover');
@@ -1121,7 +964,6 @@
                 }
             });
             
-            // Changement de fichier via l'input
             fileInput.addEventListener('change', function() {
                 if (this.files.length > 0) {
                     const file = this.files[0];
@@ -1134,11 +976,10 @@
             });
         }
     }
-    
-    // Valider le fichier
+
     function validateFile(file) {
         const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
-        const maxSize = 5 * 1024 * 1024; // 5MB
+        const maxSize = 5 * 1024 * 1024;
         
         if (!validTypes.includes(file.type)) {
             alert('❌ Format de fichier non supporté. Utilisez JPG, PNG, WebP ou PDF.');
@@ -1152,12 +993,8 @@
         
         return true;
     }
-    
-    // Gérer la sélection de fichier
+
     function handleFileSelect(file) {
-        selectedFile = file;
-        
-        // Afficher les informations du fichier sélectionné
         const fileInfo = document.getElementById('selectedFileInfo');
         const fileName = document.getElementById('selectedFileName');
         const fileSize = document.getElementById('selectedFileSize');
@@ -1166,69 +1003,28 @@
         fileName.textContent = file.name;
         fileSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
         
-        // Mettre à jour le conteneur
-        const container = document.getElementById('documentPreviewContainer');
-        container.classList.add('has-document');
-        
-        // Si on a un état actuel, on le cache
-        const currentState = document.getElementById('documentCurrentState');
-        if (currentState) {
-            currentState.style.display = 'none';
-        }
-        
-        // Si c'est une image, afficher un aperçu
+        const uploadArea = document.getElementById('uploadArea');
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                container.innerHTML = `
-                    <img src="${e.target.result}" alt="Aperçu du document" class="document-preview">
-                    <div class="document-name">
-                        <i class="fas fa-file me-1"></i>
-                        ${file.name}
-                    </div>
-                    <div class="document-size">
-                        <i class="fas fa-weight-hanging me-1"></i>
-                        ${(file.size / 1024).toFixed(1)} KB
-                    </div>
-                    <div class="document-actions">
-                        <button type="button" class="btn btn-danger btn-sm" onclick="clearSelectedFile()">
-                            <i class="fas fa-times me-1"></i> Annuler
-                        </button>
-                    </div>
-                    <input type="hidden" name="id_document" value="${file.name}">
+                uploadArea.innerHTML = `
+                    <img src="${e.target.result}" alt="Aperçu" style="max-height: 150px; max-width: 100%; border-radius: 8px;">
+                    <div class="upload-text mt-2">${file.name}</div>
+                    <div class="upload-hint">${(file.size / 1024).toFixed(1)} KB</div>
                 `;
             };
             reader.readAsDataURL(file);
         } else {
-            container.innerHTML = `
-                <div class="document-icon">
+            uploadArea.innerHTML = `
+                <div class="upload-icon">
                     <i class="fas fa-file-pdf text-danger"></i>
                 </div>
-                <div class="document-name">
-                    <i class="fas fa-file me-1"></i>
-                    ${file.name}
-                </div>
-                <div class="document-size">
-                    <i class="fas fa-weight-hanging me-1"></i>
-                    ${(file.size / 1024).toFixed(1)} KB
-                </div>
-                <div class="document-actions">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="clearSelectedFile()">
-                        <i class="fas fa-times me-1"></i> Annuler
-                    </button>
-                </div>
-                <input type="hidden" name="id_document" value="${file.name}">
+                <div class="upload-text">${file.name}</div>
+                <div class="upload-hint">${(file.size / 1024).toFixed(1)} KB</div>
             `;
         }
-        
-        // Cacher la zone d'upload si elle existe
-        const uploadState = document.getElementById('documentUploadState');
-        if (uploadState) {
-            uploadState.style.display = 'none';
-        }
     }
-    
-    // Annuler la sélection de fichier
+
     function clearSelectedFile() {
         const fileInput = document.getElementById('id_document');
         const fileInfo = document.getElementById('selectedFileInfo');
@@ -1237,12 +1033,20 @@
             fileInput.value = '';
         }
         fileInfo.style.display = 'none';
-        selectedFile = null;
         
-        // Recharger la page pour revenir à l'état initial
-        location.reload();
+        const uploadArea = document.getElementById('uploadArea');
+        const hasDocument = {{ $member->id_document ? 'true' : 'false' }};
+        const text = hasDocument ? 'Cliquez pour remplacer le document' : 'Cliquez ou glissez-déposez pour ajouter un document';
+        
+        uploadArea.innerHTML = `
+            <div class="upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <div class="upload-text">${text}</div>
+            <div class="upload-hint">Formats acceptés : JPG, PNG, PDF, WebP | Taille max : 5MB</div>
+        `;
     }
-    
+
     // ==========================================
     // GESTION DES MOTS DE PASSE
     // ==========================================
@@ -1296,13 +1100,8 @@
     // ==========================================
     
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialiser la zone de drop si elle existe
-        const uploadArea = document.getElementById('uploadArea');
-        if (uploadArea) {
-            initUploadArea();
-        }
+        initUploadArea();
         
-        // Afficher les mots de passe générés automatiquement dans les modales
         document.querySelectorAll('[id^="createUserModal"]').forEach(function(modal) {
             modal.addEventListener('shown.bs.modal', function() {
                 const id = this.id.replace('createUserModal', '');

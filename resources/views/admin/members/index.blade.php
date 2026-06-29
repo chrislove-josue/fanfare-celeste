@@ -236,6 +236,7 @@
         transition: all 0.2s ease;
         font-size: 0.75rem;
         text-decoration: none;
+        cursor: pointer;
     }
     
     .action-buttons .btn-action.view {
@@ -404,6 +405,50 @@
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     }
     
+    /* Styles pour le modal du document */
+    #documentModal .modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    #documentModal .modal-header {
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 1rem 1.5rem;
+    }
+
+    #documentModal .modal-body {
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8fafc;
+        padding: 1.5rem;
+    }
+
+    #documentModal .modal-body img {
+        max-height: 500px;
+        max-width: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    #documentModal .modal-body iframe {
+        width: 100%;
+        height: 500px;
+        border: none;
+        border-radius: 8px;
+    }
+
+    #documentModal .modal-footer {
+        background: #fff;
+        border-top: 1px solid #e5e7eb;
+        padding: 1rem 1.5rem;
+        flex-wrap: wrap;
+    }
+    
     @media (max-width: 768px) {
         .stat-card-pro .stat-number {
             font-size: 1.3rem;
@@ -426,6 +471,16 @@
         }
         .filter-section .row {
             gap: 0.5rem;
+        }
+        #documentModal .modal-body {
+            min-height: 250px;
+            padding: 1rem;
+        }
+        #documentModal .modal-body iframe {
+            height: 300px;
+        }
+        #documentModal .modal-body img {
+            max-height: 300px;
         }
     }
 </style>
@@ -643,14 +698,19 @@
                                 <i class="fas fa-edit"></i>
                             </a>
                             
-                            <!-- ===== BOUTON DOCUMENT D'IDENTITÉ ===== -->
+                            <!-- ===== BOUTON DOCUMENT D'IDENTITÉ (MODAL) ===== -->
                             @if($member->id_document)
-                                <a href="{{ route('admin.members.document', $member) }}" 
-                                   class="btn-action document" 
-                                   title="Voir le document d'identité"
-                                   target="_blank">
+                                @php
+                                    $fileName = basename($member->id_document);
+                                    $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+                                    $documentPath = asset('storage/' . $member->id_document);
+                                @endphp
+                                <button type="button" 
+                                        class="btn-action document" 
+                                        title="Voir le document d'identité"
+                                        onclick="viewDocumentModal('{{ $documentPath }}', '{{ $member->full_name }}', '{{ $member->member_number }}', '{{ $fileName }}')">
                                     <i class="fas fa-id-card"></i>
-                                </a>
+                                </button>
                             @else
                                 <span class="btn-action document-disabled" title="Aucun document">
                                     <i class="fas fa-id-card"></i>
@@ -774,6 +834,51 @@
     </div>
 </div>
 
+<!-- ========================================== -->
+<!-- MODAL POUR LE DOCUMENT                     -->
+<!-- ========================================== -->
+<div class="modal fade" id="documentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">
+                    <i class="fas fa-id-card text-primary me-2"></i>
+                    Document d'identité - <span id="documentModalMemberName"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="documentModalBody">
+                <div class="text-center" id="documentLoading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Chargement du document...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="d-flex flex-wrap gap-3 me-auto">
+                    <span class="text-muted small">
+                        <i class="fas fa-user me-1"></i>
+                        <span id="documentModalMemberInfo"></span>
+                    </span>
+                    <span class="text-muted small">
+                        <i class="fas fa-hashtag me-1"></i>
+                        <span id="documentModalMemberNumber"></span>
+                    </span>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="#" id="documentDownloadLink" class="btn btn-primary btn-sm" download>
+                        <i class="fas fa-download me-1"></i> Télécharger
+                    </a>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Fermer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
     function confirmDelete(id, name) {
@@ -781,6 +886,99 @@
         document.getElementById('deleteForm').action = '{{ route("admin.members.index") }}/' + id;
         new bootstrap.Modal(document.getElementById('deleteModal')).show();
     }
+
+    // ==========================================
+    // GESTION DU DOCUMENT DANS LE MODAL
+    // ==========================================
+
+    function viewDocumentModal(documentPath, memberName, memberNumber, fileName) {
+        // Mettre à jour les informations du modal
+        document.getElementById('documentModalMemberName').textContent = memberName;
+        document.getElementById('documentModalMemberInfo').textContent = memberName;
+        document.getElementById('documentModalMemberNumber').textContent = memberNumber;
+        document.getElementById('documentDownloadLink').href = documentPath;
+        document.getElementById('documentDownloadLink').download = 'document_' + memberNumber + '.' + fileName.split('.').pop();
+        
+        // Afficher le loader
+        const body = document.getElementById('documentModalBody');
+        body.innerHTML = `
+            <div class="text-center" id="documentLoading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+                <p class="mt-2 text-muted">Chargement du document...</p>
+            </div>
+        `;
+        
+        // Ouvrir le modal
+        const modal = new bootstrap.Modal(document.getElementById('documentModal'));
+        modal.show();
+        
+        // Déterminer le type de fichier
+        const extension = fileName.split('.').pop().toLowerCase();
+        const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension);
+        
+        if (isImage) {
+            // Charger l'image
+            const img = new Image();
+            img.onload = function() {
+                body.innerHTML = `
+                    <img src="${documentPath}" 
+                         alt="Document d'identité" 
+                         class="img-fluid rounded shadow-sm"
+                         style="max-height: 500px; max-width: 100%; object-fit: contain;">
+                `;
+            };
+            img.onerror = function() {
+                body.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <p class="text-muted">Impossible de charger l'image</p>
+                        <a href="${documentPath}" target="_blank" class="btn btn-primary btn-sm">
+                            <i class="fas fa-external-link-alt me-1"></i> Ouvrir dans un nouvel onglet
+                        </a>
+                    </div>
+                `;
+            };
+            img.src = documentPath;
+        } else if (extension === 'pdf') {
+            // Afficher le PDF dans un iframe
+            body.innerHTML = `
+                <iframe src="${documentPath}" 
+                        style="width: 100%; height: 500px; border: none; border-radius: 8px;" 
+                        frameborder="0"></iframe>
+            `;
+        } else {
+            // Autres types de fichiers
+            body.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-file-alt fa-4x text-primary mb-3"></i>
+                    <p class="text-muted">Type de fichier non prévisualisable</p>
+                    <a href="${documentPath}" target="_blank" class="btn btn-primary btn-sm">
+                        <i class="fas fa-external-link-alt me-1"></i> Ouvrir le fichier
+                    </a>
+                </div>
+            `;
+        }
+    }
+
+    // Ouvrir automatiquement le modal si on vient avec un paramètre
+    document.addEventListener('DOMContentLoaded', function() {
+        @if(request()->has('modal'))
+            setTimeout(function() {
+                const memberId = '{{ request('member_id') }}';
+                if (memberId) {
+                    // Trouver le bouton du document pour ce membre
+                    const buttons = document.querySelectorAll('.btn-action.document');
+                    buttons.forEach(function(btn) {
+                        if (btn.getAttribute('data-member-id') === memberId) {
+                            btn.click();
+                        }
+                    });
+                }
+            }, 500);
+        @endif
+    });
 </script>
 @endpush
 @endsection

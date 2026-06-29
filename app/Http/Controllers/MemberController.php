@@ -263,8 +263,8 @@ class MemberController extends Controller
     // ==========================================
     public function update(Request $request, Member $member)
     {
-        // Validation des données - id_document n'est validé que si présent
-        $rules = [
+        // 1. Validation de base (sans id_document dans les règles)
+        $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:members,email,' . $member->id,
@@ -285,14 +285,7 @@ class MemberController extends Controller
             'skills' => 'nullable|string',
             'notes' => 'nullable|string',
             'photo' => 'nullable|image|max:2048',
-        ];
-
-        // Ajouter la validation pour id_document uniquement si un fichier est uploadé
-        if ($request->hasFile('id_document')) {
-            $rules['id_document'] = 'nullable|file|max:5120|mimes:jpg,jpeg,png,pdf,webp';
-        }
-
-        $validated = $request->validate($rules);
+        ]);
 
         DB::beginTransaction();
         
@@ -301,21 +294,18 @@ class MemberController extends Controller
             // GESTION DE LA PHOTO
             // ==========================================
             if ($request->hasFile('photo')) {
-                // Supprimer l'ancienne photo si elle existe
                 if ($member->photo && Storage::disk('public')->exists($member->photo)) {
                     Storage::disk('public')->delete($member->photo);
                 }
-                // Créer le dossier s'il n'existe pas
                 $this->ensureDirectoryExists('members/photos');
-                // Stocker la nouvelle photo
                 $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
             }
 
             // ==========================================
-            // GESTION DU DOCUMENT D'IDENTITÉ (CORRIGÉ)
+            // GESTION DU DOCUMENT D'IDENTITÉ (SIMPLIFIÉ)
             // ==========================================
             
-            // 1. Vérifier si on doit supprimer le document
+            // Suppression du document
             if ($request->has('remove_document') && $request->remove_document == '1') {
                 if ($member->id_document && Storage::disk('public')->exists($member->id_document)) {
                     Storage::disk('public')->delete($member->id_document);
@@ -323,33 +313,41 @@ class MemberController extends Controller
                 $validated['id_document'] = null;
             }
             
-            // 2. Vérifier si un nouveau document est uploadé
+            // Upload d'un nouveau document
             if ($request->hasFile('id_document')) {
-                // Supprimer l'ancien document s'il existe
+                $file = $request->file('id_document');
+                $maxSize = 5 * 1024 * 1024;
+                $allowedTypes = ['jpg', 'jpeg', 'png', 'pdf', 'webp'];
+                $extension = strtolower($file->getClientOriginalExtension());
+                
+                if (!in_array($extension, $allowedTypes)) {
+                    throw new \Exception('Format de fichier non supporté. Utilisez JPG, PNG, PDF ou WebP.');
+                }
+                
+                if ($file->getSize() > $maxSize) {
+                    throw new \Exception('Le fichier est trop volumineux. Taille max : 5MB.');
+                }
+                
+                // Supprimer l'ancien document
                 if ($member->id_document && Storage::disk('public')->exists($member->id_document)) {
                     Storage::disk('public')->delete($member->id_document);
                 }
-                // Créer le dossier s'il n'existe pas
+                
+                // Créer le dossier et stocker
                 $this->ensureDirectoryExists('members/documents');
-                // Stocker le nouveau document
-                $validated['id_document'] = $request->file('id_document')->store('members/documents', 'public');
+                $validated['id_document'] = $file->store('members/documents', 'public');
             }
-            
-            // 3. Si aucun nouveau document n'est uploadé et qu'on ne supprime pas,
-            //    on garde l'ancien document (ne pas toucher à id_document)
-            //    On ne fait rien, la valeur existante reste
 
-            // Mettre à jour le membre avec les données validées
+            // Mettre à jour le membre
             $member->update($validated);
 
-            // Mettre à jour l'utilisateur associé si existant
+            // Mettre à jour l'utilisateur associé
             if ($member->user) {
                 $member->user->update([
                     'name' => $member->full_name,
                     'email' => $member->email,
                 ]);
                 
-                // Mettre à jour les rôles
                 if ($request->has('roles')) {
                     $member->user->syncRoles($request->roles);
                 }
@@ -362,7 +360,7 @@ class MemberController extends Controller
                 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Erreur lors de la mise à jour: ' . $e->getMessage())
+            return back()->with('error', 'Erreur : ' . $e->getMessage())
                          ->withInput();
         }
     }
@@ -375,7 +373,6 @@ class MemberController extends Controller
         DB::beginTransaction();
         
         try {
-            // Supprimer les fichiers associés
             if ($member->photo && Storage::disk('public')->exists($member->photo)) {
                 Storage::disk('public')->delete($member->photo);
             }
@@ -383,7 +380,6 @@ class MemberController extends Controller
                 Storage::disk('public')->delete($member->id_document);
             }
             
-            // Supprimer l'utilisateur associé
             if ($member->user) {
                 $member->user->delete();
             }
@@ -476,7 +472,6 @@ class MemberController extends Controller
             
             return view('admin.members.document', compact('member', 'imageSrc'));
         } else {
-            // Pour les PDF et autres types, on les affiche dans le navigateur
             return response()->file($path, [
                 'Content-Type' => $mime,
                 'Content-Disposition' => 'inline; filename="document_' . $member->member_number . '.' . pathinfo($path, PATHINFO_EXTENSION) . '"'
@@ -524,7 +519,6 @@ class MemberController extends Controller
                 'member_id' => $member->id,
             ]);
             
-            // Assigner le rôle par défaut "member"
             $user->assignRole('member');
             
             DB::commit();
@@ -682,9 +676,6 @@ class MemberController extends Controller
     // MÉTHODES PRIVÉES
     // ==========================================
 
-    /**
-     * Créer un compte utilisateur pour un membre
-     */
     private function createUserAccount(Member $member): User
     {
         $password = Str::random(10);
@@ -696,18 +687,11 @@ class MemberController extends Controller
             'member_id' => $member->id,
         ]);
 
-        // Assigner le rôle par défaut
         $user->assignRole('member');
 
         return $user;
     }
 
-    /**
-     * Vérifier et créer un dossier s'il n'existe pas
-     * 
-     * @param string $path Chemin relatif dans le disque public
-     * @return void
-     */
     private function ensureDirectoryExists(string $path): void
     {
         $fullPath = storage_path('app/public/' . $path);
