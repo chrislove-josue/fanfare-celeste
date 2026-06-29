@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Administration - Fanfare Céleste')</title>
+    <link rel="shortcut icon" href="{{ asset('storage/logo/logo.ico') }}" type="image/x-icon">
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -591,7 +592,7 @@
     <aside class="sidebar" id="sidebar">
         <!-- Brand - Fixe en haut -->
         <div class="sidebar-brand">
-            <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center gap-3">
+            <a href="{{ route('admin.dashboard') }}" class="gap-3 d-flex align-items-center">
                 <img src="{{ asset('storage/logo/logo-blanc.jpeg') }}" 
                      alt="Fanfare Céleste" 
                      style="height: 60px; width: auto;">
@@ -876,7 +877,7 @@
 
         <!-- ===== USER INFO - Fixe en bas ===== -->
         <div class="sidebar-user">
-            <div class="d-flex align-items-center gap-3 mb-2">
+            <div class="gap-3 mb-2 d-flex align-items-center">
                 <div class="user-avatar">
                     {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                 </div>
@@ -972,14 +973,14 @@
                     <i class="fas fa-chevron-down text-muted ms-1" style="font-size: 0.6rem;"></i>
                 </button>
 
-                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 py-2" style="min-width: 220px; border-radius: var(--radius-sm);">
+                <ul class="py-2 border-0 shadow-lg dropdown-menu dropdown-menu-end" style="min-width: 220px; border-radius: var(--radius-sm);">
                     <li>
-                        <a class="dropdown-item py-2" href="{{ route('my.profile') }}">
+                        <a class="py-2 dropdown-item" href="{{ route('my.profile') }}">
                             <i class="fas fa-user-circle me-2"></i> Mon profil
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item py-2" href="{{ route('admin.dashboard') }}">
+                        <a class="py-2 dropdown-item" href="{{ route('admin.dashboard') }}">
                             <i class="fas fa-th-large me-2"></i> Tableau de bord
                         </a>
                     </li>
@@ -987,7 +988,7 @@
                     <li>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="dropdown-item py-2 text-danger">
+                            <button type="submit" class="py-2 dropdown-item text-danger">
                                 <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
                             </button>
                         </form>
@@ -1001,7 +1002,7 @@
             <!-- Breadcrumb -->
             @hasSection('breadcrumb')
             <nav aria-label="breadcrumb" class="mb-3">
-                <ol class="breadcrumb mb-0">
+                <ol class="mb-0 breadcrumb">
                     <li class="breadcrumb-item">
                         <a href="{{ route('admin.dashboard') }}" class="text-decoration-none">
                             <i class="fas fa-home"></i>
