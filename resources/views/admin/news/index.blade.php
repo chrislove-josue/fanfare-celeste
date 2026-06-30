@@ -9,28 +9,40 @@
 @endsection
 
 @section('content')
-<div class="card shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-        <h5 class="card-title mb-0">
+<div class="shadow-sm card">
+    <div class="flex-wrap card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 card-title">
             <i class="fas fa-newspaper me-2 text-primary"></i>
             Liste des actualités & événements
         </h5>
-        <div>
+        <div class="gap-2 d-flex">
+            <a href="{{ route('admin.news.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i> Nouvelle actualité
+            </a>
             <a href="{{ route('admin.events.create') }}" class="btn btn-success">
                 <i class="fas fa-calendar-plus me-2"></i> Nouvel événement
             </a>
         </div>
     </div>
-    <div class="card-body p-0">
+    <div class="p-0 card-body">
         @if(session('success'))
-            <div class="alert alert-success m-3">
+            <div class="m-3 alert alert-success">
+                <i class="fas fa-check-circle me-2"></i>
                 {{ session('success') }}
             </div>
         @endif
 
         @if(session('error'))
-            <div class="alert alert-danger m-3">
+            <div class="m-3 alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>
                 {{ session('error') }}
+            </div>
+        @endif
+
+        @if(session('warning'))
+            <div class="m-3 alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {{ session('warning') }}
             </div>
         @endif
 
@@ -56,6 +68,7 @@
                         <option value="upcoming" {{ request('status') === 'upcoming' ? 'selected' : '' }}>À venir</option>
                         <option value="ongoing" {{ request('status') === 'ongoing' ? 'selected' : '' }}>En cours</option>
                         <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Terminé</option>
+                        <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Annulé</option>
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -67,7 +80,7 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table mb-0 table-hover">
                 <thead class="table-light">
                     <tr>
                         <th style="width: 80px;">Image</th>
@@ -76,31 +89,35 @@
                         <th>Extrait / Description</th>
                         <th>Statut</th>
                         <th>Date</th>
-                        <th style="width: 150px;">Actions</th>
+                        <th style="width: 200px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($items as $item)
                     <tr>
                         <td>
-                            @if($item->type === 'event' && $item->featured_image)
-                                <img src="{{ asset('storage/' . $item->featured_image) }}" 
-                                     alt="{{ $item->title }}" 
-                                     style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;">
-                            @elseif($item->type === 'event')
-                                <div class="bg-primary rounded d-flex align-items-center justify-content-center" 
-                                     style="width: 60px; height: 60px; color: #fff;">
-                                    <i class="fas fa-calendar-alt fa-2x"></i>
-                                </div>
-                            @elseif($item->featured_image)
-                                <img src="{{ asset('storage/' . $item->featured_image) }}" 
-                                     alt="{{ $item->title }}" 
-                                     style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;">
+                            @if($item->type === 'event')
+                                @if($item->poster_path)
+                                    <img src="{{ asset('storage/' . $item->poster_path) }}" 
+                                         alt="{{ $item->title }}" 
+                                         style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;">
+                                @else
+                                    <div class="rounded bg-primary d-flex align-items-center justify-content-center" 
+                                         style="width: 60px; height: 60px; color: #fff;">
+                                        <i class="fas fa-calendar-alt fa-2x"></i>
+                                    </div>
+                                @endif
                             @else
-                                <div class="bg-light rounded d-flex align-items-center justify-content-center" 
-                                     style="width: 60px; height: 60px; color: #6c757d;">
-                                    <i class="fas fa-newspaper fa-2x"></i>
-                                </div>
+                                @if($item->cover_image_path)
+                                    <img src="{{ asset('storage/' . $item->cover_image_path) }}" 
+                                         alt="{{ $item->title }}" 
+                                         style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;">
+                                @else
+                                    <div class="rounded bg-light d-flex align-items-center justify-content-center" 
+                                         style="width: 60px; height: 60px; color: #6c757d;">
+                                        <i class="fas fa-newspaper fa-2x"></i>
+                                    </div>
+                                @endif
                             @endif
                         </td>
                         <td>
@@ -124,7 +141,11 @@
                         </td>
                         <td>
                             <div class="text-truncate" style="max-width: 200px;">
-                                {{ Str::limit($item->excerpt ?? $item->description ?? $item->content, 80) }}
+                                @if($item->type === 'event')
+                                    {{ Str::limit(strip_tags($item->description ?? ''), 80) }}
+                                @else
+                                    {{ Str::limit(strip_tags($item->content ?? ''), 80) }}
+                                @endif
                             </div>
                         </td>
                         <td>
@@ -135,6 +156,8 @@
                                     <span class="badge bg-success">En cours</span>
                                 @elseif($item->status === 'completed')
                                     <span class="badge bg-secondary">Terminé</span>
+                                @elseif($item->status === 'cancelled')
+                                    <span class="badge bg-danger">Annulé</span>
                                 @else
                                     <span class="badge bg-warning">{{ $item->status }}</span>
                                 @endif
@@ -158,16 +181,20 @@
                         <td>
                             <div class="btn-group btn-group-sm">
                                 @if($item->type === 'event')
-                                    <a href="{{ route('public.events.show', $item) }}" 
-                                       target="_blank" 
-                                       class="btn btn-outline-primary" title="Voir sur le site">
+                                    <a href="{{ route('admin.news.show-event', $item) }}" 
+                                       class="btn btn-outline-primary" title="Voir le détail">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('admin.events.edit', $item) }}" 
+                                    <a href="{{ route('public.events.show', $item) }}" 
+                                       target="_blank" 
+                                       class="btn btn-outline-info" title="Voir sur le site">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                    <a href="{{ route('admin.news.edit-event', $item) }}" 
                                        class="btn btn-outline-secondary" title="Modifier">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="{{ route('admin.events.destroy', $item) }}" 
+                                    <form action="{{ route('admin.news.destroy-event', $item) }}" 
                                           method="POST" class="d-inline"
                                           onsubmit="return confirm('Supprimer cet événement ?')">
                                         @csrf
@@ -177,10 +204,14 @@
                                         </button>
                                     </form>
                                 @else
+                                    <a href="{{ route('admin.news.show', $item) }}" 
+                                       class="btn btn-outline-primary" title="Voir le détail">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
                                     <a href="{{ route('public.news.show', $item->slug) }}" 
                                        target="_blank" 
-                                       class="btn btn-outline-primary" title="Voir sur le site">
-                                        <i class="fas fa-eye"></i>
+                                       class="btn btn-outline-info" title="Voir sur le site">
+                                        <i class="fas fa-external-link-alt"></i>
                                     </a>
                                     <a href="{{ route('admin.news.edit', $item) }}" 
                                        class="btn btn-outline-secondary" title="Modifier">
@@ -201,8 +232,8 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center text-muted py-4">
-                            <i class="fas fa-newspaper fa-2x d-block mb-2"></i>
+                        <td colspan="7" class="py-4 text-center text-muted">
+                            <i class="mb-2 fas fa-newspaper fa-2x d-block"></i>
                             Aucune actualité ou événement trouvé
                             <br>
                             <div class="mt-2">
@@ -229,63 +260,63 @@
 </div>
 
 <!-- Statistiques rapides -->
-<div class="row mt-4">
+<div class="mt-4 row">
     <div class="col-md-3">
-        <div class="card shadow-sm">
+        <div class="shadow-sm card">
             <div class="card-body d-flex align-items-center">
                 <div class="me-3">
-                    <div class="bg-primary rounded-circle p-2 text-white">
+                    <div class="p-2 text-white bg-primary rounded-circle">
                         <i class="fas fa-newspaper"></i>
                     </div>
                 </div>
                 <div>
                     <div class="text-muted small">Total actualités</div>
-                    <div class="h5 mb-0">{{ $totalNews ?? 0 }}</div>
+                    <div class="mb-0 h5">{{ $totalNews ?? 0 }}</div>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card shadow-sm">
+        <div class="shadow-sm card">
             <div class="card-body d-flex align-items-center">
                 <div class="me-3">
-                    <div class="bg-success rounded-circle p-2 text-white">
+                    <div class="p-2 text-white bg-success rounded-circle">
                         <i class="fas fa-calendar-alt"></i>
                     </div>
                 </div>
                 <div>
                     <div class="text-muted small">Total événements</div>
-                    <div class="h5 mb-0">{{ $totalEvents ?? 0 }}</div>
+                    <div class="mb-0 h5">{{ $totalEvents ?? 0 }}</div>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card shadow-sm">
+        <div class="shadow-sm card">
             <div class="card-body d-flex align-items-center">
                 <div class="me-3">
-                    <div class="bg-warning rounded-circle p-2 text-white">
+                    <div class="p-2 text-white bg-warning rounded-circle">
                         <i class="fas fa-clock"></i>
                     </div>
                 </div>
                 <div>
                     <div class="text-muted small">Événements à venir</div>
-                    <div class="h5 mb-0">{{ $upcomingEvents ?? 0 }}</div>
+                    <div class="mb-0 h5">{{ $upcomingEvents ?? 0 }}</div>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card shadow-sm">
+        <div class="shadow-sm card">
             <div class="card-body d-flex align-items-center">
                 <div class="me-3">
-                    <div class="bg-info rounded-circle p-2 text-white">
+                    <div class="p-2 text-white bg-info rounded-circle">
                         <i class="fas fa-check-circle"></i>
                     </div>
                 </div>
                 <div>
-                    <div class="text-muted small">Publiés</div>
-                    <div class="h5 mb-0">{{ $publishedCount ?? 0 }}</div>
+                    <div class="text-muted small">Publiés / Actifs</div>
+                    <div class="mb-0 h5">{{ $publishedCount ?? 0 }}</div>
                 </div>
             </div>
         </div>

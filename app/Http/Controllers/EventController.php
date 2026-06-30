@@ -7,6 +7,7 @@ use App\Models\Member;
 use App\Models\EventParticipation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
@@ -19,6 +20,9 @@ class EventController extends Controller
         $this->middleware('permission:manage participations')->only(['addParticipant', 'updateParticipation']);
     }
 
+    /**
+     * Display a listing of events.
+     */
     public function index()
     {
         $upcomingEvents = Event::upcoming()
@@ -35,19 +39,20 @@ class EventController extends Controller
         return view('admin.events.index', compact('upcomingEvents', 'pastEvents', 'ongoingEvents'));
     }
 
+    /**
+     * Show the form for creating a new event.
+     */
     public function create()
     {
-        // Récupérer tous les utilisateurs (pas seulement ceux avec des rôles)
         $users = \App\Models\User::all();
-        
-        // Si vous voulez filtrer par rôles, assurez-vous que les rôles existent
-        // $users = \App\Models\User::role(['president', 'conductor', 'super-admin', 'admin'])->get();
-        
         $types = Event::getTypes();
         
         return view('admin.events.create', compact('users', 'types'));
     }
 
+    /**
+     * Store a newly created event in storage.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -58,7 +63,7 @@ class EventController extends Controller
             'end_date' => 'required|date|after:start_date',
             'location' => 'required|string',
             'location_url' => 'nullable|url',
-            'responsible_id' => 'nullable|exists:users,id', // Rendre nullable
+            'responsible_id' => 'nullable|exists:users,id',
             'budget' => 'nullable|numeric|min:0',
             'notes' => 'nullable|string',
             'poster' => 'nullable|image|max:2048'
@@ -72,16 +77,20 @@ class EventController extends Controller
 
         Event::create($validated);
 
-        return redirect()->route('admin.events.index')
-            ->with('success', 'Événement créé avec succès');
+        // CORRECTION: Rediriger vers admin.news.index au lieu de admin.events.index
+        return redirect()->route('admin.news.index')
+            ->with('success', 'Événement créé avec succès !');
     }
 
+    /**
+     * Display the specified event.
+     */
     public function show(Event $event)
     {
         $participants = $event->participations()->with('member')->get();
         $availableMembers = Member::where('status', 'active')->get();
 
-        $membersTotal = Member::query()->count();
+        $membersTotal = Member::count();
         $publicRegistrationsCount = \App\Models\EventPublicRegistration::query()
             ->where('event_id', $event->id)
             ->count();
@@ -95,20 +104,21 @@ class EventController extends Controller
         return view('admin.events.show', compact('event', 'participants', 'availableMembers', 'totalParticipants', 'presentCount', 'absentCount', 'lateCount'));
     }
 
+    /**
+     * Show the form for editing the specified event.
+     */
     public function edit(Event $event)
     {
-        // Récupérer tous les utilisateurs
         $users = \App\Models\User::all();
-        
-        // Si vous voulez filtrer par rôles
-        // $users = \App\Models\User::role(['president', 'conductor', 'super-admin', 'admin'])->get();
-        
         $types = Event::getTypes();
         $statuses = Event::getStatuses();
         
         return view('admin.events.edit', compact('event', 'users', 'types', 'statuses'));
     }
 
+    /**
+     * Update the specified event in storage.
+     */
     public function update(Request $request, Event $event)
     {
         $validated = $request->validate([
@@ -119,7 +129,7 @@ class EventController extends Controller
             'end_date' => 'required|date|after:start_date',
             'location' => 'required|string',
             'location_url' => 'nullable|url',
-            'responsible_id' => 'nullable|exists:users,id', // Rendre nullable
+            'responsible_id' => 'nullable|exists:users,id',
             'status' => 'required|in:planned,upcoming,ongoing,completed,cancelled',
             'budget' => 'nullable|numeric|min:0',
             'actual_cost' => 'nullable|numeric|min:0',
@@ -128,29 +138,37 @@ class EventController extends Controller
 
         if ($request->hasFile('poster')) {
             if ($event->poster_path) {
-                \Storage::disk('public')->delete($event->poster_path);
+                Storage::disk('public')->delete($event->poster_path);
             }
             $validated['poster_path'] = $request->file('poster')->store('events/posters', 'public');
         }
 
         $event->update($validated);
 
-        return redirect()->route('admin.events.show', $event)
-            ->with('success', 'Événement mis à jour');
+        // CORRECTION: Rediriger vers admin.news.show-event au lieu de admin.events.show
+        return redirect()->route('admin.news.show-event', $event)
+            ->with('success', 'Événement mis à jour avec succès !');
     }
 
+    /**
+     * Remove the specified event from storage.
+     */
     public function destroy(Event $event)
     {
         if ($event->poster_path) {
-            \Storage::disk('public')->delete($event->poster_path);
+            Storage::disk('public')->delete($event->poster_path);
         }
         
         $event->delete();
 
-        return redirect()->route('admin.events.index')
-            ->with('success', 'Événement supprimé');
+        // CORRECTION: Rediriger vers admin.news.index au lieu de admin.events.index
+        return redirect()->route('admin.news.index')
+            ->with('success', 'Événement supprimé avec succès !');
     }
 
+    /**
+     * Add a participant to an event.
+     */
     public function addParticipant(Request $request, Event $event)
     {
         $request->validate([
@@ -171,10 +189,14 @@ class EventController extends Controller
             'attendance_status' => 'confirmed'
         ]);
 
-        return redirect()->route('admin.events.show', $event)
+        // CORRECTION: Rediriger vers admin.news.show-event au lieu de admin.events.show
+        return redirect()->route('admin.news.show-event', $event)
             ->with('success', 'Participant ajouté avec succès');
     }
 
+    /**
+     * Update participation status.
+     */
     public function updateParticipation(Request $request, Event $event, EventParticipation $participation)
     {
         $request->validate([
@@ -188,10 +210,14 @@ class EventController extends Controller
             'arrival_time' => $request->attendance_status == 'present' ? now() : $participation->arrival_time
         ]);
 
-        return redirect()->route('admin.events.show', $event)
+        // CORRECTION: Rediriger vers admin.news.show-event au lieu de admin.events.show
+        return redirect()->route('admin.news.show-event', $event)
             ->with('success', 'Statut de participation mis à jour');
     }
 
+    /**
+     * Display the calendar view.
+     */
     public function calendar()
     {
         $events = Event::where('start_date', '>=', now()->startOfMonth())
@@ -210,6 +236,9 @@ class EventController extends Controller
         return view('admin.events.calendar', compact('eventsByDate'));
     }
 
+    /**
+     * Generate report for an event.
+     */
     public function report(Event $event)
     {
         $participations = $event->participations()->with('member')->get();

@@ -20,7 +20,6 @@ use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\PartnerController;
-use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\PublicNewsController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\VideoController;
@@ -143,12 +142,29 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::post('/contributions/record', [FinancialController::class, 'recordContribution'])->name('contributions.record');
     });
 
-    // ===== GESTION DES ÉVÉNEMENTS =====
-    Route::resource('events', EventController::class);
-    Route::post('/events/{event}/add-participant', [EventController::class, 'addParticipant'])->name('events.add-participant');
-    Route::post('/events/{event}/update-participation', [EventController::class, 'updateParticipation'])->name('events.update-participation');
+    // ===== GESTION DES ÉVÉNEMENTS (ADMIN) =====
+    Route::get('/events', [EventController::class, 'index'])->name('events.index');
+    Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
+    Route::post('/events', [EventController::class, 'store'])->name('events.store');
     Route::get('/events/calendar/view', [EventController::class, 'calendar'])->name('events.calendar');
     Route::get('/events/{event}/report', [EventController::class, 'report'])->name('events.report');
+    
+    Route::post('/events/{event}/add-participant', [EventController::class, 'addParticipant'])->name('events.add-participant');
+    Route::post('/events/{event}/update-participation', [EventController::class, 'updateParticipation'])->name('events.update-participation');
+
+    // ===== GESTION UNIFIÉE DES ACTUALITÉS ET ÉVÉNEMENTS =====
+    Route::resource('news', NewsController::class);
+    
+    Route::get('/news/event/{event}', [NewsController::class, 'showEvent'])->name('news.show-event');
+    Route::get('/news/event/{event}/edit', [NewsController::class, 'editEvent'])->name('news.edit-event');
+    Route::put('/news/event/{event}', [NewsController::class, 'updateEvent'])->name('news.update-event');
+    Route::delete('/news/event/{event}', [NewsController::class, 'destroyEvent'])->name('news.destroy-event');
+    
+    Route::post('/news/event/{event}/add-participant', [NewsController::class, 'addParticipant'])->name('news.add-participant');
+    Route::put('/news/event/{event}/participation/{participation}', [NewsController::class, 'updateParticipation'])->name('news.update-participation');
+    Route::delete('/news/event/{event}/participation/{participation}', [NewsController::class, 'removeParticipant'])->name('news.remove-participant');
+    
+    Route::post('/news/{news}/publish', [NewsController::class, 'publish'])->name('news.publish');
 
     // ===== GESTION DE LA GALERIE =====
     Route::resource('gallery', AdminGalleryController::class);
@@ -188,17 +204,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::resource('testimonials', TestimonialController::class);
     Route::post('/testimonials/{testimonial}/approve', [TestimonialController::class, 'approve'])->name('testimonials.approve');
     Route::post('/testimonials/{testimonial}/toggle', [TestimonialController::class, 'toggle'])->name('testimonials.toggle');
-    
-    // Actualités
-    Route::resource('news', NewsController::class);
-    Route::post('/news/{news}/publish', [NewsController::class, 'publish'])->name('news.publish');
 
     // ===== GESTION DES PARTENAIRES =====
     Route::resource('partners', PartnerController::class);
     Route::post('/partners/{partner}/toggle-active', [PartnerController::class, 'toggleActive'])->name('partners.toggle-active');
-
-    // ===== GESTION DES MESSAGES DE CONTACT =====
-    Route::resource('contact-messages', ContactMessageController::class);
 
     // ===== PARAMÈTRES =====
     Route::get('/settings', [SettingController::class, 'index'])->name('settings');

@@ -16,11 +16,9 @@ class PublicEventController extends Controller
         $prefilledData = [];
         
         if ($user) {
-            // Récupérer les informations du membre lié à l'utilisateur
             $member = $user->member;
             
             if ($member) {
-                // Pré-remplir avec les données du membre
                 $prefilledData = [
                     'first_name' => $member->first_name ?? '',
                     'last_name' => $member->last_name ?? '',
@@ -28,7 +26,6 @@ class PublicEventController extends Controller
                     'whatsapp' => $member->whatsapp ?? '',
                 ];
             } else {
-                // Si l'utilisateur n'a pas de membre associé, utiliser les données de l'utilisateur
                 $prefilledData = [
                     'first_name' => explode(' ', $user->name)[0] ?? '',
                     'last_name' => explode(' ', $user->name)[1] ?? '',
@@ -53,7 +50,6 @@ class PublicEventController extends Controller
             'whatsapp' => 'nullable|string|max:30',
         ]);
 
-        // Vérifier si l'utilisateur est déjà inscrit avec ce numéro de téléphone
         $existingRegistration = EventPublicRegistration::where('event_id', $event->id)
             ->where('phone', $validated['phone'])
             ->first();
@@ -63,7 +59,6 @@ class PublicEventController extends Controller
                          ->withInput();
         }
 
-        // Créer l'inscription
         EventPublicRegistration::create([
             'event_id' => $event->id,
             'first_name' => $validated['first_name'],

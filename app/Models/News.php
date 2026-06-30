@@ -12,15 +12,12 @@ class News extends Model
     protected $table = 'news';
     
     protected $fillable = [
-        'title', 'slug', 'content', 'excerpt', 'category',
-        'featured_image', 'status', 'published_at', 'views_count',
-        'author_id', 'meta_title', 'meta_description', 'is_featured'
+        'title', 'slug', 'content', 'cover_image_path',
+        'status', 'published_at',
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
-        'views_count' => 'integer',
-        'is_featured' => 'boolean'
     ];
 
     public function author(): BelongsTo
@@ -34,13 +31,15 @@ class News extends Model
             ->where('published_at', '<=', now());
     }
 
-    public function scopeFeatured($query)
+    // Accesseur pour l'extrait (utilise le contenu)
+    public function getExcerptAttribute()
     {
-        return $query->where('is_featured', true);
+        return Str::limit(strip_tags($this->content), 150);
     }
-
-    public function getExcerptAttribute($value)
+    
+    // Accesseur pour l'image (pour compatibilité avec les vues)
+    public function getFeaturedImageAttribute()
     {
-        return $value ?? Str::limit(strip_tags($this->content), 150);
+        return $this->cover_image_path;
     }
 }
