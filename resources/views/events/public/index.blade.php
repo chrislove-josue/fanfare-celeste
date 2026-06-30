@@ -5,10 +5,10 @@
 @section('content')
 <section class="py-5">
     <div class="container">
-        <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="mb-4 d-flex align-items-center justify-content-between">
             <div>
                 <h1 class="mb-1">Événements</h1>
-                <p class="text-muted mb-0">Découvrez nos événements, sous forme de blog.</p>
+                <p class="mb-0 text-muted">Découvrez nos événements, sous forme de blog.</p>
             </div>
         </div>
 
@@ -28,7 +28,7 @@
                         @endif
 
                         <div class="card-body d-flex flex-column">
-                            <div class="text-primary mb-2" style="font-size: 0.95rem;">
+                            <div class="mb-2 text-primary" style="font-size: 0.95rem;">
                                 <i class="far fa-calendar-alt"></i>
                                 {{ optional($event->start_date)->format('d/m/Y H:i') }}
                             </div>
@@ -46,12 +46,12 @@
                                         {{ $event->location }}
                                     </small>
                                 </div>
-                                <div class="d-flex gap-2 mt-2">
+                                <div class="gap-2 mt-2 d-flex">
                                     <a href="{{ route('public.events.show', $event) }}" class="btn btn-sm btn-outline-secondary stretched-link" style="text-decoration:none;">
-                                        <i class="fas fa-book-open me-1"></i> Lire l’article
+                                        <i class="fas fa-book-open me-1"></i> Lire l'article
                                     </a>
-                                    <a href="{{ route(auth()->check() ? 'public.events.participate' : 'public.events.participate.form', $event) }}" class="btn btn-sm btn-primary">
-                                        <i class="fas fa-user-plus me-1"></i> S’inscrire
+                                    <a href="{{ route('public.events.participate', $event) }}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-user-plus me-1"></i> S'inscrire
                                     </a>
                                 </div>
                             </div>

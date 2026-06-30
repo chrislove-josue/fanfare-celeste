@@ -1,4 +1,4 @@
-APP_NAME="Fanfare Céleste"
+APP_NAME="Fanfare Céleste La Trompette de Dieu de l'Atlantique"
 APP_ENV=local
 APP_DEBUG=true
 APP_KEY=base64:yWP2ymplV6GDWfFfsdq45JRou75lnC1NGy6kNVOb4fw=
@@ -27,15 +27,22 @@ REDIS_HOST=127.0.0.1
 REDIS_PASSWORD=null
 REDIS_PORT=6379
 
+# ============================================
+# CONFIGURATION MAIL - Mailtrap (Développement)
+# ============================================
 MAIL_MAILER=smtp
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=fanfareceleste@gmail.com
-MAIL_PASSWORD=your_app_password
+MAIL_HOST=mail.trueline-system.com
+MAIL_PORT=465
+MAIL_USERNAME=nestor@trueline-system.com
+MAIL_PASSWORD=natchougo@2526
 MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=noreply@fanfare-celeste.com
+MAIL_FROM_ADDRESS="Chrislovenestor@gmail.com"
 MAIL_FROM_NAME="${APP_NAME}"
 
+
+# ============================================
+# AUTRES CONFIGURATIONS
+# ============================================
 WHATSAPP_API_KEY=your_whatsapp_key
 WHATSAPP_PHONE_NUMBER=+22997000000
 
