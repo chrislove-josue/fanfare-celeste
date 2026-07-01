@@ -147,34 +147,61 @@
 
     <hr>
 
-    <!-- Sections -->
-    <div id="sections" class="mb-5">
-        <h2 class="text-center fw-bold mb-4" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(1.5rem, 3vw, 2.2rem);">Nos Sections</h2>
-        <p class="text-center text-muted mb-5" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(0.9rem, 1.2vw, 1rem);">Découvrez les différentes familles d'instruments de notre fanfare</p>
-        
-        @if(isset($sections) && count($sections) > 0)
-        <div class="row g-4">
-            @foreach($sections as $key => $section)
-            <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}" data-aos-mobile="false">
-                <div class="section-card text-center p-3 p-md-4 bg-white rounded shadow-sm h-100 hover-card">
-                    <div class="icon-wrapper mb-3" style="width: 50px; height: 50px;">
-                        <i class="fas {{ $section['icon'] }} fa-2x text-primary"></i>
+   <!-- Nos Valeurs -->
+<div id="valeurs" class="mb-5">
+    <h2 class="text-center fw-bold mb-4" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(1.5rem, 3vw, 2.2rem);">Nos Valeurs Fondamentales</h2>
+    <p class="text-center text-muted mb-5" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(0.9rem, 1.2vw, 1rem);">Les principes qui guident notre engagement et notre musique</p>
+    
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="0" data-aos-mobile="false">
+            <div class="card h-100 shadow-sm border-0 hover-card text-center p-3">
+                <div class="card-body">
+                    <div class="icon-wrapper mb-3" style="width: 60px; height: 60px; background: rgba(57, 70, 178, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fas fa-praying-hands fa-2x text-primary"></i>
                     </div>
-                    <h6 class="fw-bold" style="font-size: clamp(0.85rem, 1vw, 1rem);">{{ $section['name'] }}</h6>
-                    <p class="text-muted small mb-2" style="font-size: clamp(0.7rem, 0.8vw, 0.85rem);">{{ $section['members_count'] ?? 0 }} musiciens</p>
-                    @if(isset($section['leader']))
-                        <small class="text-muted d-block" style="font-size: clamp(0.6rem, 0.7vw, 0.75rem);">Chef : {{ $section['leader'] }}</small>
-                    @endif
+                    <h5 class="fw-bold mb-2" style="font-size: clamp(0.95rem, 1.1vw, 1.1rem);">Foi et Spiritualité</h5>
+                    <p class="text-muted small mb-0" style="font-size: clamp(0.75rem, 0.85vw, 0.9rem);">Chaque note est une prière, chaque mélodie est un témoignage. Nous louons l'Éternel à travers la fanfare.</p>
                 </div>
             </div>
-            @endforeach
         </div>
-        @else
-        <div class="text-center py-4">
-            <p class="text-muted">Les sections seront bientôt présentées.</p>
+        
+        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="50" data-aos-mobile="false">
+            <div class="card h-100 shadow-sm border-0 hover-card text-center p-3">
+                <div class="card-body">
+                    <div class="icon-wrapper mb-3" style="width: 60px; height: 60px; background: rgba(57, 70, 178, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fas fa-star fa-2x text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2" style="font-size: clamp(0.95rem, 1.1vw, 1.1rem);">Excellence Musicale</h4>
+                    <p class="text-muted small mb-0" style="font-size: clamp(0.75rem, 0.85vw, 0.9rem);">Des prestations de qualité grâce à des critères d'adhésion rigoureux : phase de test et phase de moralité.</p>
+                </div>
+            </div>
         </div>
-        @endif
+        
+        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100" data-aos-mobile="false">
+            <div class="card h-100 shadow-sm border-0 hover-card text-center p-3">
+                <div class="card-body">
+                    <div class="icon-wrapper mb-3" style="width: 60px; height: 60px; background: rgba(57, 70, 178, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fas fa-users fa-2x text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2" style="font-size: clamp(0.95rem, 1.1vw, 1.1rem);">Fraternité et Unité</h4>
+                    <p class="text-muted small mb-0" style="font-size: clamp(0.75rem, 0.85vw, 0.9rem);">Un groupe soudé, basé sur la moralité et l'appartenance à la congrégation, portant la soutane avec fierté.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="150" data-aos-mobile="false">
+            <div class="card h-100 shadow-sm border-0 hover-card text-center p-3">
+                <div class="card-body">
+                    <div class="icon-wrapper mb-3" style="width: 60px; height: 60px; background: rgba(57, 70, 178, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fas fa-globe-africa fa-2x text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2" style="font-size: clamp(0.95rem, 1.1vw, 1.1rem);">Rayonnement Régional</h4>
+                    <p class="text-muted small mb-0" style="font-size: clamp(0.75rem, 0.85vw, 0.9rem);">Devenir une référence musicale en Afrique de l'Ouest, en alliant excellence artistique et rayonnement spirituel.</p>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
     <hr>
 
