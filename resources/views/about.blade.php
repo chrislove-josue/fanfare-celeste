@@ -26,26 +26,24 @@
     </div>
 
     <!-- Histoire -->
-    <div id="histoire" class="row mb-5 align-items-center">
-        <div class="col-lg-6" data-aos="fade-right" data-aos-mobile="false">
-            <h2 class="fw-bold mb-3">Notre Histoire</h2>
-            @if($historyPage)
-                <div class="content">
-                    {!! $historyPage->content !!}
-                </div>
-            @else
-                <div class="content">
-                    <p class="text-muted">Fondée en 2010, la Fanfare Céleste est née d'une vision : utiliser la musique comme un instrument de louange et de rassemblement. Depuis, elle n'a cessé de grandir et de rayonner, portant haut les couleurs de la foi et de l'excellence musicale.</p>
-                    <p class="text-muted">Notre fanfare a su conquérir le cœur de nombreux fidèles et mélomanes à travers ses prestations lors des grandes cérémonies religieuses, des concerts et des festivals. Chaque note jouée est une prière, chaque mélodie est un témoignage.</p>
-                </div>
-            @endif
-        </div>
-        <div class="col-lg-6 text-center mt-4 mt-lg-0" data-aos="fade-left" data-aos-mobile="false">
-            <img src="https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=600&h=400&fit=crop" 
-                 alt="Histoire" class="img-fluid rounded shadow" 
-                 style="height: 250px; width: 100%; object-fit: cover;">
+<!-- Histoire -->
+<div id="histoire" class="row mb-5 align-items-center">
+    <div class="col-lg-6" data-aos="fade-right" data-aos-mobile="false">
+        <h2 class="fw-bold mb-3">Notre Histoire</h2>
+        <div class="content">
+            <p>La <strong>Fanfare Céleste "La Trompette de Dieu"</strong> est née d'une vision spirituelle : <strong>louer l'Éternel à travers la fanfare</strong>. Basée dans la région de l'Atlantique au Bénin, elle regroupe plusieurs musiciens talentueux venus des sous-régions. Le groupe a fait sa sortie officielle le <strong>vendredi 06 mai 2022</strong> sur la paroisse Alpha Oméga Agbandonou, marquant ainsi le début d'une aventure musicale unique dans le monde du gospel au Bénin.</p>
+
+            <p>Particulièrement original, ce groupe se distingue par sa double compétence : <strong>le rang de prestation de fanfare d'harmonie</strong> et <strong>le rang de prestation des morceaux arrangés</strong>. Toutes les prestations se font en <strong>soutane</strong>, et l'appartenance à la congrégation est une condition préalable pour y adhérer.</p>
+
+            <p>La sortie officielle a été marquée par un <strong>géant concert spirituel</strong> avec la Chorale Cité de Paix de Yèvié (Adomaya), suivi d'une messe d'Action de grâce le lendemain, le samedi 07 mai 2022 à 09 heures, sur la paroisse Alpha Oméga Agbandonou.</p>
         </div>
     </div>
+    <div class="col-lg-6 text-center mt-4 mt-lg-0" data-aos="fade-left" data-aos-mobile="false">
+        <img src="{{ asset('storage/about/about.jpeg') }}" 
+             alt="Histoire" class="img-fluid rounded shadow" 
+             style="height: auto; width: 100%; max-width: 400px; object-fit: cover; object-position: center;">
+    </div>
+</div>
 
     <hr>
 
@@ -58,13 +56,19 @@
                         <i class="fas fa-bullseye fa-3x text-primary"></i>
                     </div>
                     <h3 class="fw-bold mb-3" style="font-size: clamp(1.2rem, 2.5vw, 1.8rem);">Notre Mission</h3>
-                    @if($missionPage)
-                        <div class="text-muted" style="font-size: clamp(0.9rem, 1.2vw, 1rem);">
-                            {!! $missionPage->content !!}
-                        </div>
-                    @else
-                        <p class="text-muted" style="font-size: clamp(0.9rem, 1.2vw, 1rem);">Annoncer la bonne nouvelle à travers la musique, en formant des musiciens talentueux et en offrant des prestations de qualité qui élèvent les cœurs vers Dieu.</p>
-                    @endif
+                    <div class="text-muted text-start" style="font-size: clamp(0.9rem, 1.2vw, 1rem);">
+                        <p><strong>Annoncer la bonne nouvelle à travers la musique</strong>, en offrant des prestations de qualité qui élèvent les cœurs vers Dieu.</p>
+                        
+                        <p>La Fanfare Céleste se veut un instrument de louange et de rassemblement, au service des événements célestes tels que :</p>
+                        <ul style="list-style: none; padding-left: 0;">
+                            <li><i class="fas fa-music text-primary me-2"></i> Concerts spirituels</li>
+                            <li><i class="fas fa-cross text-primary me-2"></i> Inhumations</li>
+                            <li><i class="fas fa-child text-primary me-2"></i> Sorties d'enfants</li>
+                            <li><i class="fas fa-ring text-primary me-2"></i> Mariages</li>
+                            <li><i class="fas fa-church text-primary me-2"></i> Grands événements de l'église</li>
+                        </ul>
+                        <p class="mb-0">Notre mission est aussi de <strong>promouvoir les talents musicaux</strong> au sein de la congrégation, en formant des musiciens d'exception capables de porter haut les couleurs de la foi et de l'excellence musicale.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -76,13 +80,20 @@
                         <i class="fas fa-eye fa-3x text-success"></i>
                     </div>
                     <h3 class="fw-bold mb-3" style="font-size: clamp(1.2rem, 2.5vw, 1.8rem);">Notre Vision</h3>
-                    @if($visionPage)
-                        <div class="text-muted" style="font-size: clamp(0.9rem, 1.2vw, 1rem);">
-                            {!! $visionPage->content !!}
-                        </div>
-                    @else
-                        <p class="text-muted" style="font-size: clamp(0.9rem, 1.2vw, 1rem);">Devenir une référence musicale en Afrique de l'Ouest, en alliant excellence artistique et rayonnement spirituel, pour toucher les cœurs et transformer les vies.</p>
-                    @endif
+                    <div class="text-muted text-start" style="font-size: clamp(0.9rem, 1.2vw, 1rem);">
+                        <p><strong>Devenir une référence musicale en Afrique de l&apos;Ouest</strong>, en alliant excellence artistique et rayonnement spirituel. Nous aspirons à toucher les cœurs et à transformer les vies par la puissance de la musique sacrée.</p>
+                        
+                        <p>Notre vision repose sur des valeurs fondamentales :</p>
+                        <ul style="list-style: none; padding-left: 0;">
+                            <li><i class="fas fa-check-circle text-success me-2"></i> <strong>Qualité et vivacité</strong> des prestations, garanties par des critères d'adhésion rigoureux (phase de test et phase de moralité)</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> <strong>Rayonnement spirituel</strong>, en étant un groupe purement gospel et céleste</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> <strong>Unité et inspiration</strong>, pour que la joie éternelle nous inspire et nous guide dans notre mission</li>
+                        </ul>
+                        <blockquote class="blockquote mt-3 mb-0" style="font-size: clamp(0.85rem, 1vw, 0.95rem);">
+                            <p class="mb-0">« Nous profitons de cette occasion pour solliciter les bonnes volontés à accompagner ce groupe afin que la joie éternelle nous inspire »</p>
+                            <footer class="blockquote-footer mt-1"><strong>Marius Adoliwossi</strong>, N°1 du groupe</footer>
+                        </blockquote>
+                    </div>
                 </div>
             </div>
         </div>
@@ -285,7 +296,6 @@
         height: 60px;
     }
 
-    /* Animation de la navigation interne */
     .btn-outline-primary {
         transition: all 0.3s ease;
     }

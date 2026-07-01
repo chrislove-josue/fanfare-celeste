@@ -699,10 +699,6 @@
                     <span class="badge bg-primary">{{ \App\Models\Event::upcoming()->count() }}</span>
                 </a>
 
-                <a class="nav-link {{ $isActive('admin.events.calendar') }}" href="{{ route('admin.events.calendar') }}">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Calendrier</span>
-                </a>
                 @endcan
 
                 @can('create events')
@@ -726,12 +722,6 @@
                 </a>
                 @endcan
 
-                @can('view documents')
-                <a class="nav-link {{ $isActive(['admin.documents.index', 'admin.documents.create']) }}" href="{{ route('admin.documents.index') }}">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Documents</span>
-                </a>
-                @endcan
 
                 <!-- ===== DIVIDER ===== -->
                 <hr class="sidebar-divider">
@@ -739,12 +729,6 @@
                 <!-- ===== CONTENU DU SITE ===== -->
                 <div class="nav-label">Contenu du site</div>
 
-                @can('manage pages')
-                <a class="nav-link {{ $isActive(['admin.pages.index', 'admin.pages.create', 'admin.pages.edit']) }}" href="{{ route('admin.pages.index') }}">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Pages</span>
-                </a>
-                @endcan
 
                 @can('manage carousels')
                 <a class="nav-link {{ $isActive(['admin.carousels.index', 'admin.carousels.create', 'admin.carousels.edit']) }}" href="{{ route('admin.carousels.index') }}">
@@ -753,12 +737,6 @@
                 </a>
                 @endcan
 
-                @can('manage testimonials')
-                <a class="nav-link {{ $isActive(['admin.testimonials.index', 'admin.testimonials.create', 'admin.testimonials.edit']) }}" href="{{ route('admin.testimonials.index') }}">
-                    <i class="fas fa-quote-right"></i>
-                    <span>Témoignages</span>
-                </a>
-                @endcan
 
                 @can('manage news')
                 <a class="nav-link {{ $isActive(['admin.news.index', 'admin.news.create', 'admin.news.edit']) }}" href="{{ route('admin.news.index') }}">
@@ -800,19 +778,7 @@
                     <span>Ajouter un membre</span>
                 </a>
                 @endcan
-
-                <!-- ===== DIVIDER ===== -->
-                <hr class="sidebar-divider">
-
-                <!-- ===== RAPPORTS ===== -->
-                <div class="nav-label">Rapports</div>
-
-                @can('export reports')
-                <a class="nav-link {{ $isActive(['admin.reports.members', 'admin.reports.financial', 'admin.reports.events']) }}" href="{{ route('admin.reports.members') }}">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Rapports</span>
-                </a>
-                @endcan
+            
 
                 <!-- ===== DIVIDER ===== -->
                 <hr class="sidebar-divider">
@@ -848,31 +814,7 @@
                 <!-- ===== DIVIDER ===== -->
                 <hr class="sidebar-divider">
 
-                <!-- ===== PARAMÈTRES ===== -->
-                @can('manage settings')
-                <div class="nav-label">Système</div>
-
-                <a class="nav-link {{ $isActive('admin.settings') }}" href="{{ route('admin.settings') }}">
-                    <i class="fas fa-cog"></i>
-                    <span>Paramètres</span>
-                </a>
-                @endcan
-
-                @can('view logs')
-                <a class="nav-link" href="#">
-                    <i class="fas fa-history"></i>
-                    <span>Logs</span>
-                    <span class="badge bg-secondary" style="font-size: 0.5rem;">Bientôt</span>
-                </a>
-                @endcan
-
-                @can('manage roles')
-                <a class="nav-link" href="#">
-                    <i class="fas fa-user-shield"></i>
-                    <span>Rôles & permissions</span>
-                    <span class="badge bg-secondary" style="font-size: 0.5rem;">Bientôt</span>
-                </a>
-                @endcan
+              
             </nav>
 
             <!-- ===== USER INFO - Fixe en bas ===== -->
