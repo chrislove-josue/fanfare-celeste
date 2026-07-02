@@ -67,8 +67,8 @@ class MemberController extends Controller
         }
         
         // Tri
-        $sort = $request->sort ?? 'created_at';
-        $direction = $request->direction ?? 'desc';
+        $sort = $request->sort ?? 'member_number';
+$direction = $request->direction ?? 'asc';
         $query->orderBy($sort, $direction);
         
         $members = $query->paginate(15);
@@ -148,7 +148,7 @@ class MemberController extends Controller
         DB::beginTransaction();
         
         try {
-            // Générer le numéro de membre
+            // Générer le numéro de membre au format FCTDA-XXX
             $validated['member_number'] = Member::generateMemberNumber();
             $validated['status'] = $request->status ?? 'pending';
 
@@ -259,11 +259,11 @@ class MemberController extends Controller
     }
 
     // ==========================================
-    // UPDATE - Mise à jour d'un membre (CORRIGÉ)
+    // UPDATE - Mise à jour d'un membre
     // ==========================================
     public function update(Request $request, Member $member)
     {
-        // 1. Validation de base (sans id_document dans les règles)
+        // 1. Validation de base
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -302,7 +302,7 @@ class MemberController extends Controller
             }
 
             // ==========================================
-            // GESTION DU DOCUMENT D'IDENTITÉ (SIMPLIFIÉ)
+            // GESTION DU DOCUMENT D'IDENTITÉ
             // ==========================================
             
             // Suppression du document

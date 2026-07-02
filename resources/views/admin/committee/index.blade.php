@@ -75,13 +75,15 @@
         text-transform: uppercase;
         letter-spacing: 0.3px;
     }
-    
-    .position-badge.president { background: #fee2e2; color: #dc2626; }
-    .position-badge.vice_president { background: #fef3c7; color: #d97706; }
+
+    /* Couleurs alignées sur les 7 postes réels du modèle CommitteeMember */
+    .position-badge.le_maitre { background: #fee2e2; color: #dc2626; }
     .position-badge.general_secretary { background: #dbeafe; color: #2563eb; }
     .position-badge.treasurer { background: #dcfce7; color: #16a34a; }
     .position-badge.conductor { background: #fce7f3; color: #db2777; }
-    .position-badge.section_leader { background: #ede9fe; color: #7c3aed; }
+    .position-badge.deputy_conductor { background: #fdf2f8; color: #ec4899; }
+    .position-badge.conseiller { background: #ede9fe; color: #7c3aed; }
+    .position-badge.organisateur { background: #fef3c7; color: #d97706; }
     .position-badge.default { background: #e5e7eb; color: #6b7280; }
     
     .member-avatar-sm {

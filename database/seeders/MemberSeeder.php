@@ -12,19 +12,34 @@ class MemberSeeder extends Seeder
 {
     private function generateUniqueMemberNumber(): string
     {
+        // Récupérer le dernier numéro utilisé
+        $lastMember = Member::where('member_number', 'LIKE', 'FCTDA-%')
+            ->orderBy('id', 'desc')
+            ->first();
+        
+        if ($lastMember) {
+            // Extraire le numéro et l'incrémenter
+            $lastNumber = (int) str_replace('FCTDA-', '', $lastMember->member_number);
+            $newNumber = $lastNumber + 1;
+        } else {
+            // Commencer à 1 s'il n'y a pas de membre
+            $newNumber = 1;
+        }
+        
+        // S'assurer que le numéro est unique (au cas où)
         $tries = 50;
         while ($tries-- > 0) {
-            $candidate = Member::generateMemberNumber();
+            // Formatage avec 3 chiffres (001, 002, 003, ...)
+            $candidate = 'FCTDA-' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
             $exists = Member::where('member_number', $candidate)->exists();
             if (! $exists) {
                 return $candidate;
             }
+            $newNumber++;
         }
-
-        // En dernier recours (cas très improbable), fallback sur un suffixe aléatoire.
-        $year = date('Y');
-        $random = str_pad((string) random_int(1, 9999), 4, '0', STR_PAD_LEFT);
-        return 'FC-' . $year . '-' . $random;
+        
+        // En dernier recours, utiliser un timestamp
+        return 'FCTDA-' . str_pad(time(), 3, '0', STR_PAD_LEFT);
     }
 
     private function columnExistsOnUsers(string $column): bool
@@ -137,12 +152,12 @@ class MemberSeeder extends Seeder
                 'instrument' => 'Saxophone',
                 'birth_date' => '1990-11-08',
                 'birth_place' => 'Tangbo-Djèvié',
-                'parish' => 'St Michel Sohoun',
+                'parish' => 'St Michel Sohoun Centre',
                 'sub_region' => 'Allada C/Sékou',
                 'entry_date' => '2010-01-01',
                 'section' => 'Cuivres',
                 'status' => 'active',
-                'member_number' => 'FC-001',
+                // Le member_number sera généré automatiquement
                 'role' => 'admin'
             ],
         ];
@@ -154,22 +169,23 @@ class MemberSeeder extends Seeder
                 $data['sub_region'] ?? 'Non spécifié'
             );
 
-            $member = Member::updateOrCreate(
-                ['email' => $data['email']],
-                [
-                    'member_number' => $data['member_number'] ?? $this->generateUniqueMemberNumber(),
-                    'first_name' => $data['first_name'],
-                    'last_name' => $data['last_name'],
-                    'phone' => $data['phone'],
-                    'address' => $address,
-                    'birth_date' => $data['birth_date'] ?? '1980-01-01',
-                    'birth_place' => $data['birth_place'] ?? null,
-                    'instrument' => $data['instrument'],
-                    'entry_date' => $data['entry_date'] ?? '2010-01-01',
-                    'section' => $data['section'] ?? 'Cuivres',
-                    'status' => $data['status'] ?? 'active',
-                ]
-            );
+            // Générer le member_number automatiquement
+            $memberNumber = $this->generateUniqueMemberNumber();
+
+            $member = Member::create([
+                'member_number' => $memberNumber,
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'address' => $address,
+                'birth_date' => $data['birth_date'] ?? '1980-01-01',
+                'birth_place' => $data['birth_place'] ?? null,
+                'instrument' => $data['instrument'],
+                'entry_date' => $data['entry_date'] ?? '2010-01-01',
+                'section' => $data['section'] ?? 'Cuivres',
+                'status' => $data['status'] ?? 'active',
+            ]);
 
             // Créer l'utilisateur avec le rôle spécifié
             $this->createUserWithRole([
@@ -192,7 +208,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Tori Bossito A',
                 'instrument' => 'Tuba',
                 'section' => 'Cuivres',
-                'member_number' => 'FC-002',
                 'email' => 'aime.zounde@example.com'
             ],
             [
@@ -205,7 +220,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Allada C/Sèkou',
                 'instrument' => 'Caisse claire',
                 'section' => 'Percussions',
-                'member_number' => 'FC-003',
                 'email' => 'clement.lokonon@example.com'
             ],
             [
@@ -218,8 +232,19 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Allada C/Sékou',
                 'instrument' => 'Trombone',
                 'section' => 'Cuivres',
-                'member_number' => 'FC-004',
                 'email' => 'sabin.hounsougbo@example.com'
+            ],
+            [
+                'first_name' => 'Clément',
+                'last_name' => 'KPONDJI',
+                'phone' => '+22967412954',
+                'birth_date' => '1993-09-03',
+                'birth_place' => 'Adjan',
+                'parish' => 'St Michel Sohoun-Hô',
+                'sub_region' => 'Allada C/Sékou',
+                'instrument' => 'Trompette',
+                'section' => 'Cuivres',
+                'email' => 'clement.kpondji@example.com'
             ],
             [
                 'first_name' => 'Jérémie',
@@ -231,7 +256,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Allada C/Sékou',
                 'instrument' => 'Trombone',
                 'section' => 'Cuivres',
-                'member_number' => 'FC-005',
                 'email' => 'jeremie.sounne@example.com'
             ],
             [
@@ -244,7 +268,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Allada C/Sékou',
                 'instrument' => 'Cymbale',
                 'section' => 'Percussions',
-                'member_number' => 'FC-006',
                 'email' => 'guy.dansou@example.com'
             ],
             [
@@ -257,7 +280,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Allada C/Sékou',
                 'instrument' => 'Trompette',
                 'section' => 'Cuivres',
-                'member_number' => 'FC-007',
                 'email' => 'bienvenu.kpodo@example.com'
             ],
             [
@@ -270,7 +292,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Allada C/Sékou',
                 'instrument' => 'Cornet',
                 'section' => 'Cuivres',
-                'member_number' => 'FC-008',
                 'email' => 'clement.sehou@example.com'
             ],
             [
@@ -283,7 +304,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Zè/G',
                 'instrument' => 'Trompette',
                 'section' => 'Cuivres',
-                'member_number' => 'FC-009',
                 'email' => 'hassou.tchankpan@example.com'
             ],
             [
@@ -296,7 +316,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Allada C/Sékou',
                 'instrument' => 'Trombone',
                 'section' => 'Cuivres',
-                'member_number' => 'FC-010',
                 'email' => 'blaise.anagonou@example.com'
             ],
             [
@@ -309,7 +328,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Zè/H',
                 'instrument' => 'Trompette',
                 'section' => 'Cuivres',
-                'member_number' => 'FC-011',
                 'email' => 'jacques.zannou@example.com'
             ],
             [
@@ -322,7 +340,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Zè/A',
                 'instrument' => 'Trompette',
                 'section' => 'Cuivres',
-                'member_number' => 'FC-012',
                 'email' => 'francois.adjide@example.com'
             ],
             [
@@ -335,7 +352,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Allada C/Sékou',
                 'instrument' => 'Trombone',
                 'section' => 'Cuivres',
-                'member_number' => 'FC-013',
                 'email' => 'jacques.simaho@example.com'
             ],
             [
@@ -348,7 +364,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Allada C/Sékou',
                 'instrument' => 'Trombone',
                 'section' => 'Cuivres',
-                'member_number' => 'FC-014',
                 'email' => 'celestin.kotcho@example.com'
             ],
             [
@@ -361,7 +376,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Golo-Djigbé A',
                 'instrument' => 'Trompette',
                 'section' => 'Cuivres',
-                'member_number' => 'FC-015',
                 'email' => 'moise.tinyemon@example.com'
             ],
             [
@@ -374,7 +388,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Allada C/Sékou',
                 'instrument' => 'Trombone',
                 'section' => 'Cuivres',
-                'member_number' => 'FC-016',
                 'email' => 'olivier.kandjete@example.com'
             ],
             [
@@ -387,7 +400,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Allada C/Sékou',
                 'instrument' => 'Trompette',
                 'section' => 'Cuivres',
-                'member_number' => 'FC-017',
                 'email' => 'abel.affanou@example.com'
             ],
             [
@@ -400,7 +412,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Allada C/Sékou',
                 'instrument' => 'Caisse claire',
                 'section' => 'Percussions',
-                'member_number' => 'FC-018',
                 'email' => 'isaac.akoto@example.com'
             ],
             [
@@ -413,7 +424,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Allada C/Sékou',
                 'instrument' => 'Grosse Caisse',
                 'section' => 'Percussions',
-                'member_number' => 'FC-019',
                 'email' => 'emile.anagonou@example.com'
             ],
             [
@@ -426,7 +436,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Zè/C',
                 'instrument' => 'Caisse claire',
                 'section' => 'Percussions',
-                'member_number' => 'FC-020',
                 'email' => 'epiphane.hodonou@example.com'
             ],
             [
@@ -439,7 +448,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Allada C/Sékou',
                 'instrument' => 'Cymbal',
                 'section' => 'Percussions',
-                'member_number' => 'FC-021',
                 'email' => 'desire.bossou@example.com'
             ],
             [
@@ -452,7 +460,6 @@ class MemberSeeder extends Seeder
                 'sub_region' => 'Tori Cada',
                 'instrument' => 'Trompette',
                 'section' => 'Cuivres',
-                'member_number' => 'FC-022',
                 'email' => 'mawunyon.zounde@example.com'
             ],
         ];
@@ -464,40 +471,23 @@ class MemberSeeder extends Seeder
                 $data['sub_region'] ?? 'Non spécifié'
             );
 
-            // Vérifier si le membre existe déjà par son member_number
-            $existingMember = Member::where('member_number', $data['member_number'])->first();
-            
-            if ($existingMember) {
-                $member = $existingMember;
-                // Mettre à jour les informations
-                $member->update([
-                    'first_name' => $data['first_name'],
-                    'last_name' => $data['last_name'],
-                    'phone' => $data['phone'],
-                    'address' => $address,
-                    'birth_date' => $data['birth_date'],
-                    'birth_place' => $data['birth_place'] ?? null,
-                    'instrument' => $data['instrument'],
-                    'entry_date' => '2010-01-01',
-                    'section' => $data['section'],
-                    'status' => 'active',
-                ]);
-            } else {
-                $member = Member::create([
-                    'member_number' => $data['member_number'],
-                    'first_name' => $data['first_name'],
-                    'last_name' => $data['last_name'],
-                    'email' => $data['email'],
-                    'phone' => $data['phone'],
-                    'address' => $address,
-                    'birth_date' => $data['birth_date'],
-                    'birth_place' => $data['birth_place'] ?? null,
-                    'instrument' => $data['instrument'],
-                    'entry_date' => '2010-01-01',
-                    'section' => $data['section'],
-                    'status' => 'active',
-                ]);
-            }
+            // Générer le member_number automatiquement
+            $memberNumber = $this->generateUniqueMemberNumber();
+
+            $member = Member::create([
+                'member_number' => $memberNumber,
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'address' => $address,
+                'birth_date' => $data['birth_date'],
+                'birth_place' => $data['birth_place'] ?? null,
+                'instrument' => $data['instrument'],
+                'entry_date' => '2010-01-01',
+                'section' => $data['section'],
+                'status' => 'active',
+            ]);
 
             // Créer l'utilisateur associé avec le rôle 'member'
             if ($member->status === 'active') {
@@ -514,5 +504,6 @@ class MemberSeeder extends Seeder
         $this->command->info('👤 SuperAdmin: superadmin@fanfareceleste.org / Admin123!');
         $this->command->info('👤 Admin: admin@fanfareceleste.org / Admin123!');
         $this->command->info('👤 Membres: email@example.com / password123');
+        $this->command->info('📝 Les numéros de membres sont au format FCTDA-001, FCTDA-002, ... (auto-incrémenté)');
     }
 }

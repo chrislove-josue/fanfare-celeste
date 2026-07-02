@@ -294,20 +294,25 @@ class Member extends Model
     }
 
     /**
-     * Générer le numéro de membre
+     * Générer le numéro de membre au format FCTDA-XXX
      */
     public static function generateMemberNumber(): string
     {
-        $year = date('Y');
-        $lastMember = self::whereYear('created_at', $year)->latest()->first();
+        // Récupérer le dernier membre avec le préfixe FCTDA
+        $lastMember = self::where('member_number', 'LIKE', 'FCTDA-%')
+            ->orderBy('id', 'desc')
+            ->first();
         
         if ($lastMember) {
-            $lastNumber = intval(substr($lastMember->member_number, -4));
-            $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+            // Extraire le numéro et l'incrémenter
+            $lastNumber = (int) str_replace('FCTDA-', '', $lastMember->member_number);
+            $newNumber = $lastNumber + 1;
         } else {
-            $newNumber = '0001';
+            // Commencer à 1 s'il n'y a pas de membre
+            $newNumber = 1;
         }
         
-        return 'FC-' . $year . '-' . $newNumber;
+        // Formater avec 3 chiffres (001, 002, 003, ...)
+        return 'FCTDA-' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
     }
 }

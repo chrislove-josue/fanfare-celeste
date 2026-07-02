@@ -102,48 +102,52 @@
     <hr>
 
     <!-- Bureau exécutif -->
-    <div id="bureau" class="mb-5">
-        <h2 class="text-center fw-bold mb-4" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(1.5rem, 3vw, 2.2rem);">Bureau Exécutif</h2>
-        <p class="text-center text-muted mb-5" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(0.9rem, 1.2vw, 1rem);">L'équipe dirigeante de la Fanfare Céleste</p>
-        
-        @if($committeeMembers->count() > 0)
-        <div class="row g-4 justify-content-center">
-            @foreach($committeeMembers as $member)
-            <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}" data-aos-mobile="false">
-                <div class="card h-100 shadow-sm text-center hover-card">
-                    <div class="card-body">
-                        @if($member->member && $member->member->photo)
-                            <img src="{{ asset('storage/' . $member->member->photo) }}" 
-                                 alt="{{ $member->member->full_name }}" 
-                                 class="rounded-circle mb-3" 
-                                 style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #3946B2;">
-                        @else
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" 
-                                 style="width: 80px; height: 80px; font-size: 28px; font-weight: 700;">
-                                {{ $member->member ? strtoupper(substr($member->member->first_name, 0, 1) . substr($member->member->last_name, 0, 1)) : '??' }}
-                            </div>
-                        @endif
-                        <h6 class="fw-bold mb-1" style="font-size: clamp(0.8rem, 1vw, 0.95rem);">{{ $member->member->full_name ?? 'N/A' }}</h6>
-                        <p class="text-primary small mb-2" style="font-size: clamp(0.65rem, 0.8vw, 0.8rem);">{{ $positions[$member->position] ?? $member->position }}</p>
+    <!-- Bureau exécutif -->
+<div id="bureau" class="mb-5">
+    <h2 class="text-center fw-bold mb-4" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(1.5rem, 3vw, 2.2rem);">Bureau Exécutif</h2>
+    <p class="text-center text-muted mb-5" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(0.9rem, 1.2vw, 1rem);">L'équipe dirigeante de la Fanfare Céleste</p>
+    
+    @if($committeeMembers->count() > 0)
+    <div class="row g-4 justify-content-center">
+        @foreach($committeeMembers as $committeeMember)
+        <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}" data-aos-mobile="false">
+            <div class="card h-100 shadow-sm text-center hover-card">
+                <div class="card-body">
+                    @if($committeeMember->member && $committeeMember->member->photo)
+                        <img src="{{ asset('storage/' . $committeeMember->member->photo) }}" 
+                             alt="{{ $committeeMember->member->full_name }}" 
+                             class="rounded-circle mb-3" 
+                             style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #3946B2;">
+                    @else
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" 
+                             style="width: 80px; height: 80px; font-size: 28px; font-weight: 700;">
+                            {{ $committeeMember->member ? strtoupper(substr($committeeMember->member->first_name, 0, 1) . substr($committeeMember->member->last_name, 0, 1)) : '??' }}
+                        </div>
+                    @endif
+                    <h6 class="fw-bold mb-1" style="font-size: clamp(0.8rem, 1vw, 0.95rem);">{{ $committeeMember->member->full_name ?? 'N/A' }}</h6>
+                    <p class="text-primary small mb-2" style="font-size: clamp(0.65rem, 0.8vw, 0.8rem);">
+                        {{-- ✅ Utilisation de getPositionLabelAttribute() ou du tableau $positions --}}
+                        {{ $committeeMember->position_label }}
+                    </p>
+                    <p class="text-muted small mb-0" style="font-size: clamp(0.6rem, 0.7vw, 0.75rem);">
+                        <i class="fas fa-envelope me-1"></i> {{ $committeeMember->member->email ?? 'Non renseigné' }}
+                    </p>
+                    @if($committeeMember->member && $committeeMember->member->phone)
                         <p class="text-muted small mb-0" style="font-size: clamp(0.6rem, 0.7vw, 0.75rem);">
-                            <i class="fas fa-envelope me-1"></i> {{ $member->member->email ?? 'Non renseigné' }}
+                            <i class="fas fa-phone me-1"></i> {{ $committeeMember->member->phone }}
                         </p>
-                        @if($member->member && $member->member->phone)
-                            <p class="text-muted small mb-0" style="font-size: clamp(0.6rem, 0.7vw, 0.75rem);">
-                                <i class="fas fa-phone me-1"></i> {{ $member->member->phone }}
-                            </p>
-                        @endif
-                    </div>
+                    @endif
                 </div>
             </div>
-            @endforeach
         </div>
-        @else
-        <div class="text-center py-4">
-            <p class="text-muted">Le bureau exécutif sera bientôt présenté.</p>
-        </div>
-        @endif
+        @endforeach
     </div>
+    @else
+    <div class="text-center py-4">
+        <p class="text-muted">Le bureau exécutif sera bientôt présenté.</p>
+    </div>
+    @endif
+</div>
 
     <hr>
 

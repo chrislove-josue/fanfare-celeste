@@ -26,21 +26,44 @@ class CommitteeMember extends Model
         return $this->belongsTo(Member::class);
     }
 
+    /**
+     * Liste des postes disponibles dans le comité
+     * CORRESPOND EXACTEMENT aux clés utilisées dans le seeder
+     */
     public static function getPositions(): array
     {
         return [
-            'president' => 'Président',
-            'vice_president' => 'Vice-président',
-            'general_secretary' => 'Secrétaire général',
-            'deputy_secretary' => 'Secrétaire adjoint',
-            'treasurer' => 'Trésorier',
-            'deputy_treasurer' => 'Trésorier adjoint',
-            'conductor' => 'Chef de fanfare',
-            'deputy_conductor' => 'Chef adjoint',
-            'section_leader_trumpet' => 'Responsable Trompettes',
-            'section_leader_trombone' => 'Responsable Trombones',
-            'section_leader_saxophone' => 'Responsable Saxophones',
-            'section_leader_percussion' => 'Responsable Percussions',
+            'le_maitre' => 'Le Maître',
+            'general_secretary' => 'Secrétaire Général',
+            'treasurer' => 'Trésorier Général',
+            'conductor' => 'Surveillant Général',
+            'deputy_conductor' => 'Surveillant Adjoint',
+            'conseiller' => 'Conseiller',
+            'organisateur' => 'Organisateur',
+        ];
+    }
+
+    /**
+     * Récupère le libellé du poste
+     */
+    public function getPositionLabelAttribute(): string
+    {
+        return self::getPositions()[$this->position] ?? $this->position;
+    }
+
+    /**
+     * Ordre d'affichage des postes
+     */
+    public static function getPositionOrder(): array
+    {
+        return [
+            'le_maitre' => 1,
+            'general_secretary' => 2,
+            'treasurer' => 3,
+            'conductor' => 4,
+            'deputy_conductor' => 5,
+            'conseiller' => 6,
+            'organisateur' => 7,
         ];
     }
 
@@ -51,4 +74,37 @@ class CommitteeMember extends Model
             'is_current' => false
         ]);
     }
+
+    /**
+     * Vérifie si le membre est actif dans le comité
+     */
+    public function isActive(): bool
+    {
+        return $this->is_current === true;
+    }
+
+    /**
+ * Postes regroupés par catégorie
+ * Utilisé pour l'affichage groupé (formulaires, listes)
+ */
+public static function getPositionsByCategory(): array
+{
+    $positions = self::getPositions();
+
+    return [
+        'Bureau exécutif' => [
+            'le_maitre' => $positions['le_maitre'],
+            'general_secretary' => $positions['general_secretary'],
+            'treasurer' => $positions['treasurer'],
+        ],
+        'Surveillance' => [
+            'conductor' => $positions['conductor'],
+            'deputy_conductor' => $positions['deputy_conductor'],
+        ],
+        'Conseil' => [
+            'conseiller' => $positions['conseiller'],
+            'organisateur' => $positions['organisateur'],
+        ],
+    ];
+}
 }
