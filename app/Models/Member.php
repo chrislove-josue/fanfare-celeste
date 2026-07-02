@@ -139,15 +139,15 @@ class Member extends Model
         return 'data:image/jpeg;base64,' . base64_encode($data);
     }
 
+    /**
+     * Le QR code encode désormais une URL publique de vérification
+     * (au lieu d'un simple JSON illisible pour la plupart des scanners).
+     * Scanner ce QR ouvre une page qui affiche les coordonnées du membre.
+     */
     public function getMemberCardQrCodeAttribute(): string
     {
-        $data = json_encode([
-            'member_number' => $this->member_number,
-            'name' => $this->full_name,
-            'section' => $this->section,
-            'instrument' => $this->instrument
-        ]);
-        return base64_encode(QrCode::format('svg')->size(300)->generate($data));
+        $url = route('members.verify', ['memberNumber' => $this->member_number]);
+        return base64_encode(QrCode::format('svg')->size(300)->generate($url));
     }
 
     // ==========================================

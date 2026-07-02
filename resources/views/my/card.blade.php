@@ -36,7 +36,7 @@
                         <!-- Arrière-plan décoratif -->
                         <div style="position: absolute; top: -50%; right: -20%; width: 300px; height: 300px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
                         <div style="position: absolute; bottom: -40%; left: -10%; width: 200px; height: 200px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
-                        
+
                         <!-- Entête -->
                         <div class="d-flex justify-content-between align-items-start mb-3" style="position: relative; z-index: 1;">
                             <div>
@@ -54,8 +54,8 @@
                             <!-- Photo -->
                             <div style="flex-shrink: 0;">
                                 @if($member && $member->photo)
-                                    <img src="{{ asset('storage/' . $member->photo) }}" 
-                                         alt="{{ $member->full_name }}" 
+                                    <img src="{{ asset('storage/' . $member->photo) }}"
+                                         alt="{{ $member->full_name }}"
                                          style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.3);">
                                 @else
                                     <div style="width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 3px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700;">
@@ -72,21 +72,36 @@
                                 <div style="font-size: 13px; opacity: 0.8; margin-bottom: 8px;">
                                     {{ $member->section ?? 'Section non définie' }}
                                 </div>
-                                
+
+                                @php
+                                    // Découpage du champ "address" au format "Paroisse: X | Sous-région: Y"
+                                    $paroisse = null;
+                                    $sousRegion = null;
+                                    if ($member->address) {
+                                        if (preg_match('/Paroisse\s*:\s*(.*?)(?:\||$)/iu', $member->address, $m)) {
+                                            $paroisse = trim($m[1]);
+                                        }
+                                        if (preg_match('/Sous[-\s]?r[ée]gion\s*:\s*(.*?)(?:\||$)/iu', $member->address, $m)) {
+                                            $sousRegion = trim($m[1]);
+                                        }
+                                        if (!$paroisse && !$sousRegion) {
+                                            $paroisse = trim($member->address);
+                                        }
+                                    }
+                                @endphp
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px 15px; font-size: 12px; opacity: 0.8;">
                                     <div><span style="opacity: 0.5;">Instrument :</span> {{ $member->instrument ?? '-' }}</div>
                                     <div><span style="opacity: 0.5;">Niveau :</span> {{ $member->instrument_level ?? '-' }}</div>
                                     <div><span style="opacity: 0.5;">Entrée :</span> {{ $member->entry_date ? $member->entry_date->format('d/m/Y') : '-' }}</div>
-                                    <div>
-                                        <span style="opacity: 0.5;">Statut :</span>
-                                        @if($member && $member->status === 'active')
-                                            <span style="color: #40A81B;">✓ Actif</span>
-                                        @elseif($member && $member->status === 'pending')
-                                            <span style="color: #ffc107;">⏳ En attente</span>
-                                        @else
-                                            <span style="color: #dc3545;">✗ Inactif</span>
-                                        @endif
-                                    </div>
+                                    @if($currentCommitteePosition)
+                                        <div><span style="opacity: 0.5;">Poste :</span> {{ $currentCommitteePosition->position_label ?? $currentCommitteePosition->position }}</div>
+                                    @endif
+                                    @if($paroisse)
+                                        <div><span style="opacity: 0.5;">Paroisse :</span> {{ $paroisse }}</div>
+                                    @endif
+                                    @if($sousRegion)
+                                        <div><span style="opacity: 0.5;">Sous région :</span> {{ $sousRegion }}</div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -94,12 +109,13 @@
                         <!-- Pied de carte -->
                         <div style="position: relative; z-index: 1; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
                             <div style="font-size: 9px; opacity: 0.4;">
-                                Valide jusqu'au {{ $member && $member->entry_date ? $member->entry_date->addYear()->format('d/m/Y') : date('d/m/Y', strtotime('+1 year')) }}
+                                {{-- copy() évite de muter $member->entry_date, réutilisé juste en dessous --}}
+                                Valide jusqu'au {{ $member && $member->entry_date ? $member->entry_date->copy()->addYear()->format('d/m/Y') : date('d/m/Y', strtotime('+1 year')) }}
                             </div>
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <div style="font-size: 9px; opacity: 0.4;">Membre depuis {{ $member && $member->entry_date ? $member->entry_date->format('d/m/Y') : '-' }}</div>
                                 <!-- QR Code (si disponible) -->
-                                @if(isset($qrCode))
+                                @if(isset($qrCode) && $qrCode)
                                     <div style="background: #fff; padding: 5px; border-radius: 4px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
                                         <img src="data:image/svg+xml;base64,{{ $qrCode }}" alt="QR Code" style="width: 40px; height: 40px;">
                                     </div>
@@ -125,7 +141,7 @@
                 <!-- Information de sécurité -->
                 <div class="alert alert-secondary mt-4 mb-0" style="font-size: 12px;">
                     <i class="fas fa-shield-alt me-2"></i>
-                    <strong>Document sécurisé</strong> - Cette carte est un document officiel de la Fanfare Céleste. 
+                    <strong>Document sécurisé</strong> - Cette carte est un document officiel de la Fanfare Céleste.
                     Elle ne peut être modifiée que par l'administration.
                 </div>
             </div>

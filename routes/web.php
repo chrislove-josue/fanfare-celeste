@@ -56,6 +56,9 @@ Route::post('/gallery/{gallery}/like', [PublicGalleryController::class, 'like'])
 // About - Page unique
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 
+Route::get('/verify/{memberNumber}', [App\Http\Controllers\MemberController::class, 'verify'])
+    ->name('members.verify');
+
 // Redirections des anciennes pages vers about
 Route::get('/about/history', function() { return redirect()->route('about'); });
 Route::get('/about/mission', function() { return redirect()->route('about'); });

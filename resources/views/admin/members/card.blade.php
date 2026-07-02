@@ -6,269 +6,348 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: DejaVu Sans, sans-serif; }
 
-@page {
-    margin: 0;
-    size: 148mm 105mm landscape;
-}
-
-.badge {
-    width: 148mm;
-    border: 2px solid #c9a227;
-    border-radius: 8px;
+.card {
+    width: 99mm;
+    height: 142mm;
+    margin: 3mm auto 3mm;
+    border: 5px solid #E6007E;
+    background: #ffffff;
+    padding: 4mm 4mm 2.5mm;
     overflow: hidden;
     page-break-inside: avoid;
 }
 
-.inner {
+/* ===== EN-TÊTE : LOGOS ===== */
+.logos-table {
     width: 100%;
     border-collapse: collapse;
+    margin-bottom: 2mm;
 }
 
-.col-stripe {
-    width: 7px;
-    background: #c9a227;
-    padding: 0;
-}
-
-.col-left {
-    width: 86px;
-    background: #101f55;
-    padding: 12px 7px;
-    border-right: 1px solid rgba(201,162,39,0.25);
-    vertical-align: top;
+.logos-table td {
     text-align: center;
+    vertical-align: middle;
+    width: 33.33%;
 }
 
-.col-right {
-    padding: 11px 13px;
-    vertical-align: top;
-    background: #0d1b4b;
+.logo-box {
+    width: 22mm;
+    height: 18mm;
+    margin: 0 auto;
+    display: block;
 }
 
-.fanfare-label {
-    font-size: 7.5px;
-    color: #c9a227;
+.logo-placeholder {
+    width: 20mm;
+    height: 16mm;
+    margin: 0 auto;
+    border: 1px dashed #cccccc;
+    color: #cccccc;
+    font-size: 6px;
+    text-align: center;
+    line-height: 16mm;
+}
+
+/* ===== TITRES ===== */
+.title-fanfare {
+    text-align: center;
+    color: #E6007E;
     font-weight: bold;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    line-height: 1.5;
-    margin-bottom: 10px;
+    font-size: 19px;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5mm;
 }
 
-.photo-circle {
-    width: 68px;
-    height: 68px;
-    border-radius: 34px;
-    border: 2.5px solid #c9a227;
-    overflow: hidden;
-    background-color: #1e2d6b;
-    margin: 0 auto 8px;
-}
-
-.official-label {
-    font-size: 6.5px;
-    color: #c9a227;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    border: 1px solid #c9a227;
-    border-radius: 3px;
-    padding: 2px 5px;
-    display: inline-block;
-    margin-top: 8px;
-}
-
-.badge-title {
-    font-size: 7px;
-    color: #c9a227;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 3px;
-}
-
-.member-name {
-    font-size: 18px;
+.subtitle-trompette {
+    text-align: center;
+    color: #2E9E3F;
     font-weight: bold;
-    color: #ffffff;
-    line-height: 1.1;
-    margin-bottom: 2px;
+    font-size: 14px;
+    font-family: "DejaVu Serif", serif;
+    margin-bottom: 0.5mm;
 }
 
-.member-number {
+.country {
+    text-align: center;
+    color: #111111;
     font-size: 9px;
-    color: #8fa8d8;
-    letter-spacing: 1px;
-    margin-bottom: 6px;
+    font-family: "DejaVu Serif", serif;
+    letter-spacing: 0.5px;
+    margin-bottom: 1.5mm;
 }
 
-.status-pill {
-    font-size: 7.5px;
-    color: #6fe0a0;
-    background: #1a4a2e;
-    padding: 2px 9px;
-    border-radius: 10px;
-    letter-spacing: 0.8px;
-    display: inline-block;
-    margin-bottom: 9px;
-}
-
-.info-table {
+/* ===== MATRICULE / TEL ===== */
+.top-info-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 9px;
+    margin-bottom: 1.5mm;
 }
 
-.info-table td {
-    width: 50%;
-    vertical-align: top;
-    padding: 0 3px 4px 0;
+.top-info-table td {
+    vertical-align: middle;
 }
 
-.info-table td:nth-child(2) {
-    padding-left: 3px;
-    padding-right: 0;
-}
-
-.info-box {
-    background: rgba(255,255,255,0.06);
-    border: 0.5px solid rgba(255,255,255,0.1);
-    border-radius: 5px;
-    padding: 5px 7px;
-}
-
-.info-label {
-    font-size: 6.5px;
-    color: #8fa8d8;
-    text-transform: uppercase;
-    letter-spacing: 0.7px;
-    margin-bottom: 2px;
-}
-
-.info-value {
+.matricule-label {
+    font-weight: bold;
+    color: #111111;
     font-size: 10px;
-    color: #ffffff;
-    font-weight: bold;
 }
 
-.bottom-table {
+.matricule-value {
+    color: #E30613;
+    font-weight: bold;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.tel-value {
+    color: #0072BC;
+    font-weight: bold;
+    font-size: 9.5px;
+    text-align: right;
+    white-space: nowrap;
+    padding-right: 1mm;
+}
+
+/* ===== BLOC INFOS + PHOTO ===== */
+.main-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.phone {
-    font-size: 9.5px;
-    color: #c9a227;
-    font-weight: bold;
+.info-col {
+    vertical-align: top;
+    width: 50%;
+    padding-right: 2mm;
 }
 
-.date {
-    font-size: 6.5px;
-    color: #4a5f8a;
-    margin-top: 2px;
+.photo-col {
+    vertical-align: top;
+    width: 50%;
+    text-align: right;
+}
+
+.info-line {
+    font-size: 9px;
+    color: #111111;
+    margin-bottom: 1.6mm;
+    line-height: 1.25;
+}
+
+.info-line .label {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.info-line .value {
+    font-weight: normal;
+}
+
+.photo-frame {
+    width: 30mm;
+    height: 30mm;
+    border: 2px solid #29ABE2;
+    background-color: #eef2f8;
+    overflow: hidden;
+    margin-left: auto;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.photo-frame img {
+    width: 30mm;
+    height: 30mm;
+    display: block;
+}
+
+.photo-placeholder-text {
+    color: #a9b8cf;
+    font-size: 8px;
+    line-height: 30mm;
+}
+
+/* ===== PIED : QR CODE + SIGNATURE ===== */
+.footer-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5mm;
+}
+
+.footer-table td {
+    vertical-align: bottom;
+}
+
+.qr-col {
+    width: 40%;
 }
 
 .qr-wrap {
-    width: 54px;
-    height: 54px;
-    background: rgba(255,255,255,0.95);
-    border-radius: 5px;
-    padding: 2px;
+    width: 20mm;
+    height: 20mm;
 }
 
 .qr-wrap img {
-    width: 50px;
-    height: 50px;
+    width: 20mm;
+    height: 20mm;
+}
+
+.signature-col {
+    width: 60%;
+    text-align: center;
+}
+
+.stamp-placeholder {
+    width: 16mm;
+    height: 16mm;
+    border: 1px dashed #E30613;
+    border-radius: 50%;
+    color: #E30613;
+    font-size: 6px;
+    text-align: center;
+    line-height: 16mm;
+    margin: 0 auto 0.5mm;
+}
+
+.stamp-img {
+    width: 16mm;
+    height: 16mm;
+    margin: 0 auto 0.5mm;
+    display: block;
+}
+
+.le-maitre-label {
+    font-size: 9px;
+    font-weight: bold;
+    color: #111111;
+    margin-bottom: 0.5mm;
+}
+
+.signature-name {
+    font-size: 11px;
+    font-weight: bold;
+    color: #111111;
+    font-family: "DejaVu Serif", serif;
 }
 </style>
 </head>
 <body>
-<div class="badge">
-<table class="inner">
-<tr>
 
-    <td class="col-stripe"></td>
+@php
+    // Découpage du champ "address" au format réel : "Paroisse: X | Sous-région: Y"
+    $paroisse = '—';
+    $sousRegion = '—';
 
-    <td class="col-left">
-        <div class="fanfare-label">FANFARE<br>CÉLESTE</div>
+    if ($member->address) {
+        if (preg_match('/Paroisse\s*:\s*(.*?)(?:\||$)/iu', $member->address, $m)) {
+            $paroisse = trim($m[1]);
+        }
+        if (preg_match('/Sous[-\s]?r[ée]gion\s*:\s*(.*?)(?:\||$)/iu', $member->address, $m)) {
+            $sousRegion = trim($m[1]);
+        }
+        // Si aucun label reconnu, on utilise le texte brut comme Paroisse
+        if ($paroisse === '—' && $sousRegion === '—') {
+            $paroisse = trim($member->address);
+        }
+    }
 
-        @if($member->photo_url)
-    <div class="photo-circle">
-        <img src="{{ $member->photo_url }}"
-             width="68"
-             height="68"
-             style="display:block;width:68px;height:68px;" />
-    </div>
-@else
-    <div class="photo-circle">
-        <table style="width:68px;height:68px;"><tr><td style="text-align:center;vertical-align:middle;">
-            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="1.5">
-                <circle cx="12" cy="8" r="4"/>
-                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-            </svg>
-        </td></tr></table>
-    </div>
-@endif
+    // Matricule complet (ex: FCTDA-004)
+    $matriculeNumber = $member->member_number ?? '—';
+@endphp
 
-        <div class="official-label">MEMBRE<br>OFFICIEL</div>
-    </td>
+<div class="card">
 
-    <td class="col-right">
-        <div class="badge-title">CARTE DE MEMBRE</div>
-        <div class="member-name">{{ $member->full_name }}</div>
-        <div class="member-number">{{ $member->member_number }}</div>
-        <div class="status-pill">&#9679; {{ ucfirst($member->status) }}</div>
+    {{-- ===== LOGOS ===== --}}
+    <table class="logos-table">
+        <tr>
+            <td>
+                {{-- Logo Fanfare Céleste --}}
+                @if(file_exists(public_path('images/card/logo-fanfare.png')))
+                    <img src="{{ public_path('images/card/logo-fanfare.png') }}" class="logo-box">
+                @else
+                    <div class="logo-placeholder">LOGO<br>FANFARE</div>
+                @endif
+            </td>
+            <td>
+                {{-- Logo Église Céleste (arc-en-ciel) --}}
+                @if(file_exists(public_path('images/card/logo-eglise.png')))
+                    <img src="{{ public_path('images/card/logo-eglise.png') }}" class="logo-box">
+                @else
+                    <div class="logo-placeholder">LOGO<br>ÉGLISE</div>
+                @endif
+            </td>
+            <td>
+                {{-- Trompette --}}
+                @if(file_exists(public_path('images/card/trompette.png')))
+                    <img src="{{ public_path('images/card/trompette.png') }}" class="logo-box">
+                @else
+                    <div class="logo-placeholder">TROMPETTE</div>
+                @endif
+            </td>
+        </tr>
+    </table>
 
-        <table class="info-table">
-            <tr>
-                <td>
-                    <div class="info-box">
-                        <div class="info-label">Section</div>
-                        <div class="info-value">{{ $member->section ?? '—' }}</div>
-                    </div>
-                </td>
-                <td>
-                    <div class="info-box">
-                        <div class="info-label">Instrument</div>
-                        <div class="info-value">{{ $member->instrument ?? '—' }}</div>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div class="info-box">
-                        <div class="info-label">Né(e) le</div>
-                        <div class="info-value">
-                            {{ $member->birth_date ? $member->birth_date->format('d/m/Y') : '—' }}
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <div class="info-box">
-                        <div class="info-label">Membre depuis</div>
-                        <div class="info-value">
-                            {{ $member->entry_date ? $member->entry_date->format('Y') : '—' }}
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </table>
+    {{-- ===== TITRES ===== --}}
+    <div class="title-fanfare">FANFARE CÉLESTE</div>
+    <div class="subtitle-trompette">LA TROMPETTE DE DIEU</div>
+    <div class="country">RÉPUBLIQUE DU BÉNIN</div>
 
-        <table class="bottom-table">
-            <tr>
-                <td style="vertical-align:middle;">
-                    <div class="phone">{{ $member->phone ?? '—' }}</div>
-                    <div class="date">Générée le {{ now()->format('d/m/Y') }}</div>
-                </td>
-                <td style="text-align:right;vertical-align:middle;">
-                    <div class="qr-wrap">
-                        <img src="data:image/svg+xml;base64,{{ $qrCode }}" alt="QR" />
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </td>
+    {{-- ===== MATRICULE / TEL ===== --}}
+    <table class="top-info-table">
+        <tr>
+            <td style="width:50%;">
+                <div class="matricule-label">Matricule :</div>
+                <div class="matricule-value">{{ $matriculeNumber }}</div>
+            </td>
+            <td style="width:50%;" class="tel-value">
+                TEL: 61 01 26 49
+            </td>
+        </tr>
+    </table>
 
-</tr>
-</table>
+    {{-- ===== INFOS + PHOTO ===== --}}
+    <table class="main-table">
+        <tr>
+            <td class="info-col">
+                <div class="info-line"><span class="label">Nom</span>: <span class="value">{{ strtoupper($member->last_name) }}</span></div>
+                <div class="info-line"><span class="label">Prénoms</span>: <span class="value">{{ $member->first_name }}</span></div>
+                <div class="info-line"><span class="label">Né le</span>: <span class="value">{{ $member->birth_date ? $member->birth_date->format('d-m-Y') : '—' }}{{ $member->birth_place ? ' à ' . $member->birth_place : '' }}</span></div>
+                <div class="info-line"><span class="label">Paroisse</span>: <span class="value">{{ $paroisse }}</span></div>
+                <div class="info-line"><span class="label">Sous Région</span>: <span class="value">{{ $sousRegion }}</span></div>
+                <div class="info-line"><span class="label">Instrument</span>: <span class="value">{{ $member->instrument ?? '—' }}</span></div>
+                <div class="info-line"><span class="label">Contact</span>: <span class="value">{{ $member->phone ?? '—' }}</span></div>
+            </td>
+            <td class="photo-col">
+                <div class="photo-frame">
+                    @if($member->photo_url)
+                        <img src="{{ $member->photo_url }}">
+                    @else
+                        <div class="photo-placeholder-text">PHOTO</div>
+                    @endif
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    {{-- ===== QR CODE + SIGNATURE ===== --}}
+    <table class="footer-table">
+        <tr>
+            <td class="qr-col">
+                <div class="qr-wrap">
+                    <img src="data:image/svg+xml;base64,{{ $qrCode }}" alt="QR">
+                </div>
+            </td>
+            <td class="signature-col">
+                @if(file_exists(public_path('images/card/tampon.png')))
+                    <img src="{{ public_path('images/card/tampon.png') }}" class="stamp-img">
+                @else
+                    <div class="stamp-placeholder">TAMPON</div>
+                @endif
+                <div class="le-maitre-label">Le maître</div>
+                <div class="signature-name">Marius ADOLIWOSSI</div>
+            </td>
+        </tr>
+    </table>
+
 </div>
 </body>
 </html>

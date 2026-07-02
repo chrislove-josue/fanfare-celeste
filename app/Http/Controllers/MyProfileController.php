@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Member;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class MyProfileController extends Controller
 {
@@ -31,54 +32,54 @@ class MyProfileController extends Controller
         ]);
     }
 
-public function updateProfile(Request $request)
-{
-    $user = $request->user();
-    $member = $user->member;
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+        $member = $user->member;
 
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email,' . $user->id,
-        'phone' => 'nullable|string|max:20',
-        'address' => 'nullable|string',
-    ]);
-
-    $user->update([
-        'name' => $validated['name'],
-        'email' => $validated['email'],
-    ]);
-
-    if ($member) {
-        $member->update([
-            'phone' => $validated['phone'] ?? $member->phone,
-            'address' => $validated['address'] ?? $member->address,
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string',
         ]);
+
+        $user->update([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ]);
+
+        if ($member) {
+            $member->update([
+                'phone' => $validated['phone'] ?? $member->phone,
+                'address' => $validated['address'] ?? $member->address,
+            ]);
+        }
+
+        return redirect()->route('my.profile')
+            ->with('success', 'Profil mis à jour avec succès.');
     }
 
-    return redirect()->route('my.profile')
-        ->with('success', 'Profil mis à jour avec succès.');
-}
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
 
-public function updatePassword(Request $request)
-{
-    $request->validate([
-        'current_password' => 'required|string',
-        'password' => 'required|string|min:8|confirmed',
-    ]);
+        $user = $request->user();
 
-    $user = $request->user();
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Le mot de passe actuel est incorrect.']);
+        }
 
-    if (!Hash::check($request->current_password, $user->password)) {
-        return back()->withErrors(['current_password' => 'Le mot de passe actuel est incorrect.']);
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return redirect()->route('my.profile')
+            ->with('success', 'Mot de passe mis à jour avec succès.');
     }
-
-    $user->update([
-        'password' => Hash::make($request->password),
-    ]);
-
-    return redirect()->route('my.profile')
-        ->with('success', 'Mot de passe mis à jour avec succès.');
-}
 
     public function contributions(Request $request)
     {
@@ -93,7 +94,7 @@ public function updatePassword(Request $request)
         $contributions = $member->contributions()
             ->latest()
             ->paginate(20);
-            
+
         $totalContributions = $member->contributions()->sum('amount');
         $monthlyContributions = $member->contributions()
             ->whereMonth('payment_date', now()->month)
@@ -122,15 +123,15 @@ public function updatePassword(Request $request)
         $transactions = $member->transactions()
             ->latest('transaction_date')
             ->paginate(20);
-            
+
         $totalIncome = $member->transactions()
             ->where('type', 'income')
             ->sum('amount');
-            
+
         $totalExpenses = $member->transactions()
             ->where('type', 'expense')
             ->sum('amount');
-            
+
         $balance = $totalIncome - $totalExpenses;
 
         return view('my.transactions', [
@@ -143,25 +144,24 @@ public function updatePassword(Request $request)
         ]);
     }
 
-    
-public function card(Request $request)
-{
-    $user = $request->user();
-    $member = $user->member;
-    
-    if (!$member) {
-        return redirect()->route('my.profile')
-            ->with('warning', 'Vous n\'êtes pas encore associé à un membre.');
+    public function card(Request $request)
+    {
+        $user = $request->user();
+        $member = $user->member;
+
+        if (!$member) {
+            return redirect()->route('my.profile')
+                ->with('warning', 'Vous n\'êtes pas encore associé à un membre.');
+        }
+
+        // memberCardQrCode est un accessor Eloquent (propriété magique),
+        // pas une méthode : on l'appelle directement, sans method_exists().
+        $qrCode = $member->memberCardQrCode ?? null;
+
+        $currentCommitteePosition = $member->currentCommitteePosition;
+
+        return view('my.card', compact('member', 'qrCode', 'currentCommitteePosition'));
     }
-    
-    // Générer le QR Code si disponible
-    $qrCode = null;
-    if (method_exists($member, 'memberCardQrCode')) {
-        $qrCode = $member->memberCardQrCode;
-    }
-    
-    return view('my.card', compact('member', 'qrCode'));
-}
 
     public function events(Request $request)
     {
@@ -177,7 +177,7 @@ public function card(Request $request)
             ->with('event')
             ->latest()
             ->paginate(20);
-            
+
         $totalEvents = $member->eventParticipations()->count();
         $upcomingEvents = $member->eventParticipations()
             ->whereHas('event', function($query) {

@@ -68,7 +68,7 @@ class MemberController extends Controller
         
         // Tri
         $sort = $request->sort ?? 'member_number';
-$direction = $request->direction ?? 'asc';
+        $direction = $request->direction ?? 'asc';
         $query->orderBy($sort, $direction);
         
         $members = $query->paginate(15);
@@ -441,7 +441,9 @@ $direction = $request->direction ?? 'asc';
         $qrCode = $member->memberCardQrCode;
         
         $pdf = Pdf::loadView('admin.members.card', compact('member', 'qrCode'));
-        $pdf->setPaper('a6', 'landscape');
+        // Format explicite en points (105mm x 148mm), évite toute ambiguïté
+        // de conversion avec le format nommé 'a6'
+        $pdf->setPaper([0, 0, 297.64, 419.53]);
         
         return $pdf->download('carte_membre_' . $member->member_number . '.pdf');
     }
@@ -670,6 +672,42 @@ $direction = $request->direction ?? 'asc';
             DB::rollback();
             return back()->with('error', 'Erreur lors de la synchronisation: ' . $e->getMessage());
         }
+    }
+
+    // ==========================================
+    // VERIFY - Page publique de vérification (scan QR code)
+    // ==========================================
+    public function verify(string $memberNumber)
+    {
+        $member = Member::where('member_number', $memberNumber)->first();
+
+        if (!$member) {
+            abort(404, 'Membre introuvable.');
+        }
+
+        $currentCommitteePosition = $member->currentCommitteePosition;
+
+        // Découpage du champ "address" au format "Paroisse: X | Sous-région: Y"
+        $paroisse = null;
+        $sousRegion = null;
+        if ($member->address) {
+            if (preg_match('/Paroisse\s*:\s*(.*?)(?:\||$)/iu', $member->address, $m)) {
+                $paroisse = trim($m[1]);
+            }
+            if (preg_match('/Sous[-\s]?r[ée]gion\s*:\s*(.*?)(?:\||$)/iu', $member->address, $m)) {
+                $sousRegion = trim($m[1]);
+            }
+            if (!$paroisse && !$sousRegion) {
+                $paroisse = trim($member->address);
+            }
+        }
+
+        return view('members.verify', compact(
+            'member',
+            'currentCommitteePosition',
+            'paroisse',
+            'sousRegion'
+        ));
     }
 
     // ==========================================
