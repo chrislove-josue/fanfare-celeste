@@ -285,13 +285,14 @@ class Member extends Model
         return [
             'active' => 'Actif',
             'pending' => 'En attente',
-            'inactive' => 'Inactif',
+            // 'inactive' volontairement retiré : on ne veut plus l'afficher dans les choix
             'suspended' => 'Suspendu',
             'withdrawn' => 'Retiré',
             'deceased' => 'Décédé',
             'training' => 'En formation'
         ];
     }
+
 
     /**
      * Générer le numéro de membre au format FCTDA-XXX

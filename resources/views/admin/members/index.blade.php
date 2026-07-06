@@ -675,8 +675,9 @@
                     <td>
                         <span class="badge-status {{ $member->status }}">
                             <i class="fas fa-{{ $member->status === 'active' ? 'check-circle' : ($member->status === 'pending' ? 'clock' : ($member->status === 'training' ? 'graduation-cap' : 'times-circle')) }}"></i>
-                            {{ ucfirst($member->status) }}
+                            {{ \App\Models\Member::getStatuses()[$member->status] ?? ucfirst($member->status) }}
                         </span>
+
                     </td>
                     <td>
                         @if($member->user)

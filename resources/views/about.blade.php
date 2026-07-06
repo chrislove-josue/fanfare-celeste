@@ -26,24 +26,23 @@
     </div>
 
     <!-- Histoire -->
-<!-- Histoire -->
-<div id="histoire" class="row mb-5 align-items-center">
-    <div class="col-lg-6" data-aos="fade-right" data-aos-mobile="false">
-        <h2 class="fw-bold mb-3">Notre Histoire</h2>
-        <div class="content">
-            <p>La <strong>Fanfare Céleste "La Trompette de Dieu"</strong> est née d'une vision spirituelle : <strong>louer l'Éternel à travers la fanfare</strong>. Basée dans la région de l'Atlantique au Bénin, elle regroupe plusieurs musiciens talentueux venus des sous-régions. Le groupe a fait sa sortie officielle le <strong>vendredi 06 mai 2022</strong> sur la paroisse Alpha Oméga Agbandonou, marquant ainsi le début d'une aventure musicale unique dans le monde du gospel au Bénin.</p>
+    <div id="histoire" class="row mb-5 align-items-center">
+        <div class="col-lg-6" data-aos="fade-right" data-aos-mobile="false">
+            <h2 class="fw-bold mb-3">Notre Histoire</h2>
+            <div class="content">
+                <p>La <strong>Fanfare Céleste "La Trompette de Dieu"</strong> est née d'une vision spirituelle : <strong>louer l'Éternel à travers la fanfare</strong>. Basée dans la région de l'Atlantique au Bénin, elle regroupe plusieurs musiciens talentueux venus des sous-régions. Le groupe a fait sa sortie officielle le <strong>vendredi 06 mai 2022</strong> sur la paroisse Alpha Oméga Agbandonou, sous la supervision du <strong>Vénérable Suprême Evangéliste Philippe AGBAOSSI</strong>, maître de la Fanfare nationale, marquant ainsi le début d'une aventure musicale unique dans le monde du gospel au Bénin.</p>
 
-            <p>Particulièrement original, ce groupe se distingue par sa double compétence : <strong>le rang de prestation de fanfare d'harmonie</strong> et <strong>le rang de prestation des morceaux arrangés</strong>. Toutes les prestations se font en <strong>soutane</strong>, et l'appartenance à la congrégation est une condition préalable pour y adhérer.</p>
+                <p>Particulièrement original, ce groupe se distingue par sa double compétence : <strong>le rang de prestation de fanfare d'harmonie</strong> et <strong>le rang de prestation des morceaux arrangés</strong>. Toutes les prestations se font en <strong>soutane</strong>, et l'appartenance à la congrégation est une condition préalable pour y adhérer.</p>
 
-            <p>La sortie officielle a été marquée par un <strong>géant concert spirituel</strong> avec la Chorale Cité de Paix de Yèvié (Adomaya), suivi d'une messe d'Action de grâce le lendemain, le samedi 07 mai 2022 à 09 heures, sur la paroisse Alpha Oméga Agbandonou.</p>
+                <p>La sortie officielle a été marquée par un <strong>géant concert spirituel</strong> avec la Chorale Cité de Paix de Yèvié (Adomaya), suivi d'une messe d'Action de grâce le lendemain, le samedi 07 mai 2022 à 09 heures, sur la paroisse Alpha Oméga Agbandonou.</p>
+            </div>
+        </div>
+        <div class="col-lg-6 text-center mt-4 mt-lg-0" data-aos="fade-left" data-aos-mobile="false">
+            <img src="{{ asset('storage/about/about.jpeg') }}" 
+                 alt="Histoire" class="img-fluid rounded shadow" 
+                 style="width: 100%; max-width: 400px; height: auto; aspect-ratio: auto; object-fit: contain;">
         </div>
     </div>
-    <div class="col-lg-6 text-center mt-4 mt-lg-0" data-aos="fade-left" data-aos-mobile="false">
-        <img src="{{ asset('storage/about/about.jpeg') }}" 
-             alt="Histoire" class="img-fluid rounded shadow" 
-             style="height: auto; width: 100%; max-width: 400px; object-fit: cover; object-position: center;">
-    </div>
-</div>
 
     <hr>
 
@@ -102,110 +101,108 @@
     <hr>
 
     <!-- Bureau exécutif -->
-    <!-- Bureau exécutif -->
-<div id="bureau" class="mb-5">
-    <h2 class="text-center fw-bold mb-4" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(1.5rem, 3vw, 2.2rem);">Bureau Exécutif</h2>
-    <p class="text-center text-muted mb-5" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(0.9rem, 1.2vw, 1rem);">L'équipe dirigeante de la Fanfare Céleste</p>
-    
-    @if($committeeMembers->count() > 0)
-    <div class="row g-4 justify-content-center">
-        @foreach($committeeMembers as $committeeMember)
-        <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}" data-aos-mobile="false">
-            <div class="card h-100 shadow-sm text-center hover-card">
-                <div class="card-body">
-                    @if($committeeMember->member && $committeeMember->member->photo)
-                        <img src="{{ asset('storage/' . $committeeMember->member->photo) }}" 
-                             alt="{{ $committeeMember->member->full_name }}" 
-                             class="rounded-circle mb-3" 
-                             style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #3946B2;">
-                    @else
-                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" 
-                             style="width: 80px; height: 80px; font-size: 28px; font-weight: 700;">
-                            {{ $committeeMember->member ? strtoupper(substr($committeeMember->member->first_name, 0, 1) . substr($committeeMember->member->last_name, 0, 1)) : '??' }}
-                        </div>
-                    @endif
-                    <h6 class="fw-bold mb-1" style="font-size: clamp(0.8rem, 1vw, 0.95rem);">{{ $committeeMember->member->full_name ?? 'N/A' }}</h6>
-                    <p class="text-primary small mb-2" style="font-size: clamp(0.65rem, 0.8vw, 0.8rem);">
-                        {{-- ✅ Utilisation de getPositionLabelAttribute() ou du tableau $positions --}}
-                        {{ $committeeMember->position_label }}
-                    </p>
-                    <p class="text-muted small mb-0" style="font-size: clamp(0.6rem, 0.7vw, 0.75rem);">
-                        <i class="fas fa-envelope me-1"></i> {{ $committeeMember->member->email ?? 'Non renseigné' }}
-                    </p>
-                    @if($committeeMember->member && $committeeMember->member->phone)
-                        <p class="text-muted small mb-0" style="font-size: clamp(0.6rem, 0.7vw, 0.75rem);">
-                            <i class="fas fa-phone me-1"></i> {{ $committeeMember->member->phone }}
+    <div id="bureau" class="mb-5">
+        <h2 class="text-center fw-bold mb-4" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(1.5rem, 3vw, 2.2rem);">Bureau Exécutif</h2>
+        <p class="text-center text-muted mb-5" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(0.9rem, 1.2vw, 1rem);">L'équipe dirigeante de la Fanfare Céleste</p>
+        
+        @if($committeeMembers->count() > 0)
+        <div class="row g-4 justify-content-center">
+            @foreach($committeeMembers as $committeeMember)
+            <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}" data-aos-mobile="false">
+                <div class="card h-100 shadow-sm text-center hover-card">
+                    <div class="card-body">
+                        @if($committeeMember->member && $committeeMember->member->photo)
+                            <img src="{{ asset('storage/' . $committeeMember->member->photo) }}" 
+                                 alt="{{ $committeeMember->member->full_name }}" 
+                                 class="rounded-circle mb-3" 
+                                 style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #3946B2;">
+                        @else
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" 
+                                 style="width: 80px; height: 80px; font-size: 28px; font-weight: 700;">
+                                {{ $committeeMember->member ? strtoupper(substr($committeeMember->member->first_name, 0, 1) . substr($committeeMember->member->last_name, 0, 1)) : '??' }}
+                            </div>
+                        @endif
+                        <h6 class="fw-bold mb-1" style="font-size: clamp(0.8rem, 1vw, 0.95rem);">{{ $committeeMember->member->full_name ?? 'N/A' }}</h6>
+                        <p class="text-primary small mb-2" style="font-size: clamp(0.65rem, 0.8vw, 0.8rem);">
+                            {{ $committeeMember->position_label }}
                         </p>
-                    @endif
+                        <p class="text-muted small mb-0" style="font-size: clamp(0.6rem, 0.7vw, 0.75rem);">
+                            <i class="fas fa-envelope me-1"></i> {{ $committeeMember->member->email ?? 'Non renseigné' }}
+                        </p>
+                        @if($committeeMember->member && $committeeMember->member->phone)
+                            <p class="text-muted small mb-0" style="font-size: clamp(0.6rem, 0.7vw, 0.75rem);">
+                                <i class="fas fa-phone me-1"></i> {{ $committeeMember->member->phone }}
+                            </p>
+                        @endif
+                    </div>
                 </div>
             </div>
+            @endforeach
         </div>
-        @endforeach
+        @else
+        <div class="text-center py-4">
+            <p class="text-muted">Le bureau exécutif sera bientôt présenté.</p>
+        </div>
+        @endif
     </div>
-    @else
-    <div class="text-center py-4">
-        <p class="text-muted">Le bureau exécutif sera bientôt présenté.</p>
-    </div>
-    @endif
-</div>
 
     <hr>
 
-   <!-- Nos Valeurs -->
-<div id="valeurs" class="mb-5">
-    <h2 class="text-center fw-bold mb-4" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(1.5rem, 3vw, 2.2rem);">Nos Valeurs Fondamentales</h2>
-    <p class="text-center text-muted mb-5" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(0.9rem, 1.2vw, 1rem);">Les principes qui guident notre engagement et notre musique</p>
-    
-    <div class="row g-4">
-        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="0" data-aos-mobile="false">
-            <div class="card h-100 shadow-sm border-0 hover-card text-center p-3">
-                <div class="card-body">
-                    <div class="icon-wrapper mb-3" style="width: 60px; height: 60px; background: rgba(57, 70, 178, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
-                        <i class="fas fa-praying-hands fa-2x text-primary"></i>
+    <!-- Nos Valeurs -->
+    <div id="valeurs" class="mb-5">
+        <h2 class="text-center fw-bold mb-4" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(1.5rem, 3vw, 2.2rem);">Nos Valeurs Fondamentales</h2>
+        <p class="text-center text-muted mb-5" data-aos="fade-up" data-aos-mobile="false" style="font-size: clamp(0.9rem, 1.2vw, 1rem);">Les principes qui guident notre engagement et notre musique</p>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="0" data-aos-mobile="false">
+                <div class="card h-100 shadow-sm border-0 hover-card text-center p-3">
+                    <div class="card-body">
+                        <div class="icon-wrapper mb-3" style="width: 60px; height: 60px; background: rgba(57, 70, 178, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <i class="fas fa-praying-hands fa-2x text-primary"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2" style="font-size: clamp(0.95rem, 1.1vw, 1.1rem);">Foi et Spiritualité</h5>
+                        <p class="text-muted small mb-0" style="font-size: clamp(0.75rem, 0.85vw, 0.9rem);">Chaque note est une prière, chaque mélodie est un témoignage. Nous louons l'Éternel à travers la fanfare.</p>
                     </div>
-                    <h5 class="fw-bold mb-2" style="font-size: clamp(0.95rem, 1.1vw, 1.1rem);">Foi et Spiritualité</h5>
-                    <p class="text-muted small mb-0" style="font-size: clamp(0.75rem, 0.85vw, 0.9rem);">Chaque note est une prière, chaque mélodie est un témoignage. Nous louons l'Éternel à travers la fanfare.</p>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="50" data-aos-mobile="false">
-            <div class="card h-100 shadow-sm border-0 hover-card text-center p-3">
-                <div class="card-body">
-                    <div class="icon-wrapper mb-3" style="width: 60px; height: 60px; background: rgba(57, 70, 178, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
-                        <i class="fas fa-star fa-2x text-primary"></i>
+            
+            <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="50" data-aos-mobile="false">
+                <div class="card h-100 shadow-sm border-0 hover-card text-center p-3">
+                    <div class="card-body">
+                        <div class="icon-wrapper mb-3" style="width: 60px; height: 60px; background: rgba(57, 70, 178, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <i class="fas fa-star fa-2x text-primary"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2" style="font-size: clamp(0.95rem, 1.1vw, 1.1rem);">Excellence Musicale</h5>
+                        <p class="text-muted small mb-0" style="font-size: clamp(0.75rem, 0.85vw, 0.9rem);">Des prestations de qualité grâce à des critères d'adhésion rigoureux : phase de test et phase de moralité.</p>
                     </div>
-                    <h5 class="fw-bold mb-2" style="font-size: clamp(0.95rem, 1.1vw, 1.1rem);">Excellence Musicale</h4>
-                    <p class="text-muted small mb-0" style="font-size: clamp(0.75rem, 0.85vw, 0.9rem);">Des prestations de qualité grâce à des critères d'adhésion rigoureux : phase de test et phase de moralité.</p>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100" data-aos-mobile="false">
-            <div class="card h-100 shadow-sm border-0 hover-card text-center p-3">
-                <div class="card-body">
-                    <div class="icon-wrapper mb-3" style="width: 60px; height: 60px; background: rgba(57, 70, 178, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
-                        <i class="fas fa-users fa-2x text-primary"></i>
+            
+            <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100" data-aos-mobile="false">
+                <div class="card h-100 shadow-sm border-0 hover-card text-center p-3">
+                    <div class="card-body">
+                        <div class="icon-wrapper mb-3" style="width: 60px; height: 60px; background: rgba(57, 70, 178, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <i class="fas fa-users fa-2x text-primary"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2" style="font-size: clamp(0.95rem, 1.1vw, 1.1rem);">Fraternité et Unité</h5>
+                        <p class="text-muted small mb-0" style="font-size: clamp(0.75rem, 0.85vw, 0.9rem);">Un groupe soudé, basé sur la moralité et l'appartenance à la congrégation, portant la soutane avec fierté.</p>
                     </div>
-                    <h5 class="fw-bold mb-2" style="font-size: clamp(0.95rem, 1.1vw, 1.1rem);">Fraternité et Unité</h4>
-                    <p class="text-muted small mb-0" style="font-size: clamp(0.75rem, 0.85vw, 0.9rem);">Un groupe soudé, basé sur la moralité et l'appartenance à la congrégation, portant la soutane avec fierté.</p>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="150" data-aos-mobile="false">
-            <div class="card h-100 shadow-sm border-0 hover-card text-center p-3">
-                <div class="card-body">
-                    <div class="icon-wrapper mb-3" style="width: 60px; height: 60px; background: rgba(57, 70, 178, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
-                        <i class="fas fa-globe-africa fa-2x text-primary"></i>
+            
+            <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="150" data-aos-mobile="false">
+                <div class="card h-100 shadow-sm border-0 hover-card text-center p-3">
+                    <div class="card-body">
+                        <div class="icon-wrapper mb-3" style="width: 60px; height: 60px; background: rgba(57, 70, 178, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <i class="fas fa-globe-africa fa-2x text-primary"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2" style="font-size: clamp(0.95rem, 1.1vw, 1.1rem);">Rayonnement Régional</h5>
+                        <p class="text-muted small mb-0" style="font-size: clamp(0.75rem, 0.85vw, 0.9rem);">Devenir une référence musicale en Afrique de l'Ouest, en alliant excellence artistique et rayonnement spirituel.</p>
                     </div>
-                    <h5 class="fw-bold mb-2" style="font-size: clamp(0.95rem, 1.1vw, 1.1rem);">Rayonnement Régional</h4>
-                    <p class="text-muted small mb-0" style="font-size: clamp(0.75rem, 0.85vw, 0.9rem);">Devenir une référence musicale en Afrique de l'Ouest, en alliant excellence artistique et rayonnement spirituel.</p>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
     <hr>
 
@@ -371,8 +368,12 @@
             font-size: 20px !important;
         }
         
+        /* Suppression de la hauteur fixe pour l'image about */
         #histoire img {
-            height: 200px !important;
+            height: auto !important;
+            max-height: 300px;
+            width: 100%;
+            max-width: 400px;
         }
         
         .badge {

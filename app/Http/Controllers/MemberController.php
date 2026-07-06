@@ -83,7 +83,8 @@ class MemberController extends Controller
         // 🏷️ Options pour les filtres
         $sections = Member::select('section')->distinct()->whereNotNull('section')->pluck('section');
         $instruments = Member::select('instrument')->distinct()->whereNotNull('instrument')->pluck('instrument');
-        $statuses = ['pending', 'active', 'inactive', 'suspended', 'withdrawn', 'deceased', 'training'];
+        $statuses = ['pending', 'active', 'suspended', 'withdrawn', 'deceased', 'training'];
+
         
         return view('admin.members.index', compact(
             'members',
