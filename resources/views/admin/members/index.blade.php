@@ -561,7 +561,8 @@
                 <option value="">Tous</option>
                 @foreach($statuses as $status)
                     <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
-                        {{ ucfirst($status) }}
+                        {{ \App\Models\Member::getStatuses()[$status] ?? ucfirst($status) }}
+
                     </option>
                 @endforeach
             </select>
