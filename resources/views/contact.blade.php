@@ -75,28 +75,23 @@
                 </div>
                 
                 <!-- Horaires -->
-                <div class="card border-0 shadow-sm mt-4">
-                    <div class="card-body">
-                        <h5 class="fw-bold mb-3">
-                            <i class="fas fa-clock text-primary me-2"></i>
-                            Nos horaires
-                        </h5>
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <small class="text-muted">Répétitions</small>
-                                <p class="fw-semibold mb-0">Mer & Sam<br>16h-19h</p>
-                            </div>
-                            <div class="col-sm-4">
-                                <small class="text-muted">Bureau</small>
-                                <p class="fw-semibold mb-0">Lun - Ven<br>9h-17h</p>
-                            </div>
-                            <div class="col-sm-4">
-                                <small class="text-muted">Permanence</small>
-                                <p class="fw-semibold mb-0">Samedi<br>10h-13h</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div class="card border-0 shadow-sm mt-4">
+    <div class="card-body text-center">
+        <h5 class="fw-bold mb-3">
+            <i class="fas fa-clock text-primary me-2"></i>
+            Horaires des répétitions
+        </h5>
+        <div class="py-3" style="background: #f8f9fa; border-radius: 10px;">
+            <i class="fas fa-calendar-check text-success" style="font-size: 2rem;"></i>
+            <p class="fw-bold mt-2 mb-0" style="font-size: 1.1rem;">
+                Premier mercredi de chaque mois
+            </p>
+            <p class="text-primary fw-semibold mb-0" style="font-size: 1.2rem;">
+                🕐 16h - 18h
+            </p>
+        </div>
+    </div>
+</div>
                 
                 <!-- Réseaux sociaux -->
                 <div class="card border-0 shadow-sm mt-4">
