@@ -101,7 +101,14 @@
                                 </div>
                             @endif
                         </div>
-
+                        <div class="d-flex flex-column gap-2">
+                            <a href="https://www.facebook.com/profile.php?id=61553222979542" 
+               target="_blank" 
+               class="btn btn-primary btn-sm"
+               title="Partager sur Facebook">
+                <i class="fab fa-facebook-f me-1"></i> Facebook
+            </a>
+                        </div>
                         <div class="alert alert-info mt-4 mb-0">
                             <i class="fas fa-user-plus me-2"></i>
                             Pour participer, cliquez sur « S’inscrire à l’événement ».

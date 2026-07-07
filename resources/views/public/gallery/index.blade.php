@@ -14,12 +14,21 @@
             <span class="badge bg-primary px-4 py-2">
                 <i class="fas fa-images me-2"></i> {{ $totalGalleries ?? 0 }} albums
             </span>
+            <span>
+                <a href="https://www.facebook.com/profile.php?id=61553222979542" 
+               target="_blank" 
+               class="btn btn-primary btn-sm"
+               title="Partager sur Facebook">
+                <i class="fab fa-facebook-f me-1"></i> Facebook
+            </a>
+            </span>
             <span class="badge bg-success px-4 py-2">
                 <i class="fas fa-image me-2"></i> {{ $totalPhotos ?? 0 }} photos
             </span>
             <span class="badge bg-danger px-4 py-2">
                 <i class="fas fa-video me-2"></i> {{ isset($videos) ? count($videos) : 0 }} vidéos
             </span>
+            
         </div>
     </div>
 </section>

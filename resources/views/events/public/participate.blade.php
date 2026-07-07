@@ -126,9 +126,7 @@
                                         <div class="alert alert-warning mb-0">
                                             <i class="fas fa-info-circle me-2"></i>
                                             <strong>Vous n'êtes pas connecté(e).</strong>
-                                            <a href="{{ route('login') }}" class="alert-link">Connectez-vous</a> 
-                                            ou <a href="{{ route('register') }}" class="alert-link">créez un compte</a> 
-                                            pour remplir automatiquement vos informations.
+                                            
                                         </div>
                                     </div>
                                 @endauth

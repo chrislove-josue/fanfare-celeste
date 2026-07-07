@@ -95,18 +95,26 @@
                 @endif
 
                 <!-- Actions -->
-                <div class="actions-box bg-white p-3 rounded shadow-sm">
-                    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
-                        <div class="d-flex gap-2">
-                            <form action="{{ route('gallery.like', $gallery) }}" method="POST" class="d-inline">
-                                @csrf
-                                <button type="submit" class="btn btn-danger btn-sm">
-                                    <i class="fas fa-heart me-1"></i> J'aime ({{ $gallery->likes_count ?? 0 }})
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+<div class="actions-box bg-white p-3 rounded shadow-sm">
+    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+        <div class="d-flex gap-2">
+            <form action="{{ route('gallery.like', $gallery) }}" method="POST" class="d-inline">
+                @csrf
+                <button type="submit" class="btn btn-danger btn-sm">
+                    <i class="fas fa-heart me-1"></i> J'aime ({{ $gallery->likes_count ?? 0 }})
+                </button>
+            </form>
+            
+            <!-- Bouton Facebook -->
+            <a href="https://www.facebook.com/profile.php?id=61553222979542" 
+               target="_blank" 
+               class="btn btn-primary btn-sm"
+               title="Partager sur Facebook">
+                <i class="fab fa-facebook-f me-1"></i> Facebook
+            </a>
+        </div>
+    </div>
+</div>
             </div>
 
             <!-- Colonne de droite -->
