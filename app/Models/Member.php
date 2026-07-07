@@ -245,10 +245,7 @@ class Member extends Model
         return [
             'Trompette' => 'Trompette',
             'Trombone' => 'Trombone',
-            'Saxophone Alto' => 'Saxophone Alto',
-            'Saxophone Ténor' => 'Saxophone Ténor',
-            'Saxophone Baryton' => 'Saxophone Baryton',
-            'Batterie' => 'Batterie',
+            'Saxophone' => 'Saxophone',
             'Caisse Claire' => 'Caisse Claire',
             'Grosse Caisse' => 'Grosse Caisse',
             'Cymbales' => 'Cymbales',
@@ -256,6 +253,7 @@ class Member extends Model
             'Flûte' => 'Flûte',            
             'Souxaphone' => 'Souxaphone',
             'Tuba' => 'Tuba',
+            'Cornet' => 'Cornet',
         ];
     }
 
