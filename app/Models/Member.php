@@ -230,15 +230,10 @@ class Member extends Model
     public static function getSections(): array
     {
         return [
-            'Trompettes' => 'Trompettes',
-            'Trombones' => 'Trombones',
-            'Saxophones' => 'Saxophones',
             'Percussions' => 'Percussions',
-            'Clairons' => 'Clairons',
+            'Cuivre' => 'Cuivre',
             'Batterie' => 'Batterie',
-            'Clarinettes' => 'Clarinettes',
-            'Flûtes' => 'Flûtes',
-            'Administration' => 'Administration'
+
         ];
     }
 
@@ -258,9 +253,9 @@ class Member extends Model
             'Grosse Caisse' => 'Grosse Caisse',
             'Cymbales' => 'Cymbales',
             'Clarinette' => 'Clarinette',
-            'Flûte' => 'Flûte',
-            'Piano' => 'Piano',
-            'Guitare' => 'Guitare'
+            'Flûte' => 'Flûte',            
+            'Souxaphone' => 'Souxaphone',
+            'Tuba' => 'Tuba',
         ];
     }
 

@@ -31,7 +31,7 @@
                             Cliquez sur le bouton ci-dessous pour nous contacter directement via WhatsApp.<br>
                             Nous vous répondrons dans les plus brefs délais.
                         </p>
-                        <a href="https://wa.me/22998123353" target="_blank" class="btn btn-light btn-lg px-5 py-3" style="border-radius: 50px; font-weight: 600;">
+                        <a href="https://wa.me/22996310775" target="_blank" class="btn btn-light btn-lg px-5 py-3" style="border-radius: 50px; font-weight: 600;">
                             <i class="fab fa-whatsapp me-2" style="color: #25D366; font-size: 1.3rem;"></i>
                             Nous contacter sur WhatsApp
                         </a>
@@ -50,7 +50,7 @@
                             <div class="card-body text-center">
                                 <i class="fas fa-phone text-primary" style="font-size: 2rem;"></i>
                                 <h6 class="fw-bold mt-2">Téléphone</h6>
-                                <p class="text-muted mb-0">+229 97 00 00 00</p>
+                                <p class="text-muted mb-0">+229 01 96 31 07 75</p>
                             </div>
                         </div>
                     </div>
@@ -59,7 +59,7 @@
                             <div class="card-body text-center">
                                 <i class="fas fa-envelope text-primary" style="font-size: 2rem;"></i>
                                 <h6 class="fw-bold mt-2">Email</h6>
-                                <p class="text-muted mb-0">contact@fanfareceleste.org</p>
+                                <p class="text-muted mb-0">mariusadoliwossi@gmail.com</p>
                             </div>
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                             <div class="card-body text-center">
                                 <i class="fas fa-map-marker-alt text-primary" style="font-size: 2rem;"></i>
                                 <h6 class="fw-bold mt-2">Adresse</h6>
-                                <p class="text-muted mb-0">Cotonou, Bénin</p>
+                                <p class="text-muted mb-0">Sékou, Allada</p>
                             </div>
                         </div>
                     </div>
@@ -106,16 +106,16 @@
                             Suivez-nous
                         </h5>
                         <div class="d-flex justify-content-center gap-3 flex-wrap">
-                            <a href="#" class="btn btn-outline-primary">
+                            <a href="https://www.facebook.com/profile.php?id=61553222979542" class="btn btn-outline-primary">
                                 <i class="fab fa-facebook-f"></i>
                             </a>
                             <a href="#" class="btn btn-outline-danger">
                                 <i class="fab fa-instagram"></i>
                             </a>
-                            <a href="#" class="btn btn-outline-danger">
+                            <a href="https://youtube.com/@fanfaretrompettededieu8359?si=48_ttXgC3roPnhzx" class="btn btn-outline-danger">
                                 <i class="fab fa-youtube"></i>
                             </a>
-                            <a href="https://wa.me/22998123353" target="_blank" class="btn btn-outline-success">
+                            <a href="https://wa.me/22996310775" target="_blank" class="btn btn-outline-success">
                                 <i class="fab fa-whatsapp"></i>
                             </a>
                         </div>

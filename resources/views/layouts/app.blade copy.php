@@ -5,19 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Fanfare Céleste')</title>
+    <link rel="shortcut icon" href="{{ asset('storage/logo/logo.ico') }}" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #1a237e;
-            --secondary-color: #ffd700;
-            --accent-color: #d32f2f;
+            --primary-color: #3946B2;
+            --secondary-color: #40A81B;
+            --accent-color: #2F8DCD;
+            --fc-gold: #B8905C;
+            --fc-cream: #FEFAF3;
         }
         
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             overflow-x: hidden;
+            background: var(--fc-cream);
         }
         
         .navbar {
@@ -66,7 +71,6 @@
             background: linear-gradient(135deg, #0d1b3e, #1a237e);
             color: white;
             padding: 3rem 0 1rem 0;
-            margin-top: 3rem;
         }
         
         .social-icon {
@@ -107,9 +111,12 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <i class="fas fa-music"></i> Fanfare Céleste
-            </a>
+            <a class="gap-2 navbar-brand d-flex align-items-center" href="{{ route('home') }}">
+    <img src="{{ asset('storage/logo/logo-blanc.jpeg') }}" 
+         alt="Fanfare Céleste" 
+         style="height: 80px; width: 150px;">
+    <span>FCTDA</span>
+</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -118,45 +125,36 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('home') }}"><i class="fas fa-home"></i> Accueil</a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-info-circle"></i> À propos
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ route('about.history') }}">Historique</a></li>
-                            <li><a class="dropdown-item" href="{{ route('about.mission') }}">Mission & Vision</a></li>
-                            <li><a class="dropdown-item" href="{{ route('about.committee') }}">Bureau Exécutif</a></li>
-                            <li><a class="dropdown-item" href="{{ route('about.sections') }}">Sections</a></li>
-                        </ul>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('about') }}"><i class="fas fa-info-circle"></i> À propos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/events') }}"><i class="fas fa-calendar-alt"></i> Événements</a>
+                        <a class="nav-link" href="{{ route('public.events.index') }}"><i class="fas fa-calendar-alt"></i> Événements</a>
                     </li>
-
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/gallery') }}"><i class="fas fa-images"></i> Galerie</a>
+                        <a class="nav-link" href="{{ route('public.gallery.index') }}"><i class="fas fa-images"></i> Galerie</a>
                     </li>
-
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('contact') }}"><i class="fas fa-envelope"></i> Contact</a>
+                    </li>
 
                     @auth
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-user"></i> {{ Auth::user()->name }}
                             </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
-                                @can('manage members')
-                                <li><a class="dropdown-item" href="{{ route('members.index') }}"><i class="fas fa-users"></i> Gestion membres</a></li>
-                                @endcan
-                                @can('manage finances')
-                                <li><a class="dropdown-item" href="{{ route('admin.financial.dashboard') }}"><i class="fas fa-chart-line"></i> Finances</a></li>
-                                @endcan
-
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ route('my.profile') }}"><i class="fas fa-user-circle"></i> Mon profil</a></li>
+                                <li><a class="dropdown-item" href="{{ route('my.card') }}"><i class="fas fa-id-card"></i> Ma carte</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="fas fa-tachometer-alt"></i> Administration</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
-                                        <button type="submit" class="dropdown-item">Déconnexion</button>
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-sign-out-alt"></i> Déconnexion
+                                        </button>
                                     </form>
                                 </li>
                             </ul>
@@ -166,7 +164,7 @@
                             <a class="nav-link" href="{{ route('login') }}"><i class="fas fa-sign-in-alt"></i> Connexion</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-primary text-white px-3" href="{{ route('membership.apply') }}">
+                            <a class="px-3 text-white nav-link btn btn-primary" href="{{ route('membership.apply') }}">
                                 <i class="fas fa-hand-peace"></i> Adhérer
                             </a>
                         </li>
@@ -183,37 +181,37 @@
     <footer class="footer">
         <div class="container">
             <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5><i class="fas fa-music"></i> Fanfare Céleste</h5>
-                    <p>La Trompette de Dieu de l'Atlantique<br>
-                    Une fanfare au service de Dieu et de la communauté</p>
+                <div class="mb-4 col-md-4">
+                    <p>Fanfare Céleste La Trompette de Dieu de l'Atlantique,
+                    une fanfare au service de Dieu et de la communauté chrétienne</p>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="mb-4 col-md-4">
                     <h5>Contact Rapide</h5>
-                    <p><i class="fas fa-phone"></i> +229 97 00 00 00<br>
-                    <i class="fas fa-envelope"></i> contact@fanfareceleste.org<br>
-                    <i class="fab fa-whatsapp"></i> +229 97 00 00 00</p>
+                    <p>
+                        <i class="fas fa-phone"></i> +229 01 96 31 07 75<br>
+                        <i class="fas fa-envelope"></i> mariusadoliwossi@gmail.com<br>
+                        <i class="fab fa-whatsapp"></i> +229 01 96 31 07 75
+                    </p>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="mb-4 col-md-4">
                     <h5>Suivez-nous</h5>
                     <div class="social-icons">
-                        <a href="#" class="text-white social-icon"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.facebook.com/profile.php?id=61553222979542" class="text-white social-icon"><i class="fab fa-facebook"></i></a>
                         <a href="#" class="text-white social-icon"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-white social-icon"><i class="fab fa-youtube"></i></a>
+                        <a href="https://youtube.com/@fanfaretrompettededieu8359?si=48_ttXgC3roPnhzx" class="text-white social-icon"><i class="fab fa-youtube"></i></a>
                         <a href="#" class="text-white social-icon"><i class="fab fa-tiktok"></i></a>
                     </div>
                 </div>
             </div>
             <hr class="bg-light">
             <div class="text-center">
-                <p class="mb-0">&copy; 2024 Fanfare Céleste - Tous droits réservés</p>
+                <p class="mb-0">&copy; 2021 - {{ date('Y') }} Fanfare Céleste - Tous droits réservés</p>
             </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></cript>
     <script>
         AOS.init({
             duration: 800,

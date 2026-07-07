@@ -8,7 +8,6 @@
     <link rel="shortcut icon" href="{{ asset('storage/logo/logo.ico') }}" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -71,7 +70,6 @@
             background: linear-gradient(135deg, #0d1b3e, #1a237e);
             color: white;
             padding: 3rem 0 1rem 0;
-            margin-top: 3rem;
         }
         
         .social-icon {
@@ -189,17 +187,17 @@
                 <div class="mb-4 col-md-4">
                     <h5>Contact Rapide</h5>
                     <p>
-                        <i class="fas fa-phone"></i> +229 97 00 00 00<br>
-                        <i class="fas fa-envelope"></i> contact@fanfareceleste.org<br>
-                        <i class="fab fa-whatsapp"></i> +229 97 00 00 00
+                        <i class="fas fa-phone"></i> +229 01 96 31 07 75<br>
+                        <i class="fas fa-envelope"></i> mariusadoliwossi@gmail.com<br>
+                        <i class="fab fa-whatsapp"></i> +229 01 96 31 07 75
                     </p>
                 </div>
                 <div class="mb-4 col-md-4">
                     <h5>Suivez-nous</h5>
                     <div class="social-icons">
-                        <a href="#" class="text-white social-icon"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.facebook.com/profile.php?id=61553222979542" class="text-white social-icon"><i class="fab fa-facebook"></i></a>
                         <a href="#" class="text-white social-icon"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-white social-icon"><i class="fab fa-youtube"></i></a>
+                        <a href="https://youtube.com/@fanfaretrompettededieu8359?si=48_ttXgC3roPnhzx" class="text-white social-icon"><i class="fab fa-youtube"></i></a>
                         <a href="#" class="text-white social-icon"><i class="fab fa-tiktok"></i></a>
                     </div>
                 </div>
@@ -212,7 +210,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></cript>
     <script>
         AOS.init({
             duration: 800,

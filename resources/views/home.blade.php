@@ -4,13 +4,13 @@
 
 @section('content')
 <!-- Hero Section -->
-<section class="hero-section" style="background: linear-gradient(135deg, #1a237e, #283593); min-height: 100vh; display: flex; align-items: center; position: relative; overflow: hidden;">
-    <div class="container position-relative" style="z-index: 2; padding: 60px 0;">
+<section class="hero-section px-2" style="background: linear-gradient(135deg, #1a237e, #283593); min-height: 100vh; display: flex; align-items: center; position: relative; overflow: hidden;">
+    <div class="container position-relative" style="z-index: 2;">
         <div class="row align-items-center">
             <!-- ===== TEXTE - À GAUCHE ===== -->
-            <div class="order-last col-lg-6 order-lg-first fade-in-up">
+            <div class="order-last col-lg-6 order-lg-first fade-in-up m-0">
                 <div class="mb-3">
-                    <span class="px-3 py-2 badge bg-warning text-dark" style="font-size: 0.9rem;">
+                    <span class="px-3 py-2 mt-2 badge bg-warning text-dark" style="font-size: 0.9rem;">
                         <i class="fas fa-music me-2"></i> Fanfare Céleste
                     </span>
                 </div>
