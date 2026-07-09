@@ -91,7 +91,7 @@
                                 @endphp
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px 15px; font-size: 12px; opacity: 0.8;">
                                     <div><span style="opacity: 0.5;">Instrument :</span> {{ $member->instrument ?? '-' }}</div>
-                                    <div><span style="opacity: 0.5;">Niveau :</span> {{ $member->instrument_level ?? '-' }}</div>
+                                    <div><span style="opacity: 0.5;">Pupitre :</span> {{ $member->instrument_level ?? '-' }}</div>
                                     <div><span style="opacity: 0.5;">Entrée :</span> {{ $member->entry_date ? $member->entry_date->format('d/m/Y') : '-' }}</div>
                                     @if($currentCommitteePosition)
                                         <div><span style="opacity: 0.5;">Poste :</span> {{ $currentCommitteePosition->position_label ?? $currentCommitteePosition->position }}</div>

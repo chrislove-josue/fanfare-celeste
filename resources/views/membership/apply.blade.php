@@ -101,15 +101,14 @@
                                 </div>
 
                                 <div class="col-md-3">
-                                    <label class="form-label" for="instrument_level">Niveau (optionnel)</label>
-                                    <select id="instrument_level" name="instrument_level" class="form-select">
-                                        <option value="">-- Choisir --</option>
-                                        <option value="debutant" @selected(old('instrument_level') === 'debutant')>Débutant</option>
-                                        <option value="intermediaire" @selected(old('instrument_level') === 'intermediaire')>Intermédiaire</option>
-                                        <option value="avance" @selected(old('instrument_level') === 'avance')>Avancé</option>
-                                        <option value="expert" @selected(old('instrument_level') === 'expert')>Expert</option>
-                                    </select>
-                                </div>
+    <label class="form-label" for="instrument_level">Pupitre (optionnel)</label>
+    <select id="instrument_level" name="instrument_level" class="form-select">
+        <option value="">-- Choisir --</option>
+        @foreach(App\Models\Member::getInstrumentLevels() as $val => $label)
+            <option value="{{ $val }}" @selected(old('instrument_level') === $val)>{{ $label }}</option>
+        @endforeach
+    </select>
+</div>
 
                                 <div class="col-md-3">
                                     <label class="form-label" for="section">Section</label>

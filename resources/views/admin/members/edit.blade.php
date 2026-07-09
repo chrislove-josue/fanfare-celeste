@@ -572,14 +572,12 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label class="form-label">Niveau instrument</label>
+                        <label class="form-label">Pupitre</label>
                     <select name="instrument_level" class="form-select @error('instrument_level') is-invalid @enderror">
                         <option value="">-- Sélectionner --</option>
-                        @foreach($instrumentLevels as $key => $label)
-                            <option value="{{ $key }}" {{ old('instrument_level', $member->instrument_level) === $key ? 'selected' : '' }}>
-                                {{ $label }}
-                            </option>
-                        @endforeach
+                        @foreach(App\Models\Member::getInstrumentLevels() as $val => $label)
+            <option value="{{ $val }}" {{ old('instrument_level', $member->instrument_level) === $val ? 'selected' : '' }}>{{ $label }}</option>
+        @endforeach
                     </select>
                     @error('instrument_level')
                         <div class="invalid-feedback">{{ $message }}</div>

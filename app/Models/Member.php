@@ -257,18 +257,28 @@ class Member extends Model
         ];
     }
 
-    /**
-     * Liste des niveaux d'instrument
-     */
-    public static function getInstrumentLevels(): array
-    {
-        return [
-            'debutant' => 'Débutant',
-            'intermediaire' => 'Intermédiaire',
-            'avance' => 'Avancé',
-            'expert' => 'Expert'
-        ];
-    }
+/**
+ * Liste des pupitres disponibles (anciennement niveaux d'instrument)
+ */
+public static function getInstrumentLevels(): array
+{
+    return [
+        'Soprano' => 'Soprano',
+        'Alto' => 'Alto',
+        'Ténor' => 'Ténor',
+        'Basse' => 'Basse'
+    ];
+}
+
+/**
+ * Alias pour plus de clarté
+ */
+public static function getDesks(): array
+{
+    return self::getInstrumentLevels();
+}
+
+
 
     /**
      * Liste des statuts disponibles

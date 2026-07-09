@@ -121,11 +121,11 @@
                         </div>
                     </div>
                     <div class="col-md-6 mt-2">
-                        <div class="d-flex justify-content-between">
-                            <span class="text-muted">Niveau</span>
-                            <span class="fw-semibold">{{ $member->instrument_level ?? '-' }}</span>
-                        </div>
-                    </div>
+    <div class="d-flex justify-content-between">
+        <span class="text-muted">Pupitre</span>
+        <span class="fw-semibold">{{ $member->instrument_level ?? '-' }}</span>
+    </div>
+</div>
                 </div>
             </div>
         </div>

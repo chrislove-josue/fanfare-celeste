@@ -113,14 +113,14 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label">Niveau instrument</label>
-                        <select name="instrument_level" class="form-select">
-                            <option value="">—</option>
-                            @foreach(['debutant'=>'Débutant','intermediaire'=>'Intermédiaire','avance'=>'Avancé','expert'=>'Expert'] as $val => $label)
-                                <option value="{{ $val }}" {{ old('instrument_level') === $val ? 'selected' : '' }}>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+    <label class="form-label">Pupitre</label>
+    <select name="instrument_level" class="form-select">
+        <option value="">—</option>
+        @foreach(App\Models\Member::getInstrumentLevels() as $val => $label)
+            <option value="{{ $val }}" {{ old('instrument_level') === $val ? 'selected' : '' }}>{{ $label }}</option>
+        @endforeach
+    </select>
+</div>
 
                     <div class="col-md-4">
                         <label class="form-label">Rôle section (optionnel)</label>

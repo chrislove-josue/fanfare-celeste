@@ -80,16 +80,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <p><strong>Instrument :</strong> {{ $member->instrument ?? '-' }}</p>
-                            <p><strong>Niveau :</strong> 
-                                @if($member->instrument_level)
-                                    @switch($member->instrument_level)
-                                        @case('debutant') <span class="badge bg-info">Débutant</span> @break
-                                        @case('intermediaire') <span class="badge bg-primary">Intermédiaire</span> @break
-                                        @case('avance') <span class="badge bg-success">Avancé</span> @break
-                                        @case('expert') <span class="badge bg-warning">Expert</span> @break
-                                    @endswitch
-                                @else - @endif
-                            </p>
+                            <p><strong>Pupitre :</strong> {{ $member->instrument_level ?? '-' }}</p>
                         </div>
                         <div class="col-md-6">
                             <p><strong>Section :</strong> {{ $member->section ?? '-' }}</p>
