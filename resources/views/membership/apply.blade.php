@@ -6,24 +6,22 @@
 <section class="py-8">
     <div class="container">
         <div class="row g-4 align-items-stretch">
-           
-
             <div class="">
-                <div class="card shadow-sm" style="border-radius: 15px; border: 1px solid rgba(0,0,0,.05);">
-                    <div class="card-body p-4">
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                            <h2 class="h3 mb-0">Formulaire d’adhésion</h2>
+                <div class="shadow-sm card" style="border-radius: 15px; border: 1px solid rgba(0,0,0,.05);">
+                    <div class="p-4 card-body">
+                        <div class="mb-4 d-flex align-items-center justify-content-between">
+                            <h2 class="mb-0 h3">Formulaire d'adhésion</h2>
                         </div>
 
                         @if(session('success'))
-                            <div class="mb-4 rounded border border-green-300 bg-green-50 p-3 text-green-800">
+                            <div class="p-3 mb-4 text-green-800 border border-green-300 rounded bg-green-50">
                                 {{ session('success') }}
                             </div>
                         @endif
 
                         @if($errors->any())
-                            <div class="mb-4 rounded border border-red-300 bg-red-50 p-3 text-red-800">
-                                <ul class="list-disc pl-5">
+                            <div class="p-3 mb-4 text-red-800 border border-red-300 rounded bg-red-50">
+                                <ul class="pl-5 list-disc">
                                     @foreach($errors->all() as $err)
                                         <li>{{ $err }}</li>
                                     @endforeach
@@ -31,13 +29,13 @@
                             </div>
                         @endif
 
-<form method="POST" action="{{ route('membership.submit') }}" class="mt-2" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('membership.submit') }}" class="mt-2" enctype="multipart/form-data">
                             @csrf
 
                             <div class="row g-3">
-                                {{-- 1) Identité (obligatoire côté contrôleur: name/email) --}}
+                                {{-- 1) Identité --}}
                                 <div class="col-md-6">
-                                    <label class="form-label" for="name">Nom complet</label>
+                                    <label class="form-label" for="name">Nom complet *</label>
                                     <div class="input-group">
                                         <span class="input-group-text" style="background: rgba(26,35,126,.06); border-color: rgba(26,35,126,.15);">
                                             <i class="fas fa-user"></i>
@@ -47,19 +45,19 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label" for="email">Email (optionnel si pas d’email, laissez vide)</label>
+                                    <label class="form-label" for="email">Email *</label>
                                     <div class="input-group">
                                         <span class="input-group-text" style="background: rgba(26,35,126,.06); border-color: rgba(26,35,126,.15);">
                                             <i class="fas fa-envelope"></i>
                                         </span>
-                                        <input id="email" name="email" type="email" class="form-control" value="{{ old('email') }}" placeholder="email@exemple.com">
+                                        <input id="email" name="email" type="email" class="form-control" value="{{ old('email') }}" required placeholder="email@exemple.com">
                                     </div>
-                                    <div class="form-text">Rempli si vous souhaitez recevoir la confirmation par email.</div>
+                                    <div class="form-text">Vous recevrez la confirmation par email.</div>
                                 </div>
 
                                 {{-- 2) Contact --}}
                                 <div class="col-md-6">
-                                    <label class="form-label" for="phone">Téléphone (optionnel)</label>
+                                    <label class="form-label" for="phone">Téléphone</label>
                                     <div class="input-group">
                                         <span class="input-group-text" style="background: rgba(25,135,84,.08); border-color: rgba(25,135,84,.2);">
                                             <i class="fas fa-phone"></i>
@@ -69,13 +67,13 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label" for="whatsapp">WhatsApp (optionnel)</label>
+                                    <label class="form-label" for="whatsapp">WhatsApp</label>
                                     <input id="whatsapp" name="whatsapp" type="text" class="form-control" value="{{ old('whatsapp') }}" placeholder="Ex: +229 01 98 12 33 53">
                                 </div>
 
                                 {{-- 3) Adresse & naissance --}}
                                 <div class="col-md-6">
-                                    <label class="form-label" for="address">Adresse (optionnel)</label>
+                                    <label class="form-label" for="address">Adresse</label>
                                     <input id="address" name="address" type="text" class="form-control" value="{{ old('address') }}" placeholder="Quartier / Ville">
                                 </div>
 
@@ -89,84 +87,86 @@
                                     <input id="birth_place" name="birth_place" type="text" class="form-control" value="{{ old('birth_place') }}" placeholder="Ville / Pays">
                                 </div>
 
-                                {{-- 4) Instrument / section --}}
-                                <div class="col-md-6">
-                                    <label class="form-label" for="instrument">Instrument (optionnel)</label>
-                                    <select id="instrument" name="instrument" class="form-select">
-                                        <option value="">-- Choisir --</option>
-                                        @foreach($instruments as $ins)
-                                            <option value="{{ $ins }}" @selected(old('instrument') === $ins)>{{ $ins }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="col-md-3">
-    <label class="form-label" for="instrument_level">Pupitre (optionnel)</label>
-    <select id="instrument_level" name="instrument_level" class="form-select">
-        <option value="">-- Choisir --</option>
-        @foreach(App\Models\Member::getInstrumentLevels() as $val => $label)
-            <option value="{{ $val }}" @selected(old('instrument_level') === $val)>{{ $label }}</option>
-        @endforeach
-    </select>
-</div>
-
-                                <div class="col-md-3">
+                                {{-- 4) Instrument / Section / Pupitre --}}
+                                <div class="col-md-4">
                                     <label class="form-label" for="section">Section</label>
                                     <select id="section" name="section" class="form-select">
                                         <option value="">-- Choisir --</option>
-                                        @foreach($sections as $sec)
-                                            <option value="{{ $sec }}" @selected(old('section') === $sec)>{{ $sec }}</option>
+                                        @foreach($sections as $key => $label)
+                                            <option value="{{ $key }}" @selected(old('section') === $key)>{{ $label }}</option>
                                         @endforeach
                                     </select>
                                 </div>
 
-                                {{-- 5) Contacts d’urgence --}}
+                                <div class="col-md-4">
+                                    <label class="form-label" for="instrument">Instrument</label>
+                                    <select id="instrument" name="instrument" class="form-select">
+                                        <option value="">-- Choisir --</option>
+                                        @foreach($instruments as $key => $label)
+                                            <option value="{{ $key }}" @selected(old('instrument') === $key)>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label" for="instrument_level">Pupitre</label>
+                                    <select id="instrument_level" name="instrument_level" class="form-select">
+                                        <option value="">-- Choisir --</option>
+                                        @foreach($pupitres as $key => $label)
+                                            <option value="{{ $key }}" @selected(old('instrument_level') === $key)>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                {{-- 5) Contacts d'urgence --}}
                                 <div class="col-md-6">
-                                    <label class="form-label" for="emergency_contact_name">Contact d’urgence (nom)</label>
+                                    <label class="form-label" for="emergency_contact_name">Contact d'urgence (nom)</label>
                                     <input id="emergency_contact_name" name="emergency_contact_name" type="text" class="form-control" value="{{ old('emergency_contact_name') }}" placeholder="Nom et prénom">
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label" for="emergency_contact_phone">Contact d’urgence (téléphone)</label>
+                                    <label class="form-label" for="emergency_contact_phone">Contact d'urgence (téléphone)</label>
                                     <input id="emergency_contact_phone" name="emergency_contact_phone" type="text" class="form-control" value="{{ old('emergency_contact_phone') }}" placeholder="Ex: +229 ...">
                                 </div>
 
                                 {{-- 6) Santé & compétences --}}
                                 <div class="col-md-6">
-                                    <label class="form-label" for="medical_notes">Notes médicales (optionnel)</label>
+                                    <label class="form-label" for="medical_notes">Notes médicales</label>
                                     <textarea id="medical_notes" name="medical_notes" class="form-control" rows="3" style="resize: vertical;">{{ old('medical_notes') }}</textarea>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label" for="skills">Compétences / notes (optionnel)</label>
+                                    <label class="form-label" for="skills">Compétences / notes</label>
                                     <textarea id="skills" name="skills" class="form-control" rows="3" style="resize: vertical;">{{ old('skills') }}</textarea>
                                 </div>
 
                                 {{-- 7) Pièces jointes --}}
                                 <div class="col-md-6">
-                                    <label class="form-label" for="photo">Photo (optionnel)</label>
+                                    <label class="form-label" for="photo">Photo</label>
                                     <input id="photo" name="photo" type="file" class="form-control" accept="image/*">
+                                    <div class="form-text">Format : JPG, PNG, WebP | Taille max : 2MB</div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label" for="id_document">Pièce d’identité (optionnel)</label>
+                                    <label class="form-label" for="id_document">Pièce d'identité</label>
                                     <input id="id_document" name="id_document" type="file" class="form-control" accept="image/*,.pdf">
+                                    <div class="form-text">Format : JPG, PNG, PDF | Taille max : 5MB</div>
                                 </div>
 
                                 {{-- 8) Message --}}
                                 <div class="col-12">
-                                    <label class="form-label" for="message">Message</label>
+                                    <label class="form-label" for="message">Message *</label>
                                     <textarea id="message" name="message" class="form-control" rows="5" required style="resize: vertical;">{{ old('message') }}</textarea>
                                     <div class="form-text">Expliquez brièvement pourquoi vous souhaitez adhérer.</div>
                                 </div>
                             </div>
 
-                            <div class="d-flex align-items-center justify-content-between mt-4">
+                            <div class="mt-4 d-flex align-items-center justify-content-between">
                                 <div class="text-muted small">
                                     <i class="fas fa-lock me-2"></i>
                                     Vos informations restent confidentielles.
                                 </div>
-                                <button type="submit" class="btn btn-primary px-4" style="border-radius: 12px;">
+                                <button type="submit" class="px-4 btn btn-primary" style="border-radius: 12px;">
                                     <i class="fas fa-paper-plane me-2"></i>Envoyer
                                 </button>
                             </div>
@@ -178,4 +178,3 @@
     </div>
 </section>
 @endsection
-
