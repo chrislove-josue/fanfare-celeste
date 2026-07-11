@@ -44,7 +44,6 @@ class MembershipController extends Controller
             'emergency_contact_phone' => 'nullable|string|max:20',
             'medical_notes' => 'nullable|string',
             'skills' => 'nullable|string',
-            'message' => 'nullable|string',
             'photo' => 'nullable|image|max:2048',
             'id_document' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,pdf,webp',
         ]);
@@ -75,7 +74,6 @@ class MembershipController extends Controller
             'emergency_contact_phone' => $validated['emergency_contact_phone'] ?? null,
             'medical_notes' => $validated['medical_notes'] ?? null,
             'skills' => $validated['skills'] ?? null,
-            'notes' => $validated['message'] ?? null,
             'status' => 'pending',
             'entry_date' => now(),
             'section_role' => null,

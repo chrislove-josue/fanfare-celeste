@@ -791,13 +791,6 @@
                     @enderror
                 </div>
 
-                <div class="col-md-12">
-                    <label class="form-label">Notes (Admin)</label>
-                    <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="3">{{ old('notes', $member->notes) }}</textarea>
-                    @error('notes')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
             </div>
         </div>
 

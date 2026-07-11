@@ -143,7 +143,6 @@ class MemberController extends Controller
             'emergency_contact_phone' => 'nullable|string|max:20',
             'medical_notes' => 'nullable|string',
             'skills' => 'nullable|string',
-            'notes' => 'nullable|string',
             'status' => 'nullable|in:active,pending,inactive,suspended,withdrawn,deceased,training',
         ]);
 

@@ -348,12 +348,6 @@
                 </div>
             @endif
             
-            @if($member->notes)
-                <div>
-                    <span class="label d-block mb-2">Notes</span>
-                    <p class="mb-0 p-2 bg-light rounded">{{ $member->notes }}</p>
-                </div>
-            @endif
         </div>
         
         <!-- Documents -->

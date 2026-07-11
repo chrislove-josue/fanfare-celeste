@@ -153,12 +153,6 @@
                                     <div class="form-text">Format : JPG, PNG, PDF | Taille max : 5MB</div>
                                 </div>
 
-                                {{-- 8) Message --}}
-                                <div class="col-12">
-                                    <label class="form-label" for="message">Message *</label>
-                                    <textarea id="message" name="message" class="form-control" rows="5"  style="resize: vertical;">{{ old('message') }}</textarea>
-                                    <div class="form-text">Expliquez brièvement pourquoi vous souhaitez adhérer.</div>
-                                </div>
                             </div>
 
                             <div class="mt-4 d-flex align-items-center justify-content-between">

@@ -154,10 +154,6 @@
                         <textarea name="skills" class="form-control" rows="3">{{ old('skills') }}</textarea>
                     </div>
 
-                    <div class="col-md-12">
-                        <label class="form-label">Notes (Admin)</label>
-                        <textarea name="notes" class="form-control" rows="3">{{ old('notes') }}</textarea>
-                    </div>
                 </div>
 
                 <div class="d-flex justify-content-end mt-4">

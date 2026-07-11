@@ -17,7 +17,7 @@ class Member extends Model
         'address', 'birth_date', 'birth_place', 'instrument', 'instrument_level',
         'entry_date', 'section', 'section_role', 'photo', 'status', 'id_document',
         'emergency_contact_name', 'emergency_contact_phone', 'medical_notes',
-        'skills', 'notes', 'adhesion_letter'
+        'skills', 'adhesion_letter'
     ];
 
     protected $casts = [
