@@ -17,7 +17,7 @@ class Member extends Model
         'address', 'birth_date', 'birth_place', 'instrument', 'instrument_level',
         'entry_date', 'section', 'section_role', 'photo', 'status', 'id_document',
         'emergency_contact_name', 'emergency_contact_phone', 'medical_notes',
-        'skills', 'notes'
+        'skills', 'notes', 'adhesion_letter'
     ];
 
     protected $casts = [
@@ -233,7 +233,6 @@ class Member extends Model
             'Percussions' => 'Percussions',
             'Cuivre' => 'Cuivre',
             'Batterie' => 'Batterie',
-
         ];
     }
 
@@ -257,28 +256,26 @@ class Member extends Model
         ];
     }
 
-/**
- * Liste des pupitres disponibles (anciennement niveaux d'instrument)
- */
-public static function getInstrumentLevels(): array
-{
-    return [
-        'Soprano' => 'Soprano',
-        'Alto' => 'Alto',
-        'Ténor' => 'Ténor',
-        'Basse' => 'Basse'
-    ];
-}
+    /**
+     * Liste des pupitres disponibles (anciennement niveaux d'instrument)
+     */
+    public static function getInstrumentLevels(): array
+    {
+        return [
+            'Soprano' => 'Soprano',
+            'Alto' => 'Alto',
+            'Ténor' => 'Ténor',
+            'Basse' => 'Basse'
+        ];
+    }
 
-/**
- * Alias pour plus de clarté
- */
-public static function getDesks(): array
-{
-    return self::getInstrumentLevels();
-}
-
-
+    /**
+     * Alias pour plus de clarté
+     */
+    public static function getDesks(): array
+    {
+        return self::getInstrumentLevels();
+    }
 
     /**
      * Liste des statuts disponibles
@@ -288,7 +285,6 @@ public static function getDesks(): array
         return [
             'active' => 'Actif',
             'pending' => 'En attente',
-            // 'inactive' volontairement retiré : on ne veut plus l'afficher dans les choix
             'suspended' => 'Suspendu',
             'withdrawn' => 'Retiré',
             'deceased' => 'Décédé',
@@ -296,6 +292,16 @@ public static function getDesks(): array
         ];
     }
 
+    /**
+     * Générer un email par défaut à partir du prénom et nom
+     */
+    public static function generateDefaultEmail(string $firstName, string $lastName): string
+    {
+        $email = strtolower(trim($firstName) . '.' . trim($lastName) . '@example.com');
+        // Remplacer les espaces et caractères spéciaux
+        $email = preg_replace('/[^a-zA-Z0-9.@]/', '', $email);
+        return $email;
+    }
 
     /**
      * Générer le numéro de membre au format FCTDA-XXX

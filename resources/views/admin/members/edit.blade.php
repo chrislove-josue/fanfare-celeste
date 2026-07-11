@@ -572,12 +572,12 @@
                 </div>
 
                 <div class="col-md-4">
-                        <label class="form-label">Pupitre</label>
+                    <label class="form-label">Pupitre</label>
                     <select name="instrument_level" class="form-select @error('instrument_level') is-invalid @enderror">
                         <option value="">-- Sélectionner --</option>
                         @foreach(App\Models\Member::getInstrumentLevels() as $val => $label)
-            <option value="{{ $val }}" {{ old('instrument_level', $member->instrument_level) === $val ? 'selected' : '' }}>{{ $label }}</option>
-        @endforeach
+                            <option value="{{ $val }}" {{ old('instrument_level', $member->instrument_level) === $val ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
                     </select>
                     @error('instrument_level')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -604,14 +604,19 @@
             </div>
         </div>
 
-        <!-- SECTION 3 : DOCUMENT D'IDENTITÉ -->
+        <!-- SECTION 3 : DOCUMENTS -->
         <div class="form-section">
             <div class="section-title">
-                <i class="fas fa-id-card"></i>
-                Document d'identité
+                <i class="fas fa-folder-open"></i>
+                Documents
             </div>
             <div class="row g-3">
-                <div class="col-md-12">
+                <!-- Document d'identité -->
+                <div class="col-md-6">
+                    <label class="form-label">
+                        <i class="fas fa-id-card text-primary me-1"></i>
+                        Pièce d'identité
+                    </label>
                     @if($member->id_document)
                         @php
                             $filePath = storage_path('app/public/' . $member->id_document);
@@ -624,26 +629,16 @@
                             $fileName = basename($member->id_document);
                         @endphp
                         
-                        <div class="document-preview-container has-document mb-3">
+                        <div class="document-preview-container has-document mb-2">
                             @if($isImage && $fileExists)
-                                <img src="{{ $documentPath }}" 
-                                     alt="Document d'identité" 
-                                     class="document-preview">
+                                <img src="{{ $documentPath }}" alt="Document" class="document-preview">
                             @else
                                 <div class="document-icon">
                                     <i class="fas fa-file-{{ $extension === 'pdf' ? 'pdf' : 'alt' }} text-{{ $extension === 'pdf' ? 'danger' : 'primary' }}"></i>
                                 </div>
                             @endif
-                            
-                            <div class="document-name">
-                                <i class="fas fa-file me-1"></i>
-                                {{ $fileName }}
-                            </div>
-                            <div class="document-size">
-                                <i class="fas fa-weight-hanging me-1"></i>
-                                {{ $fileSizeFormatted }}
-                            </div>
-                            
+                            <div class="document-name">{{ $fileName }}</div>
+                            <div class="document-size">{{ $fileSizeFormatted }}</div>
                             <div class="document-actions">
                                 <button type="button" class="btn btn-info btn-sm" onclick="viewDocumentModal('{{ $documentPath }}', '{{ $member->full_name }}', '{{ $member->member_number }}', '{{ $fileName }}')">
                                     <i class="fas fa-eye me-1"></i> Voir
@@ -651,31 +646,20 @@
                             </div>
                         </div>
                         
-                        <div class="form-check mb-3">
+                        <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" name="remove_document" id="removeDocument" value="1">
                             <label class="form-check-label text-danger" for="removeDocument">
-                                <i class="fas fa-trash me-1"></i> Supprimer le document actuel
+                                <i class="fas fa-trash me-1"></i> Supprimer
                             </label>
                         </div>
                     @endif
                     
                     <div class="upload-area" id="uploadArea">
-                        <div class="upload-icon">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                        </div>
-                        <div class="upload-text">
-                            {{ $member->id_document ? 'Cliquez pour remplacer le document' : 'Cliquez ou glissez-déposez pour ajouter un document' }}
-                        </div>
-                        <div class="upload-hint">
-                            Formats acceptés : JPG, PNG, PDF, WebP | Taille max : 5MB
-                        </div>
+                        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <div class="upload-text">{{ $member->id_document ? 'Remplacer' : 'Ajouter' }}</div>
+                        <div class="upload-hint">JPG, PNG, PDF, WebP | 5MB max</div>
                     </div>
-                    <input type="file" name="id_document" id="id_document" 
-                           class="form-control @error('id_document') is-invalid @enderror" 
-                           accept=".jpg,.jpeg,.png,.pdf,.webp" style="display: none;">
-                    @error('id_document')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <input type="file" name="id_document" id="id_document" class="form-control" accept=".jpg,.jpeg,.png,.pdf,.webp" style="display: none;">
                     
                     <div id="selectedFileInfo" style="display: none;" class="mt-2">
                         <div class="file-info">
@@ -686,6 +670,76 @@
                             <span>
                                 <span class="file-size" id="selectedFileSize"></span>
                                 <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="clearSelectedFile()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lettre d'adhésion -->
+                <div class="col-md-6">
+                    <label class="form-label">
+                        <i class="fas fa-file-signature text-success me-1"></i>
+                        Lettre d'adhésion
+                    </label>
+                    @if($member->adhesion_letter)
+                        @php
+                            $letterPath = storage_path('app/public/' . $member->adhesion_letter);
+                            $letterExists = file_exists($letterPath);
+                            $letterSize = $letterExists ? filesize($letterPath) : 0;
+                            $letterSizeFormatted = $letterSize > 0 ? number_format($letterSize / 1024, 1) . ' KB' : 'N/A';
+                            $letterExtension = pathinfo($member->adhesion_letter, PATHINFO_EXTENSION);
+                            $letterPathUrl = asset('storage/' . $member->adhesion_letter);
+                            $letterName = basename($member->adhesion_letter);
+                        @endphp
+                        
+                        <div class="document-preview-container has-document mb-2">
+                            <div class="document-icon">
+                                @if(strtolower($letterExtension) === 'pdf')
+                                    <i class="fas fa-file-pdf text-danger"></i>
+                                @elseif(in_array(strtolower($letterExtension), ['doc', 'docx']))
+                                    <i class="fas fa-file-word text-primary"></i>
+                                @else
+                                    <i class="fas fa-file-alt text-success"></i>
+                                @endif
+                            </div>
+                            <div class="document-name">{{ $letterName }}</div>
+                            <div class="document-size">{{ $letterSizeFormatted }}</div>
+                            <div class="document-actions">
+                                <button type="button" class="btn btn-info btn-sm" onclick="viewDocumentModal('{{ $letterPathUrl }}', '{{ $member->full_name }}', '{{ $member->member_number }}', '{{ $letterName }}')">
+                                    <i class="fas fa-eye me-1"></i> Voir
+                                </button>
+                                <a href="{{ $letterPathUrl }}" download class="btn btn-primary btn-sm">
+                                    <i class="fas fa-download me-1"></i> Télécharger
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="remove_adhesion_letter" id="removeAdhesionLetter" value="1">
+                            <label class="form-check-label text-danger" for="removeAdhesionLetter">
+                                <i class="fas fa-trash me-1"></i> Supprimer
+                            </label>
+                        </div>
+                    @endif
+                    
+                    <div class="upload-area" id="uploadAdhesionArea">
+                        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <div class="upload-text">{{ $member->adhesion_letter ? 'Remplacer la lettre' : 'Ajouter la lettre d\'adhésion' }}</div>
+                        <div class="upload-hint">PDF, DOC, DOCX, TXT, RTF | 5MB max</div>
+                    </div>
+                    <input type="file" name="adhesion_letter" id="adhesion_letter" class="form-control" accept=".pdf,.doc,.docx,.txt,.rtf" style="display: none;">
+                    
+                    <div id="selectedAdhesionFileInfo" style="display: none;" class="mt-2">
+                        <div class="file-info">
+                            <span>
+                                <i class="fas fa-file me-2 text-primary"></i>
+                                <span class="file-name" id="selectedAdhesionFileName"></span>
+                            </span>
+                            <span>
+                                <span class="file-size" id="selectedAdhesionFileSize"></span>
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="clearSelectedAdhesionFile()">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </span>
@@ -1212,6 +1266,131 @@
     }
 
     // ==========================================
+    // GESTION DE LA LETTRE D'ADHÉSION (UPLOAD)
+    // ==========================================
+
+    function initAdhesionUploadArea() {
+        const uploadArea = document.getElementById('uploadAdhesionArea');
+        const fileInput = document.getElementById('adhesion_letter');
+        
+        if (uploadArea && fileInput) {
+            uploadArea.addEventListener('click', function(e) {
+                e.preventDefault();
+                fileInput.click();
+            });
+            
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    if (validateAdhesionFile(file)) {
+                        fileInput.files = e.dataTransfer.files;
+                        handleAdhesionFileSelect(file);
+                    }
+                }
+            });
+            
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    const file = this.files[0];
+                    if (validateAdhesionFile(file)) {
+                        handleAdhesionFileSelect(file);
+                    } else {
+                        this.value = '';
+                    }
+                }
+            });
+        }
+    }
+
+    function validateAdhesionFile(file) {
+        const maxSize = 5 * 1024 * 1024;
+        const validExtensions = ['pdf', 'doc', 'docx', 'txt', 'rtf'];
+        const extension = file.name.split('.').pop().toLowerCase();
+        
+        if (!validExtensions.includes(extension)) {
+            alert('❌ Format de fichier non supporté. Utilisez PDF, DOC, DOCX, TXT ou RTF.');
+            return false;
+        }
+        
+        if (file.size > maxSize) {
+            alert('❌ Le fichier est trop volumineux. Taille max : 5MB.');
+            return false;
+        }
+        
+        return true;
+    }
+
+    function handleAdhesionFileSelect(file) {
+        const fileInfo = document.getElementById('selectedAdhesionFileInfo');
+        const fileName = document.getElementById('selectedAdhesionFileName');
+        const fileSize = document.getElementById('selectedAdhesionFileSize');
+        
+        if (fileInfo) {
+            fileInfo.style.display = 'block';
+            fileName.textContent = file.name;
+            fileSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+        }
+        
+        const uploadArea = document.getElementById('uploadAdhesionArea');
+        if (uploadArea) {
+            const extension = file.name.split('.').pop().toLowerCase();
+            let icon = 'fa-file-alt text-success';
+            if (extension === 'pdf') {
+                icon = 'fa-file-pdf text-danger';
+            } else if (['doc', 'docx'].includes(extension)) {
+                icon = 'fa-file-word text-primary';
+            }
+            
+            uploadArea.innerHTML = `
+                <div class="upload-icon">
+                    <i class="fas ${icon}"></i>
+                </div>
+                <div class="upload-text">${file.name}</div>
+                <div class="upload-hint">${(file.size / 1024).toFixed(1)} KB</div>
+            `;
+        }
+    }
+
+    function clearSelectedAdhesionFile() {
+        const fileInput = document.getElementById('adhesion_letter');
+        const fileInfo = document.getElementById('selectedAdhesionFileInfo');
+        
+        if (fileInput) {
+            fileInput.value = '';
+        }
+        if (fileInfo) {
+            fileInfo.style.display = 'none';
+        }
+        
+        const uploadArea = document.getElementById('uploadAdhesionArea');
+        if (uploadArea) {
+            const hasDocument = {{ $member->adhesion_letter ? 'true' : 'false' }};
+            const text = hasDocument ? 'Cliquez pour remplacer la lettre' : 'Cliquez ou glissez-déposez pour ajouter la lettre d\'adhésion';
+            
+            uploadArea.innerHTML = `
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="upload-text">${text}</div>
+                <div class="upload-hint">PDF, DOC, DOCX, TXT, RTF | 5MB max</div>
+            `;
+        }
+    }
+
+    // ==========================================
     // GESTION DES MOTS DE PASSE
     // ==========================================
     
@@ -1265,6 +1444,7 @@
     
     document.addEventListener('DOMContentLoaded', function() {
         initUploadArea();
+        initAdhesionUploadArea();
         
         document.querySelectorAll('[id^="createUserModal"]').forEach(function(modal) {
             modal.addEventListener('shown.bs.modal', function() {

@@ -35,8 +35,14 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label">Document d’identité (optionnel)</label>
+                        <label class="form-label">Document d'identité (optionnel)</label>
                         <input type="file" name="id_document" class="form-control" accept="image/*,.pdf">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Lettre d'adhésion (optionnel)</label>
+                        <input type="file" name="adhesion_letter" class="form-control" accept=".pdf,.doc,.docx,.txt,.rtf">
+                        <div class="form-text">Formats : PDF, DOC, DOCX, TXT, RTF | Taille max : 5MB</div>
                     </div>
 
                     <div class="col-md-4">
@@ -59,7 +65,8 @@
 
                     <div class="col-md-6">
                         <label class="form-label">Email</label>
-                        <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
+                        <input type="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="laissez vide pour générer automatiquement">
+                        <div class="form-text">Laissez vide pour générer automatiquement : prenom.nom@example.com</div>
                     </div>
 
                     <div class="col-md-6">
@@ -88,7 +95,7 @@
                     </div>
 
                     <div class="col-md-3">
-                        <label class="form-label">Date d’entrée</label>
+                        <label class="form-label">Date d'entrée</label>
                         <input type="date" name="entry_date" class="form-control" value="{{ old('entry_date', date('Y-m-d')) }}" required>
                     </div>
 
@@ -113,14 +120,14 @@
                     </div>
 
                     <div class="col-md-4">
-    <label class="form-label">Pupitre</label>
-    <select name="instrument_level" class="form-select">
-        <option value="">—</option>
-        @foreach(App\Models\Member::getInstrumentLevels() as $val => $label)
-            <option value="{{ $val }}" {{ old('instrument_level') === $val ? 'selected' : '' }}>{{ $label }}</option>
-        @endforeach
-    </select>
-</div>
+                        <label class="form-label">Pupitre</label>
+                        <select name="instrument_level" class="form-select">
+                            <option value="">—</option>
+                            @foreach($instrumentLevels as $val => $label)
+                                <option value="{{ $val }}" {{ old('instrument_level') === $val ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
                     <div class="col-md-4">
                         <label class="form-label">Rôle section (optionnel)</label>
@@ -128,12 +135,12 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">Contact d’urgence (nom)</label>
+                        <label class="form-label">Contact d'urgence (nom)</label>
                         <input type="text" name="emergency_contact_name" class="form-control" value="{{ old('emergency_contact_name') }}">
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">Contact d’urgence (téléphone)</label>
+                        <label class="form-label">Contact d'urgence (téléphone)</label>
                         <input type="text" name="emergency_contact_phone" class="form-control" value="{{ old('emergency_contact_phone') }}">
                     </div>
 
@@ -163,4 +170,3 @@
     </div>
 </div>
 @endsection
-

@@ -17,10 +17,9 @@ class MembershipController extends Controller
      */
     public function applyForm()
     {
-        // Utiliser les méthodes statiques du modèle Member
         $sections = Member::getSections();
         $instruments = Member::getInstruments();
-        $pupitres = Member::getInstrumentLevels(); // ou Member::getDesks()
+        $pupitres = Member::getInstrumentLevels();
         
         return view('membership.apply', compact('sections', 'instruments', 'pupitres'));
     }
@@ -30,10 +29,9 @@ class MembershipController extends Controller
      */
     public function submitApplication(Request $request)
     {
-        // Validation avec les nouvelles valeurs
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:members,email',
+            'email' => 'nullable|email|unique:members,email',
             'phone' => 'nullable|string|max:20',
             'whatsapp' => 'nullable|string|max:20',
             'address' => 'nullable|string',
@@ -56,12 +54,15 @@ class MembershipController extends Controller
         $firstName = $parts[0] ?? '';
         $lastName = (count($parts) > 1) ? end($parts) : ($parts[0] ?? '');
 
+        // Générer un email par défaut si non fourni
+        $email = $validated['email'] ?? Member::generateDefaultEmail($firstName, $lastName);
+
         // Préparer les données pour la création
         $memberData = [
             'member_number' => Member::generateMemberNumber(),
             'first_name' => $firstName,
             'last_name' => $lastName,
-            'email' => $validated['email'],
+            'email' => $email,
             'phone' => $validated['phone'] ?? null,
             'whatsapp' => $validated['whatsapp'] ?? null,
             'address' => $validated['address'] ?? null,

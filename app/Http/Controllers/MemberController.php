@@ -125,7 +125,7 @@ class MemberController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:members,email',
+            'email' => 'nullable|email|unique:members,email',
             'phone' => 'required|string|max:20',
             'whatsapp' => 'nullable|string|max:20',
             'address' => 'nullable|string',
@@ -138,6 +138,7 @@ class MemberController extends Controller
             'section_role' => 'nullable|string|max:100',
             'photo' => 'nullable|image|max:2048',
             'id_document' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,pdf,webp',
+            'adhesion_letter' => 'nullable|file|max:5120|mimes:pdf,doc,docx,txt,rtf',
             'emergency_contact_name' => 'nullable|string|max:255',
             'emergency_contact_phone' => 'nullable|string|max:20',
             'medical_notes' => 'nullable|string',
@@ -153,6 +154,11 @@ class MemberController extends Controller
             $validated['member_number'] = Member::generateMemberNumber();
             $validated['status'] = $request->status ?? 'pending';
 
+            // Générer un email par défaut si non fourni
+            if (empty($validated['email'])) {
+                $validated['email'] = Member::generateDefaultEmail($validated['first_name'], $validated['last_name']);
+            }
+
             // ==========================================
             // GESTION DE LA PHOTO
             // ==========================================
@@ -167,6 +173,14 @@ class MemberController extends Controller
             if ($request->hasFile('id_document')) {
                 $this->ensureDirectoryExists('members/documents');
                 $validated['id_document'] = $request->file('id_document')->store('members/documents', 'public');
+            }
+
+            // ==========================================
+            // GESTION DE LA LETTRE D'ADHÉSION
+            // ==========================================
+            if ($request->hasFile('adhesion_letter')) {
+                $this->ensureDirectoryExists('members/letters');
+                $validated['adhesion_letter'] = $request->file('adhesion_letter')->store('members/letters', 'public');
             }
 
             // Créer le membre
@@ -268,7 +282,7 @@ class MemberController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:members,email,' . $member->id,
+            'email' => 'nullable|email|unique:members,email,' . $member->id,
             'phone' => 'required|string|max:20',
             'whatsapp' => 'nullable|string|max:20',
             'address' => 'nullable|string',
@@ -286,11 +300,17 @@ class MemberController extends Controller
             'skills' => 'nullable|string',
             'notes' => 'nullable|string',
             'photo' => 'nullable|image|max:2048',
+            'adhesion_letter' => 'nullable|file|max:5120|mimes:pdf,doc,docx,txt,rtf',
         ]);
 
         DB::beginTransaction();
         
         try {
+            // Générer un email par défaut si non fourni
+            if (empty($validated['email'])) {
+                $validated['email'] = Member::generateDefaultEmail($validated['first_name'], $validated['last_name']);
+            }
+
             // ==========================================
             // GESTION DE LA PHOTO
             // ==========================================
@@ -339,6 +359,43 @@ class MemberController extends Controller
                 $validated['id_document'] = $file->store('members/documents', 'public');
             }
 
+            // ==========================================
+            // GESTION DE LA LETTRE D'ADHÉSION
+            // ==========================================
+            
+            // Suppression de la lettre
+            if ($request->has('remove_adhesion_letter') && $request->remove_adhesion_letter == '1') {
+                if ($member->adhesion_letter && Storage::disk('public')->exists($member->adhesion_letter)) {
+                    Storage::disk('public')->delete($member->adhesion_letter);
+                }
+                $validated['adhesion_letter'] = null;
+            }
+            
+            // Upload d'une nouvelle lettre
+            if ($request->hasFile('adhesion_letter')) {
+                $file = $request->file('adhesion_letter');
+                $maxSize = 5 * 1024 * 1024;
+                $allowedTypes = ['pdf', 'doc', 'docx', 'txt', 'rtf'];
+                $extension = strtolower($file->getClientOriginalExtension());
+                
+                if (!in_array($extension, $allowedTypes)) {
+                    throw new \Exception('Format de fichier non supporté. Utilisez PDF, DOC, DOCX, TXT ou RTF.');
+                }
+                
+                if ($file->getSize() > $maxSize) {
+                    throw new \Exception('Le fichier est trop volumineux. Taille max : 5MB.');
+                }
+                
+                // Supprimer l'ancienne lettre
+                if ($member->adhesion_letter && Storage::disk('public')->exists($member->adhesion_letter)) {
+                    Storage::disk('public')->delete($member->adhesion_letter);
+                }
+                
+                // Créer le dossier et stocker
+                $this->ensureDirectoryExists('members/letters');
+                $validated['adhesion_letter'] = $file->store('members/letters', 'public');
+            }
+
             // Mettre à jour le membre
             $member->update($validated);
 
@@ -379,6 +436,9 @@ class MemberController extends Controller
             }
             if ($member->id_document && Storage::disk('public')->exists($member->id_document)) {
                 Storage::disk('public')->delete($member->id_document);
+            }
+            if ($member->adhesion_letter && Storage::disk('public')->exists($member->adhesion_letter)) {
+                Storage::disk('public')->delete($member->adhesion_letter);
             }
             
             if ($member->user) {
@@ -442,8 +502,6 @@ class MemberController extends Controller
         $qrCode = $member->memberCardQrCode;
         
         $pdf = Pdf::loadView('admin.members.card', compact('member', 'qrCode'));
-        // Format explicite en points (105mm x 148mm), évite toute ambiguïté
-        // de conversion avec le format nommé 'a6'
         $pdf->setPaper([0, 0, 297.64, 419.53]);
         
         return $pdf->download('carte_membre_' . $member->member_number . '.pdf');

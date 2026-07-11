@@ -45,14 +45,14 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label" for="email">Email *</label>
+                                    <label class="form-label" for="email">Email</label>
                                     <div class="input-group">
                                         <span class="input-group-text" style="background: rgba(26,35,126,.06); border-color: rgba(26,35,126,.15);">
                                             <i class="fas fa-envelope"></i>
                                         </span>
-                                        <input id="email" name="email" type="email" class="form-control" value="{{ old('email') }}" required placeholder="email@exemple.com">
+                                        <input id="email" name="email" type="email" class="form-control" value="{{ old('email') }}" placeholder="email@exemple.com">
                                     </div>
-                                    <div class="form-text">Vous recevrez la confirmation par email.</div>
+                                    <div class="form-text">Laissez vide pour générer automatiquement : prenom.nom@example.com</div>
                                 </div>
 
                                 {{-- 2) Contact --}}
@@ -156,7 +156,7 @@
                                 {{-- 8) Message --}}
                                 <div class="col-12">
                                     <label class="form-label" for="message">Message *</label>
-                                    <textarea id="message" name="message" class="form-control" rows="5" required style="resize: vertical;">{{ old('message') }}</textarea>
+                                    <textarea id="message" name="message" class="form-control" rows="5"  style="resize: vertical;">{{ old('message') }}</textarea>
                                     <div class="form-text">Expliquez brièvement pourquoi vous souhaitez adhérer.</div>
                                 </div>
                             </div>
