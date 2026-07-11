@@ -30,53 +30,60 @@ class MembershipController extends Controller
     public function submitApplication(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'nullable|email|unique:members,email',
             'phone' => 'nullable|string|max:20',
             'whatsapp' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
+            'paroisse' => 'required|string|max:255',
+            'sous_region' => 'nullable|string|max:255',
             'birth_date' => 'nullable|date',
             'birth_place' => 'nullable|string|max:255',
-            'section' => 'nullable|string|in:' . implode(',', array_keys(Member::getSections())),
-            'instrument' => 'nullable|string|in:' . implode(',', array_keys(Member::getInstruments())),
+            'section' => 'required|string|in:' . implode(',', array_keys(Member::getSections())),
+            'instrument' => 'required|string|in:' . implode(',', array_keys(Member::getInstruments())),
             'instrument_level' => 'nullable|string|in:' . implode(',', array_keys(Member::getInstrumentLevels())),
+            'skills' => 'required|string',
             'emergency_contact_name' => 'nullable|string|max:255',
             'emergency_contact_phone' => 'nullable|string|max:20',
             'medical_notes' => 'nullable|string',
-            'skills' => 'nullable|string',
             'photo' => 'nullable|image|max:2048',
             'id_document' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,pdf,webp',
+            'adhesion_letter' => 'nullable|file|max:5120|mimes:pdf,doc,docx,txt,rtf',
+            'engagement' => 'required|accepted',
         ]);
 
-        // Traiter le nom complet
-        $parts = preg_split('/\s+/', trim($validated['name']));
-        $firstName = $parts[0] ?? '';
-        $lastName = (count($parts) > 1) ? end($parts) : ($parts[0] ?? '');
+        // Si l'email n'est pas fourni, le générer automatiquement
+        if (empty($validated['email'])) {
+            $validated['email'] = Member::generateDefaultEmail($validated['first_name'], $validated['last_name']);
+        }
 
-        // Générer un email par défaut si non fourni
-        $email = $validated['email'] ?? Member::generateDefaultEmail($firstName, $lastName);
+        // Combiner Paroisse et Sous-Région dans le champ address
+        $address = $validated['paroisse'];
+        if (!empty($validated['sous_region'])) {
+            $address .= ' | ' . $validated['sous_region'];
+        }
 
-        // Préparer les données pour la création
+        // Préparer les données
         $memberData = [
             'member_number' => Member::generateMemberNumber(),
-            'first_name' => $firstName,
-            'last_name' => $lastName,
-            'email' => $email,
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
+            'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
             'whatsapp' => $validated['whatsapp'] ?? null,
-            'address' => $validated['address'] ?? null,
+            'address' => $address,
             'birth_date' => $validated['birth_date'] ?? null,
             'birth_place' => $validated['birth_place'] ?? null,
             'section' => $validated['section'] ?? null,
             'instrument' => $validated['instrument'] ?? null,
             'instrument_level' => $validated['instrument_level'] ?? null,
+            'section_role' => null,
             'emergency_contact_name' => $validated['emergency_contact_name'] ?? null,
             'emergency_contact_phone' => $validated['emergency_contact_phone'] ?? null,
             'medical_notes' => $validated['medical_notes'] ?? null,
             'skills' => $validated['skills'] ?? null,
             'status' => 'pending',
             'entry_date' => now(),
-            'section_role' => null,
         ];
 
         // Gestion de la photo
@@ -89,6 +96,11 @@ class MembershipController extends Controller
             $memberData['id_document'] = $request->file('id_document')->store('members/documents', 'public');
         }
 
+        // Gestion de la lettre d'adhésion
+        if ($request->hasFile('adhesion_letter')) {
+            $memberData['adhesion_letter'] = $request->file('adhesion_letter')->store('members/letters', 'public');
+        }
+
         // Créer le membre
         $member = Member::create($memberData);
 
@@ -99,14 +111,18 @@ class MembershipController extends Controller
                 $payload = [
                     'event' => 'new_member',
                     'member_number' => $member->member_number,
-                    'name' => $member->full_name,
+                    'first_name' => $member->first_name,
+                    'last_name' => $member->last_name,
+                    'full_name' => $member->full_name,
                     'email' => $member->email,
                     'phone' => $member->phone,
                     'whatsapp' => $member->whatsapp,
+                    'paroisse' => $validated['paroisse'],
+                    'sous_region' => $validated['sous_region'] ?? null,
                     'section' => $member->section,
                     'instrument' => $member->instrument,
                     'instrument_level' => $member->instrument_level,
-                    'address' => $member->address,
+                    'skills' => $validated['skills'],
                     'birth_date' => optional($member->birth_date)->format('Y-m-d'),
                     'birth_place' => $member->birth_place,
                 ];
@@ -148,7 +164,7 @@ class MembershipController extends Controller
         }
 
         return redirect()->route('membership.thankyou')
-            ->with('success', 'Votre adhésion a été enregistrée avec succès. Votre numéro de membre est: ' . $member->member_number);
+            ->with('success', 'Votre adhésion a été enregistrée avec succès. Votre numéro de membre est: ' . $member->member_number . '. Vous serez contacté pour le test pratique.');
     }
 
     /**

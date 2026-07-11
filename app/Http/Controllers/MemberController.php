@@ -117,88 +117,93 @@ class MemberController extends Controller
         ));
     }
 
-    // ==========================================
-    // STORE - Enregistrement d'un nouveau membre
-    // ==========================================
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:members,email',
-            'phone' => 'required|string|max:20',
-            'whatsapp' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
-            'birth_date' => 'nullable|date',
-            'birth_place' => 'nullable|string|max:255',
-            'instrument' => 'nullable|string|max:100',
-            'instrument_level' => 'nullable|string|in:Soprano,Alto,Ténor,Basse',
-            'entry_date' => 'nullable|date',
-            'section' => 'nullable|string|max:100',
-            'section_role' => 'nullable|string|max:100',
-            'photo' => 'nullable|image|max:2048',
-            'id_document' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,pdf,webp',
-            'adhesion_letter' => 'nullable|file|max:5120|mimes:pdf,doc,docx,txt,rtf',
-            'emergency_contact_name' => 'nullable|string|max:255',
-            'emergency_contact_phone' => 'nullable|string|max:20',
-            'medical_notes' => 'nullable|string',
-            'skills' => 'nullable|string',
-            'status' => 'nullable|in:active,pending,inactive,suspended,withdrawn,deceased,training',
-        ]);
+// ==========================================
+// STORE - Enregistrement d'un nouveau membre
+// ==========================================
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => 'nullable|email|unique:members,email',
+        'phone' => 'required|string|max:20',
+        'whatsapp' => 'nullable|string|max:20',
+        'paroisse' => 'required|string|max:255',
+        'sous_region' => 'nullable|string|max:255',
+        'birth_date' => 'nullable|date',
+        'birth_place' => 'nullable|string|max:255',
+        'instrument' => 'nullable|string|max:100',
+        'instrument_level' => 'nullable|string|in:Soprano,Alto,Ténor,Basse',
+        'entry_date' => 'nullable|date',
+        'section' => 'nullable|string|max:100',
+        'section_role' => 'nullable|string|max:100',
+        'photo' => 'nullable|image|max:2048',
+        'id_document' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,pdf,webp',
+        'adhesion_letter' => 'nullable|file|max:5120|mimes:pdf,doc,docx,txt,rtf',
+        'emergency_contact_name' => 'nullable|string|max:255',
+        'emergency_contact_phone' => 'nullable|string|max:20',
+        'medical_notes' => 'nullable|string',
+        'skills' => 'nullable|string',
+        'status' => 'nullable|in:active,pending,inactive,suspended,withdrawn,deceased,training',
+    ]);
 
-        DB::beginTransaction();
-        
-        try {
-            // Générer le numéro de membre au format FCTDA-XXX
-            $validated['member_number'] = Member::generateMemberNumber();
-            $validated['status'] = $request->status ?? 'pending';
+    DB::beginTransaction();
+    
+    try {
+        // Générer le numéro de membre
+        $validated['member_number'] = Member::generateMemberNumber();
+        $validated['status'] = $request->status ?? 'pending';
 
-            // Générer un email par défaut si non fourni
-            if (empty($validated['email'])) {
-                $validated['email'] = Member::generateDefaultEmail($validated['first_name'], $validated['last_name']);
-            }
-
-            // ==========================================
-            // GESTION DE LA PHOTO
-            // ==========================================
-            if ($request->hasFile('photo')) {
-                $this->ensureDirectoryExists('members/photos');
-                $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
-            }
-
-            // ==========================================
-            // GESTION DU DOCUMENT D'IDENTITÉ
-            // ==========================================
-            if ($request->hasFile('id_document')) {
-                $this->ensureDirectoryExists('members/documents');
-                $validated['id_document'] = $request->file('id_document')->store('members/documents', 'public');
-            }
-
-            // ==========================================
-            // GESTION DE LA LETTRE D'ADHÉSION
-            // ==========================================
-            if ($request->hasFile('adhesion_letter')) {
-                $this->ensureDirectoryExists('members/letters');
-                $validated['adhesion_letter'] = $request->file('adhesion_letter')->store('members/letters', 'public');
-            }
-
-            // Créer le membre
-            $member = Member::create($validated);
-
-            // Créer automatiquement un compte utilisateur
-            $this->createUserAccount($member);
-
-            DB::commit();
-            
-            return redirect()->route('admin.members.show', $member)
-                ->with('success', 'Membre ajouté avec succès. Numéro: ' . $member->member_number);
-                
-        } catch (\Exception $e) {
-            DB::rollback();
-            return back()->with('error', 'Erreur lors de l\'ajout: ' . $e->getMessage())
-                         ->withInput();
+        // Générer un email par défaut si non fourni
+        if (empty($validated['email'])) {
+            $validated['email'] = Member::generateDefaultEmail($validated['first_name'], $validated['last_name']);
         }
+
+        // Combiner Paroisse et Sous-Région dans le champ address
+        $address = $validated['paroisse'];
+        if (!empty($validated['sous_region'])) {
+            $address .= ' | ' . $validated['sous_region'];
+        }
+        $validated['address'] = $address;
+
+        // Supprimer les champs temporaires
+        unset($validated['paroisse'], $validated['sous_region']);
+
+        // Gestion de la photo
+        if ($request->hasFile('photo')) {
+            $this->ensureDirectoryExists('members/photos');
+            $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
+        }
+
+        // Gestion du document d'identité
+        if ($request->hasFile('id_document')) {
+            $this->ensureDirectoryExists('members/documents');
+            $validated['id_document'] = $request->file('id_document')->store('members/documents', 'public');
+        }
+
+        // Gestion de la lettre d'adhésion
+        if ($request->hasFile('adhesion_letter')) {
+            $this->ensureDirectoryExists('members/letters');
+            $validated['adhesion_letter'] = $request->file('adhesion_letter')->store('members/letters', 'public');
+        }
+
+        // Créer le membre
+        $member = Member::create($validated);
+
+        // Créer automatiquement un compte utilisateur
+        $this->createUserAccount($member);
+
+        DB::commit();
+        
+        return redirect()->route('admin.members.show', $member)
+            ->with('success', 'Membre ajouté avec succès. Numéro: ' . $member->member_number);
+            
+    } catch (\Exception $e) {
+        DB::rollback();
+        return back()->with('error', 'Erreur lors de l\'ajout: ' . $e->getMessage())
+                     ->withInput();
     }
+}
 
     // ==========================================
     // SHOW - Détails d'un membre
@@ -272,155 +277,147 @@ class MemberController extends Controller
         ));
     }
 
+
     // ==========================================
-    // UPDATE - Mise à jour d'un membre
-    // ==========================================
-    public function update(Request $request, Member $member)
-    {
-        // 1. Validation de base
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:members,email,' . $member->id,
-            'phone' => 'required|string|max:20',
-            'whatsapp' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
-            'birth_date' => 'nullable|date',
-            'birth_place' => 'nullable|string|max:255',
-            'instrument' => 'nullable|string|max:100',
-            'instrument_level' => 'nullable|string|in:Soprano,Alto,Ténor,Basse',
-            'entry_date' => 'nullable|date',
-            'section' => 'nullable|string|max:100',
-            'section_role' => 'nullable|string|max:100',
-            'status' => 'required|in:active,pending,inactive,suspended,withdrawn,deceased,training',
-            'emergency_contact_name' => 'nullable|string|max:255',
-            'emergency_contact_phone' => 'nullable|string|max:20',
-            'medical_notes' => 'nullable|string',
-            'skills' => 'nullable|string',
-            'notes' => 'nullable|string',
-            'photo' => 'nullable|image|max:2048',
-            'adhesion_letter' => 'nullable|file|max:5120|mimes:pdf,doc,docx,txt,rtf',
-        ]);
+// UPDATE - Mise à jour d'un membre
+// ==========================================
+public function update(Request $request, Member $member)
+{
+    $validated = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => 'nullable|email|unique:members,email,' . $member->id,
+        'phone' => 'required|string|max:20',
+        'whatsapp' => 'nullable|string|max:20',
+        'paroisse' => 'required|string|max:255',
+        'sous_region' => 'nullable|string|max:255',
+        'birth_date' => 'nullable|date',
+        'birth_place' => 'nullable|string|max:255',
+        'instrument' => 'nullable|string|max:100',
+        'instrument_level' => 'nullable|string|in:Soprano,Alto,Ténor,Basse',
+        'entry_date' => 'nullable|date',
+        'section' => 'nullable|string|max:100',
+        'section_role' => 'nullable|string|max:100',
+        'status' => 'required|in:active,pending,inactive,suspended,withdrawn,deceased,training',
+        'emergency_contact_name' => 'nullable|string|max:255',
+        'emergency_contact_phone' => 'nullable|string|max:20',
+        'medical_notes' => 'nullable|string',
+        'skills' => 'nullable|string',
+        'photo' => 'nullable|image|max:2048',
+        'adhesion_letter' => 'nullable|file|max:5120|mimes:pdf,doc,docx,txt,rtf',
+    ]);
 
-        DB::beginTransaction();
-        
-        try {
-            // Générer un email par défaut si non fourni
-            if (empty($validated['email'])) {
-                $validated['email'] = Member::generateDefaultEmail($validated['first_name'], $validated['last_name']);
-            }
-
-            // ==========================================
-            // GESTION DE LA PHOTO
-            // ==========================================
-            if ($request->hasFile('photo')) {
-                if ($member->photo && Storage::disk('public')->exists($member->photo)) {
-                    Storage::disk('public')->delete($member->photo);
-                }
-                $this->ensureDirectoryExists('members/photos');
-                $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
-            }
-
-            // ==========================================
-            // GESTION DU DOCUMENT D'IDENTITÉ
-            // ==========================================
-            
-            // Suppression du document
-            if ($request->has('remove_document') && $request->remove_document == '1') {
-                if ($member->id_document && Storage::disk('public')->exists($member->id_document)) {
-                    Storage::disk('public')->delete($member->id_document);
-                }
-                $validated['id_document'] = null;
-            }
-            
-            // Upload d'un nouveau document
-            if ($request->hasFile('id_document')) {
-                $file = $request->file('id_document');
-                $maxSize = 5 * 1024 * 1024;
-                $allowedTypes = ['jpg', 'jpeg', 'png', 'pdf', 'webp'];
-                $extension = strtolower($file->getClientOriginalExtension());
-                
-                if (!in_array($extension, $allowedTypes)) {
-                    throw new \Exception('Format de fichier non supporté. Utilisez JPG, PNG, PDF ou WebP.');
-                }
-                
-                if ($file->getSize() > $maxSize) {
-                    throw new \Exception('Le fichier est trop volumineux. Taille max : 5MB.');
-                }
-                
-                // Supprimer l'ancien document
-                if ($member->id_document && Storage::disk('public')->exists($member->id_document)) {
-                    Storage::disk('public')->delete($member->id_document);
-                }
-                
-                // Créer le dossier et stocker
-                $this->ensureDirectoryExists('members/documents');
-                $validated['id_document'] = $file->store('members/documents', 'public');
-            }
-
-            // ==========================================
-            // GESTION DE LA LETTRE D'ADHÉSION
-            // ==========================================
-            
-            // Suppression de la lettre
-            if ($request->has('remove_adhesion_letter') && $request->remove_adhesion_letter == '1') {
-                if ($member->adhesion_letter && Storage::disk('public')->exists($member->adhesion_letter)) {
-                    Storage::disk('public')->delete($member->adhesion_letter);
-                }
-                $validated['adhesion_letter'] = null;
-            }
-            
-            // Upload d'une nouvelle lettre
-            if ($request->hasFile('adhesion_letter')) {
-                $file = $request->file('adhesion_letter');
-                $maxSize = 5 * 1024 * 1024;
-                $allowedTypes = ['pdf', 'doc', 'docx', 'txt', 'rtf'];
-                $extension = strtolower($file->getClientOriginalExtension());
-                
-                if (!in_array($extension, $allowedTypes)) {
-                    throw new \Exception('Format de fichier non supporté. Utilisez PDF, DOC, DOCX, TXT ou RTF.');
-                }
-                
-                if ($file->getSize() > $maxSize) {
-                    throw new \Exception('Le fichier est trop volumineux. Taille max : 5MB.');
-                }
-                
-                // Supprimer l'ancienne lettre
-                if ($member->adhesion_letter && Storage::disk('public')->exists($member->adhesion_letter)) {
-                    Storage::disk('public')->delete($member->adhesion_letter);
-                }
-                
-                // Créer le dossier et stocker
-                $this->ensureDirectoryExists('members/letters');
-                $validated['adhesion_letter'] = $file->store('members/letters', 'public');
-            }
-
-            // Mettre à jour le membre
-            $member->update($validated);
-
-            // Mettre à jour l'utilisateur associé
-            if ($member->user) {
-                $member->user->update([
-                    'name' => $member->full_name,
-                    'email' => $member->email,
-                ]);
-                
-                if ($request->has('roles')) {
-                    $member->user->syncRoles($request->roles);
-                }
-            }
-
-            DB::commit();
-
-            return redirect()->route('admin.members.show', $member)
-                ->with('success', 'Membre mis à jour avec succès');
-                
-        } catch (\Exception $e) {
-            DB::rollback();
-            return back()->with('error', 'Erreur : ' . $e->getMessage())
-                         ->withInput();
+    DB::beginTransaction();
+    
+    try {
+        // Générer un email par défaut si non fourni
+        if (empty($validated['email'])) {
+            $validated['email'] = Member::generateDefaultEmail($validated['first_name'], $validated['last_name']);
         }
+
+        // Combiner Paroisse et Sous-Région dans le champ address
+        $address = $validated['paroisse'];
+        if (!empty($validated['sous_region'])) {
+            $address .= ' | ' . $validated['sous_region'];
+        }
+        $validated['address'] = $address;
+
+        // Supprimer les champs temporaires
+        unset($validated['paroisse'], $validated['sous_region']);
+
+        // Gestion de la photo
+        if ($request->hasFile('photo')) {
+            if ($member->photo && Storage::disk('public')->exists($member->photo)) {
+                Storage::disk('public')->delete($member->photo);
+            }
+            $this->ensureDirectoryExists('members/photos');
+            $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
+        }
+
+        // Gestion du document d'identité
+        if ($request->has('remove_document') && $request->remove_document == '1') {
+            if ($member->id_document && Storage::disk('public')->exists($member->id_document)) {
+                Storage::disk('public')->delete($member->id_document);
+            }
+            $validated['id_document'] = null;
+        }
+        
+        if ($request->hasFile('id_document')) {
+            $file = $request->file('id_document');
+            $extension = strtolower($file->getClientOriginalExtension());
+            $allowedTypes = ['jpg', 'jpeg', 'png', 'pdf', 'webp'];
+            
+            if (!in_array($extension, $allowedTypes)) {
+                throw new \Exception('Format de fichier non supporté. Utilisez JPG, PNG, PDF ou WebP.');
+            }
+            
+            if ($file->getSize() > 5 * 1024 * 1024) {
+                throw new \Exception('Le fichier est trop volumineux. Taille max : 5MB.');
+            }
+            
+            if ($member->id_document && Storage::disk('public')->exists($member->id_document)) {
+                Storage::disk('public')->delete($member->id_document);
+            }
+            
+            $this->ensureDirectoryExists('members/documents');
+            $validated['id_document'] = $file->store('members/documents', 'public');
+        }
+
+        // Gestion de la lettre d'adhésion
+        if ($request->has('remove_adhesion_letter') && $request->remove_adhesion_letter == '1') {
+            if ($member->adhesion_letter && Storage::disk('public')->exists($member->adhesion_letter)) {
+                Storage::disk('public')->delete($member->adhesion_letter);
+            }
+            $validated['adhesion_letter'] = null;
+        }
+        
+        if ($request->hasFile('adhesion_letter')) {
+            $file = $request->file('adhesion_letter');
+            $extension = strtolower($file->getClientOriginalExtension());
+            $allowedTypes = ['pdf', 'doc', 'docx', 'txt', 'rtf'];
+            
+            if (!in_array($extension, $allowedTypes)) {
+                throw new \Exception('Format de fichier non supporté. Utilisez PDF, DOC, DOCX, TXT ou RTF.');
+            }
+            
+            if ($file->getSize() > 5 * 1024 * 1024) {
+                throw new \Exception('Le fichier est trop volumineux. Taille max : 5MB.');
+            }
+            
+            if ($member->adhesion_letter && Storage::disk('public')->exists($member->adhesion_letter)) {
+                Storage::disk('public')->delete($member->adhesion_letter);
+            }
+            
+            $this->ensureDirectoryExists('members/letters');
+            $validated['adhesion_letter'] = $file->store('members/letters', 'public');
+        }
+
+        // Mettre à jour le membre
+        $member->update($validated);
+
+        // Mettre à jour l'utilisateur associé
+        if ($member->user) {
+            $member->user->update([
+                'name' => $member->full_name,
+                'email' => $member->email,
+            ]);
+            
+            if ($request->has('roles')) {
+                $member->user->syncRoles($request->roles);
+            }
+        }
+
+        DB::commit();
+
+        return redirect()->route('admin.members.show', $member)
+            ->with('success', 'Membre mis à jour avec succès');
+            
+    } catch (\Exception $e) {
+        DB::rollback();
+        return back()->with('error', 'Erreur : ' . $e->getMessage())
+                     ->withInput();
     }
+}
 
     // ==========================================
     // DESTROY - Suppression d'un membre
