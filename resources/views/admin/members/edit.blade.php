@@ -397,6 +397,24 @@
     }
 </style>
 
+@php
+    // Extraction de la paroisse et sous-région depuis l'adresse
+    $paroisse = null;
+    $sousRegion = null;
+    if ($member->address) {
+        if (preg_match('/Paroisse\s*:\s*(.*?)(?:\||$)/iu', $member->address, $m)) {
+            $paroisse = trim($m[1]);
+        }
+        if (preg_match('/Sous[-\s]?r[ée]gion\s*:\s*(.*?)(?:\||$)/iu', $member->address, $m)) {
+            $sousRegion = trim($m[1]);
+        }
+        // Si aucun label reconnu, on utilise le texte brut comme Paroisse
+        if (!$paroisse && !$sousRegion) {
+            $paroisse = trim($member->address);
+        }
+    }
+@endphp
+
 <div class="container-fluid py-4">
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show">
@@ -515,12 +533,28 @@
                     @enderror
                 </div>
 
-                <div class="col-md-6">
-                    <label class="form-label">Adresse</label>
-                    <textarea name="address" class="form-control @error('address') is-invalid @enderror" rows="2">{{ old('address', $member->address) }}</textarea>
-                    @error('address')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                <!-- Paroisse et Sous-Région -->
+                <div class="col-md-12">
+                    <label class="form-label">Adresse *</label>
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <input type="text" name="paroisse" class="form-control @error('paroisse') is-invalid @enderror" 
+                                   value="{{ old('paroisse', $paroisse) }}" placeholder="Paroisse" required>
+                            @error('paroisse')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" name="sous_region" class="form-control @error('sous_region') is-invalid @enderror" 
+                                   value="{{ old('sous_region', $sousRegion) }}" placeholder="Sous-région (optionnel)">
+                            @error('sous_region')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="form-text">
+                        <span class="text-muted">Exemple : Paroisse = <strong>Cotonou Dantokpa</strong> | Sous-région = <strong>Abomey-Calavi</strong></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -790,7 +824,6 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-
             </div>
         </div>
 

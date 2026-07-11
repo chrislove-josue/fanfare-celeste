@@ -124,11 +124,11 @@
                                             <input id="paroisse" name="paroisse" type="text" class="form-control" value="{{ old('paroisse') }}" placeholder="Paroisse" required>
                                         </div>
                                         <div class="col-md-6">
-                                            <input id="sous_region" name="sous_region" type="text" class="form-control" value="{{ old('sous_region') }}" placeholder="Sous-région (optionnel)">
+                                            <input id="sous_region" name="sous_region" type="text" class="form-control" value="{{ old('sous_region') }}" placeholder="Sous-région" required>
                                         </div>
                                     </div>
                                     <div class="form-text">
-                                        <span class="text-muted">Exemple : Paroisse = <strong>Cotonou Dantokpa</strong> | Sous-région = <strong>Abomey-Calavi</strong></span>
+                                        <span class="text-muted">Exemple : Paroisse = <strong>Bethesda Tangbo</strong> | Sous-région = <strong>Zè</strong></span>
                                     </div>
                                 </div>
 

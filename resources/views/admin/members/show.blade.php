@@ -100,7 +100,7 @@
     .badge-status.deceased { background: #1f2937; color: #fff; }
     .badge-status.training { background: #dbeafe; color: #2563eb; }
 
-    /* Styles pour le modal - identiques à index */
+    /* Styles pour le modal */
     #documentModal .modal-content {
         border-radius: 12px;
         overflow: hidden;
@@ -347,7 +347,6 @@
                     </div>
                 </div>
             @endif
-            
         </div>
         
         <!-- Documents -->
@@ -455,7 +454,7 @@
 </div>
 
 <!-- ========================================== -->
-<!-- MODAL POUR LE DOCUMENT - IDENTIQUE À INDEX -->
+<!-- MODAL POUR LE DOCUMENT                     -->
 <!-- ========================================== -->
 <div class="modal fade" id="documentModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -503,7 +502,6 @@
 <script>
     // ==========================================
     // GESTION DU DOCUMENT DANS LE MODAL
-    // Version identique à celle de index.blade.php
     // ==========================================
 
     function viewDocumentModal(documentPath, memberName, memberNumber, fileName) {

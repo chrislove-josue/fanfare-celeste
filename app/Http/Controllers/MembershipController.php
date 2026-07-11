@@ -36,7 +36,7 @@ class MembershipController extends Controller
             'phone' => 'nullable|string|max:20',
             'whatsapp' => 'nullable|string|max:20',
             'paroisse' => 'required|string|max:255',
-            'sous_region' => 'nullable|string|max:255',
+            'sous_region' => 'required|string|max:255',
             'birth_date' => 'nullable|date',
             'birth_place' => 'nullable|string|max:255',
             'section' => 'required|string|in:' . implode(',', array_keys(Member::getSections())),
@@ -57,11 +57,8 @@ class MembershipController extends Controller
             $validated['email'] = Member::generateDefaultEmail($validated['first_name'], $validated['last_name']);
         }
 
-        // Combiner Paroisse et Sous-Région dans le champ address
-        $address = $validated['paroisse'];
-        if (!empty($validated['sous_region'])) {
-            $address .= ' | ' . $validated['sous_region'];
-        }
+        // Construire l'adresse au format: "Paroisse: X | Sous-région: Y"
+        $address = 'Paroisse: ' . $validated['paroisse'] . ' | Sous-région: ' . $validated['sous_region'];
 
         // Préparer les données
         $memberData = [
@@ -118,7 +115,8 @@ class MembershipController extends Controller
                     'phone' => $member->phone,
                     'whatsapp' => $member->whatsapp,
                     'paroisse' => $validated['paroisse'],
-                    'sous_region' => $validated['sous_region'] ?? null,
+                    'sous_region' => $validated['sous_region'],
+                    'address' => $address,
                     'section' => $member->section,
                     'instrument' => $member->instrument,
                     'instrument_level' => $member->instrument_level,
