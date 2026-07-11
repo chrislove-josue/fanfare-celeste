@@ -417,6 +417,12 @@
         @csrf
         @method('PUT')
 
+           {{-- ALERTE CHAMPS OBLIGATOIRES --}}
+                        <div class="p-3 mb-4 text-blue-800 border border-blue-300 rounded bg-blue-50" style="border-left: 4px solid #2563eb;">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <span class="fw-semibold">Les champs marqués d'un <span class="text-danger"> *  </span> sont obligatoires.</span>
+                        </div>
+
         <!-- SECTION 1 : INFORMATIONS PERSONNELLES -->
         <div class="form-section">
             <div class="section-title">
@@ -448,7 +454,7 @@
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label">Statut *</label>
+                    <label class="form-label">Statut  <span class="text-danger">*</span></label>
                     <select name="status" class="form-select @error('status') is-invalid @enderror" required>
                         @foreach($statuses as $key => $label)
                             <option value="{{ $key }}" {{ old('status', $member->status) === $key ? 'selected' : '' }}>
@@ -471,7 +477,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label">Prénom *</label>
+                    <label class="form-label">Prénom  <span class="text-danger">*</span></label>
                     <input type="text" name="first_name" class="form-control @error('first_name') is-invalid @enderror" 
                            value="{{ old('first_name', $member->first_name) }}" required>
                     @error('first_name')
@@ -480,7 +486,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label">Nom *</label>
+                    <label class="form-label">Nom  <span class="text-danger">*</span></label>
                     <input type="text" name="last_name" class="form-control @error('last_name') is-invalid @enderror" 
                            value="{{ old('last_name', $member->last_name) }}" required>
                     @error('last_name')
@@ -489,7 +495,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label">Email *</label>
+                    <label class="form-label">Email  <span class="text-danger">*</span></label>
                     <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" 
                            value="{{ old('email', $member->email) }}" required>
                     @error('email')
@@ -498,7 +504,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label">Téléphone *</label>
+                    <label class="form-label">Téléphone  <span class="text-danger">*</span></label>
                     <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" 
                            value="{{ old('phone', $member->phone) }}" required>
                     @error('phone')
@@ -515,9 +521,9 @@
                     @enderror
                 </div>
 
-                {{-- ADRESSE (Paroisse et Sous-Région) --}}
+                {{-- Paroisse et Sous-Région --}}
                 <div class="col-md-12">
-                    <label class="form-label">Adresse *</label>
+                    
                     <div class="row g-2">
                         <div class="col-md-6">
                             @php
@@ -536,14 +542,19 @@
                                     }
                                 }
                             @endphp
+                            <label class="form-label">Paroisse  <span class="text-danger">*</span></label>
                             <input type="text" name="paroisse" class="form-control" value="{{ old('paroisse', $paroisse) }}" placeholder="Paroisse" required>
+                        <div class="form-text">
+                            <span class="text-muted">Exemple : <strong>St Michel Sohoun Centre</strong></span>
+                        </div>
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label">Sous-Région  <span class="text-danger">*</span></label>
                             <input type="text" name="sous_region" class="form-control" value="{{ old('sous_region', $sousRegion) }}" placeholder="Sous-région" required>
+                        <div class="form-text">
+                            <span class="text-muted">Exemple : <strong>Allada C/Sékou</strong></span>
                         </div>
-                    </div>
-                    <div class="form-text">
-                        <span class="text-muted">Exemple : Paroisse = <strong>Bethesda Tangbo</strong> | Sous-région = <strong>Zè</strong></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -960,7 +971,7 @@
                         <small class="text-muted">L'email est utilisé comme identifiant</small>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Mot de passe *</label>
+                        <label class="form-label fw-semibold">Mot de passe  <span class="text-danger">*</span></label>
                         <div class="input-group">
                             <input type="text" name="password" id="editPassword{{ $member->id }}" 
                                    class="form-control" value="{{ Str::random(10) }}" required>
@@ -1015,7 +1026,7 @@
                         Vous allez réinitialiser le mot de passe de <strong>{{ $member->full_name }}</strong>.
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Nouveau mot de passe *</label>
+                        <label class="form-label fw-semibold">Nouveau mot de passe  <span class="text-danger">*</span></label>
                         <div class="input-group">
                             <input type="text" name="password" id="editResetPassword{{ $member->id }}" 
                                    class="form-control" value="{{ Str::random(10) }}" required>

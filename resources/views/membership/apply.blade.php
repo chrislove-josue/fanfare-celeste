@@ -30,6 +30,12 @@
                             </div>
                         @endif
 
+                        {{-- ALERTE CHAMPS OBLIGATOIRES --}}
+                        <div class="p-3 mb-4 text-blue-800 border border-blue-300 rounded bg-blue-50" style="border-left: 4px solid #2563eb;">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <span class="fw-semibold">Les champs marqués d'un <span class="text-danger"> * </span> sont obligatoires.</span>
+                        </div>
+
                         {{-- CONDITIONS D'ADHÉSION --}}
                         <div class="p-4 mb-4 border rounded bg-light" style="border-left: 4px solid #3946B2;">
                             <h5 class="mb-3">
@@ -44,13 +50,13 @@
                                     </div>
                                     <div class="d-flex align-items-start mb-2">
                                         <i class="fas fa-check-circle text-success me-2 mt-1"></i>
-                                        <span>Être <strong>choriste</strong> ou avoir des compétences musicales</span>
+                                        <span>Être <strong>choriste</strong> et avoir des compétences musicales</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="d-flex align-items-start mb-2">
                                         <i class="fas fa-check-circle text-success me-2 mt-1"></i>
-                                        <span>Passer un <strong>test pratique</strong> après soumission</span>
+                                        <span> <strong>Être dispoible</strong>pour passer un <strong>test pratique</strong> après soumission</span>
                                     </div>
                                     <div class="d-flex align-items-start mb-2">
                                         <i class="fas fa-check-circle text-success me-2 mt-1"></i>
@@ -60,7 +66,7 @@
                             </div>
                             <div class="mt-2 text-muted small">
                                 <i class="fas fa-info-circle me-1"></i>
-                                Une fois votre formulaire soumis, vous serez convoqué pour un test pratique. La validation finale dépendra des résultats de ce test.
+                                Une fois votre formulaire soumis, vous serez contacté pour un test pratique. La validation finale dépendra des résultats de ce test.
                             </div>
                         </div>
 
@@ -70,22 +76,22 @@
                             <div class="row g-3">
                                 {{-- 1) Identité --}}
                                 <div class="col-md-6">
-                                    <label class="form-label" for="first_name">Prénom *</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text" style="background: rgba(26,35,126,.06); border-color: rgba(26,35,126,.15);">
-                                            <i class="fas fa-user"></i>
-                                        </span>
-                                        <input id="first_name" name="first_name" type="text" class="form-control" value="{{ old('first_name') }}" required>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label" for="last_name">Nom *</label>
+                                    <label class="form-label" for="last_name">Nom <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text" style="background: rgba(26,35,126,.06); border-color: rgba(26,35,126,.15);">
                                             <i class="fas fa-user"></i>
                                         </span>
                                         <input id="last_name" name="last_name" type="text" class="form-control" value="{{ old('last_name') }}" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="first_name">Prénom <span class="text-danger"> * </span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text" style="background: rgba(26,35,126,.06); border-color: rgba(26,35,126,.15);">
+                                            <i class="fas fa-user"></i>
+                                        </span>
+                                        <input id="first_name" name="first_name" type="text" class="form-control" value="{{ old('first_name') }}" required>
                                     </div>
                                 </div>
 
@@ -102,12 +108,12 @@
 
                                 {{-- 2) Contact --}}
                                 <div class="col-md-6">
-                                    <label class="form-label" for="phone">Téléphone</label>
+                                    <label class="form-label" for="phone">Téléphone <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text" style="background: rgba(25,135,84,.08); border-color: rgba(25,135,84,.2);">
                                             <i class="fas fa-phone"></i>
                                         </span>
-                                        <input id="phone" name="phone" type="text" class="form-control" value="{{ old('phone') }}" placeholder="Ex: +229 01 98 12 33 53">
+                                        <input id="phone" name="phone" type="text" class="form-control" value="{{ old('phone') }}" placeholder="Ex: +229 01 98 12 33 53" required>
                                     </div>
                                 </div>
 
@@ -116,26 +122,30 @@
                                     <input id="whatsapp" name="whatsapp" type="text" class="form-control" value="{{ old('whatsapp') }}" placeholder="Ex: +229 01 98 12 33 53">
                                 </div>
 
-                                {{-- 3) Paroisse et Sous-Région --}}
+                                {{-- Paroisse et Sous-Région --}}
                                 <div class="col-md-12">
-                                    <label class="form-label">Adresse *</label>
                                     <div class="row g-2">
                                         <div class="col-md-6">
-                                            <input id="paroisse" name="paroisse" type="text" class="form-control" value="{{ old('paroisse') }}" placeholder="Paroisse" required>
+                                            <label class="form-label">Paroisse <span class="text-danger">*</span></label>
+                                            <input type="text" name="paroisse" class="form-control" value="{{ old('paroisse') }}" placeholder="Paroisse" required>
+                                            <div class="form-text">
+                                                <span class="text-muted">Exemple : <strong>St Michel Sohoun Centre</strong></span>
+                                            </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <input id="sous_region" name="sous_region" type="text" class="form-control" value="{{ old('sous_region') }}" placeholder="Sous-région" required>
+                                            <label class="form-label">Sous-Région <span class="text-danger">*</span></label>
+                                            <input type="text" name="sous_region" class="form-control" value="{{ old('sous_region') }}" placeholder="Sous-région" required>
+                                            <div class="form-text">
+                                                <span class="text-muted">Exemple : <strong>Allada C/Sékou</strong></span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-text">
-                                        <span class="text-muted">Exemple : Paroisse = <strong>Bethesda Tangbo</strong> | Sous-région = <strong>Zè</strong></span>
                                     </div>
                                 </div>
 
                                 {{-- 4) Naissance --}}
                                 <div class="col-md-6">
-                                    <label class="form-label" for="birth_date">Date de naissance</label>
-                                    <input id="birth_date" name="birth_date" type="date" class="form-control" value="{{ old('birth_date') }}">
+                                    <label class="form-label" for="birth_date">Date de naissance  <span class="text-danger">*</span></label>
+                                    <input id="birth_date" name="birth_date" type="date" required class="form-control" value="{{ old('birth_date') }}">
                                 </div>
 
                                 <div class="col-md-6">
@@ -145,7 +155,7 @@
 
                                 {{-- 5) Instrument / Section / Pupitre --}}
                                 <div class="col-md-4">
-                                    <label class="form-label" for="section">Section *</label>
+                                    <label class="form-label" for="section">Section <span class="text-danger">*</span></label>
                                     <select id="section" name="section" class="form-select" required>
                                         <option value="">-- Choisir --</option>
                                         @foreach($sections as $key => $label)
@@ -155,7 +165,7 @@
                                 </div>
 
                                 <div class="col-md-4">
-                                    <label class="form-label" for="instrument">Instrument *</label>
+                                    <label class="form-label" for="instrument">Instrument <span class="text-danger">*</span></label>
                                     <select id="instrument" name="instrument" class="form-select" required>
                                         <option value="">-- Choisir --</option>
                                         @foreach($instruments as $key => $label)
@@ -176,7 +186,7 @@
 
                                 {{-- 6) Compétences musicales --}}
                                 <div class="col-md-12">
-                                    <label class="form-label" for="skills">Compétences musicales *</label>
+                                    <label class="form-label" for="skills">Compétences musicales <span class="text-danger">*</span></label>
                                     <textarea id="skills" name="skills" class="form-control" rows="3" style="resize: vertical;" placeholder="Décrivez vos compétences musicales (chant, instrument, solfège, expérience...)" required>{{ old('skills') }}</textarea>
                                     <div class="form-text">Détaillez votre expérience musicale, vos atouts, formations suivies...</div>
                                 </div>
@@ -221,18 +231,31 @@
                                     <div class="form-text">PDF, DOC, DOCX, TXT, RTF | 5MB max</div>
                                 </div>
 
-                                {{-- 10) Engagement --}}
+                                {{-- 10) Engagement et confirmation --}}
                                 <div class="col-12">
                                     <div class="p-3 border rounded bg-light">
-                                        <div class="form-check">
+                                        {{-- Conditions d'adhésion --}}
+                                        <div class="form-check mb-3">
                                             <input class="form-check-input" type="checkbox" id="engagement" name="engagement" value="1" required>
                                             <label class="form-check-label" for="engagement">
-                                                <strong>J'accepte les conditions d'adhésion *</strong>
+                                                <strong>J'accepte les conditions d'adhésion <span class="text-danger">*</span></strong>
+                                            </label>
+                                        </div>
+                                        <div class="ms-4 mt-2 text-muted small mb-3">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            En cochant cette case, je certifie être membre de l'Église du Christianisme Céleste, être choriste ou avoir des compétences musicales, et j'accepte de passer un test pratique après soumission.
+                                        </div>
+
+                                        {{-- Confirmation de l'exactitude des informations --}}
+                                        <div class="form-check mt-3 pt-3 border-top">
+                                            <input class="form-check-input" type="checkbox" id="confirmation" name="confirmation" value="1" required>
+                                            <label class="form-check-label" for="confirmation">
+                                                <strong>Je confirme l'exactitude des informations renseignées <span class="text-danger">*</span></strong>
                                             </label>
                                         </div>
                                         <div class="ms-4 mt-2 text-muted small">
                                             <i class="fas fa-info-circle me-1"></i>
-                                            En cochant cette case, je certifie être membre de l'Église du Christianisme Céleste, être choriste ou avoir des compétences musicales, et j'accepte de passer un test pratique après soumission.
+                                            Je certifie sur l'honneur que toutes les informations fournies dans ce formulaire sont exactes et conformes à la réalité.
                                         </div>
                                     </div>
                                 </div>
@@ -244,7 +267,7 @@
                                     Vos informations restent confidentielles.
                                 </div>
                                 <button type="submit" class="px-4 btn btn-primary" style="border-radius: 12px;">
-                                    <i class="fas fa-paper-plane me-2"></i>Soumettre ma candidature
+                                    <i class="fas fa-paper-plane me-2"></i>Envoyer ma demande
                                 </button>
                             </div>
                         </form>
