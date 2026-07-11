@@ -6,7 +6,6 @@ use App\Models\Member;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Schema;
 
@@ -36,7 +35,7 @@ class MembershipController extends Controller
             'phone' => 'nullable|string|max:20',
             'whatsapp' => 'nullable|string|max:20',
             'paroisse' => 'required|string|max:255',
-            'sous_region' => 'required|string|max:255',
+            'sous_region' => 'nullable|string|max:255',
             'birth_date' => 'nullable|date',
             'birth_place' => 'nullable|string|max:255',
             'section' => 'required|string|in:' . implode(',', array_keys(Member::getSections())),
@@ -57,8 +56,11 @@ class MembershipController extends Controller
             $validated['email'] = Member::generateDefaultEmail($validated['first_name'], $validated['last_name']);
         }
 
-        // Construire l'adresse au format: "Paroisse: X | Sous-région: Y"
-        $address = 'Paroisse: ' . $validated['paroisse'] . ' | Sous-région: ' . $validated['sous_region'];
+        // Combiner Paroisse et Sous-Région dans le champ address avec les préfixes
+        $address = 'Paroisse: ' . $validated['paroisse'];
+        if (!empty($validated['sous_region'])) {
+            $address .= ' | Sous-région: ' . $validated['sous_region'];
+        }
 
         // Préparer les données
         $memberData = [
@@ -115,8 +117,7 @@ class MembershipController extends Controller
                     'phone' => $member->phone,
                     'whatsapp' => $member->whatsapp,
                     'paroisse' => $validated['paroisse'],
-                    'sous_region' => $validated['sous_region'],
-                    'address' => $address,
+                    'sous_region' => $validated['sous_region'] ?? null,
                     'section' => $member->section,
                     'instrument' => $member->instrument,
                     'instrument_level' => $member->instrument_level,
@@ -150,16 +151,6 @@ class MembershipController extends Controller
 
         $user = User::create($userData);
         $user->assignRole('member');
-
-        // Envoyer un email de confirmation
-        try {
-            Mail::send('emails.membership-confirmation', ['member' => $member], function ($mail) use ($member) {
-                $mail->to($member->email)
-                    ->subject('Confirmation de votre adhésion - Fanfare Céleste');
-            });
-        } catch (\Exception $e) {
-            \Log::error('Erreur envoi email: ' . $e->getMessage());
-        }
 
         return redirect()->route('membership.thankyou')
             ->with('success', 'Votre adhésion a été enregistrée avec succès. Votre numéro de membre est: ' . $member->member_number . '. Vous serez contacté pour le test pratique.');

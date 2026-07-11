@@ -397,24 +397,6 @@
     }
 </style>
 
-@php
-    // Extraction de la paroisse et sous-région depuis l'adresse
-    $paroisse = null;
-    $sousRegion = null;
-    if ($member->address) {
-        if (preg_match('/Paroisse\s*:\s*(.*?)(?:\||$)/iu', $member->address, $m)) {
-            $paroisse = trim($m[1]);
-        }
-        if (preg_match('/Sous[-\s]?r[ée]gion\s*:\s*(.*?)(?:\||$)/iu', $member->address, $m)) {
-            $sousRegion = trim($m[1]);
-        }
-        // Si aucun label reconnu, on utilise le texte brut comme Paroisse
-        if (!$paroisse && !$sousRegion) {
-            $paroisse = trim($member->address);
-        }
-    }
-@endphp
-
 <div class="container-fluid py-4">
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show">
@@ -533,27 +515,35 @@
                     @enderror
                 </div>
 
-                <!-- Paroisse et Sous-Région -->
+                {{-- ADRESSE (Paroisse et Sous-Région) --}}
                 <div class="col-md-12">
                     <label class="form-label">Adresse *</label>
                     <div class="row g-2">
                         <div class="col-md-6">
-                            <input type="text" name="paroisse" class="form-control @error('paroisse') is-invalid @enderror" 
-                                   value="{{ old('paroisse', $paroisse) }}" placeholder="Paroisse" required>
-                            @error('paroisse')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            @php
+                                // Extraire la Paroisse du champ address
+                                $paroisse = '';
+                                $sousRegion = '';
+                                if ($member->address) {
+                                    if (preg_match('/Paroisse\s*:\s*(.*?)(?:\||$)/iu', $member->address, $m)) {
+                                        $paroisse = trim($m[1]);
+                                    }
+                                    if (preg_match('/Sous[-\s]?r[ée]gion\s*:\s*(.*?)(?:\||$)/iu', $member->address, $m)) {
+                                        $sousRegion = trim($m[1]);
+                                    }
+                                    if (!$paroisse && !$sousRegion) {
+                                        $paroisse = trim($member->address);
+                                    }
+                                }
+                            @endphp
+                            <input type="text" name="paroisse" class="form-control" value="{{ old('paroisse', $paroisse) }}" placeholder="Paroisse" required>
                         </div>
                         <div class="col-md-6">
-                            <input type="text" name="sous_region" class="form-control @error('sous_region') is-invalid @enderror" 
-                                   value="{{ old('sous_region', $sousRegion) }}" placeholder="Sous-région (optionnel)">
-                            @error('sous_region')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <input type="text" name="sous_region" class="form-control" value="{{ old('sous_region', $sousRegion) }}" placeholder="Sous-région" required>
                         </div>
                     </div>
                     <div class="form-text">
-                        <span class="text-muted">Exemple : Paroisse = <strong>Cotonou Dantokpa</strong> | Sous-région = <strong>Abomey-Calavi</strong></span>
+                        <span class="text-muted">Exemple : Paroisse = <strong>Bethesda Tangbo</strong> | Sous-région = <strong>Zè</strong></span>
                     </div>
                 </div>
             </div>
@@ -609,7 +599,7 @@
                     <label class="form-label">Pupitre</label>
                     <select name="instrument_level" class="form-select @error('instrument_level') is-invalid @enderror">
                         <option value="">-- Sélectionner --</option>
-                        @foreach(App\Models\Member::getInstrumentLevels() as $val => $label)
+                        @foreach($instrumentLevels as $val => $label)
                             <option value="{{ $val }}" {{ old('instrument_level', $member->instrument_level) === $val ? 'selected' : '' }}>{{ $label }}</option>
                         @endforeach
                     </select>
@@ -821,6 +811,14 @@
                     <input type="text" name="skills" class="form-control @error('skills') is-invalid @enderror" 
                            value="{{ old('skills', $member->skills) }}" placeholder="Séparées par des virgules">
                     @error('skills')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">Notes (Admin)</label>
+                    <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="3">{{ old('notes', $member->notes) }}</textarea>
+                    @error('notes')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
@@ -1101,14 +1099,12 @@
     // ==========================================
 
     function viewDocumentModal(documentPath, memberName, memberNumber, fileName) {
-        // Mettre à jour les informations du modal
         document.getElementById('documentModalMemberName').textContent = memberName;
         document.getElementById('documentModalMemberInfo').textContent = memberName;
         document.getElementById('documentModalMemberNumber').textContent = memberNumber;
         document.getElementById('documentDownloadLink').href = documentPath;
         document.getElementById('documentDownloadLink').download = 'document_' + memberNumber + '.' + fileName.split('.').pop();
         
-        // Afficher le loader
         const body = document.getElementById('documentModalBody');
         body.innerHTML = `
             <div class="text-center" id="documentLoading">
@@ -1119,16 +1115,13 @@
             </div>
         `;
         
-        // Ouvrir le modal
         const modal = new bootstrap.Modal(document.getElementById('documentModal'));
         modal.show();
         
-        // Déterminer le type de fichier
         const extension = fileName.split('.').pop().toLowerCase();
         const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension);
         
         if (isImage) {
-            // Charger l'image
             const img = new Image();
             img.onload = function() {
                 body.innerHTML = `
@@ -1151,14 +1144,12 @@
             };
             img.src = documentPath;
         } else if (extension === 'pdf') {
-            // Afficher le PDF dans un iframe
             body.innerHTML = `
                 <iframe src="${documentPath}" 
                         style="width: 100%; height: 500px; border: none; border-radius: 8px;" 
                         frameborder="0"></iframe>
             `;
         } else {
-            // Autres types de fichiers
             body.innerHTML = `
                 <div class="text-center py-5">
                     <i class="fas fa-file-alt fa-4x text-primary mb-3"></i>

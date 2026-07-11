@@ -117,7 +117,8 @@ class MemberController extends Controller
         ));
     }
 
-// ==========================================
+
+    // ==========================================
 // STORE - Enregistrement d'un nouveau membre
 // ==========================================
 public function store(Request $request)
@@ -159,10 +160,10 @@ public function store(Request $request)
             $validated['email'] = Member::generateDefaultEmail($validated['first_name'], $validated['last_name']);
         }
 
-        // Combiner Paroisse et Sous-Région dans le champ address
-        $address = $validated['paroisse'];
+        // Combiner Paroisse et Sous-Région dans le champ address avec les préfixes
+        $address = 'Paroisse: ' . $validated['paroisse'];
         if (!empty($validated['sous_region'])) {
-            $address .= ' | ' . $validated['sous_region'];
+            $address .= ' | Sous-région: ' . $validated['sous_region'];
         }
         $validated['address'] = $address;
 
@@ -315,10 +316,10 @@ public function update(Request $request, Member $member)
             $validated['email'] = Member::generateDefaultEmail($validated['first_name'], $validated['last_name']);
         }
 
-        // Combiner Paroisse et Sous-Région dans le champ address
-        $address = $validated['paroisse'];
+        // Combiner Paroisse et Sous-Région dans le champ address avec les préfixes
+        $address = 'Paroisse: ' . $validated['paroisse'];
         if (!empty($validated['sous_region'])) {
-            $address .= ' | ' . $validated['sous_region'];
+            $address .= ' | Sous-région: ' . $validated['sous_region'];
         }
         $validated['address'] = $address;
 
@@ -418,6 +419,8 @@ public function update(Request $request, Member $member)
                      ->withInput();
     }
 }
+
+    
 
     // ==========================================
     // DESTROY - Suppression d'un membre
