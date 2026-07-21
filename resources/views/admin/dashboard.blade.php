@@ -18,7 +18,7 @@
     .stat-card-pro {
         background: #ffffff;
         border-radius: 16px;
-        padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+        padding: 1.5rem;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
         transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         border: 1px solid rgba(0, 0, 0, 0.04);
@@ -204,14 +204,9 @@
         color: #dc2626;
     }
     
-    .badge-status.income {
-        background: #dcfce7;
-        color: #16a34a;
-    }
-    
-    .badge-status.expense {
-        background: #fee2e2;
-        color: #dc2626;
+    .badge-status.completed {
+        background: #dbeafe;
+        color: #2563eb;
     }
     
     /* === CARTES RAPIDES === */
@@ -290,6 +285,11 @@
             height: 40px;
             font-size: 1rem;
         }
+        .activity-card .card-header-custom {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
     }
 </style>
 
@@ -312,8 +312,8 @@
         <a href="{{ route('admin.members.create') }}" class="btn btn-primary btn-sm">
             <i class="fas fa-user-plus me-1"></i> Nouveau membre
         </a>
-        <a href="{{ route('admin.financial.transactions.create') }}" class="btn btn-outline-primary btn-sm">
-            <i class="fas fa-plus-circle me-1"></i> Transaction
+        <a href="{{ route('admin.events.create') }}" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-calendar-plus me-1"></i> Nouvel événement
         </a>
     </div>
 </div>
@@ -332,11 +332,6 @@
                 <div>
                     <div class="stat-number">{{ number_format($totalMembers) }}</div>
                     <div class="stat-label">Membres totaux</div>
-                    <div class="mt-1">
-                        <span class="stat-trend up">
-                            <i class="fas fa-arrow-up"></i> +12% ce mois
-                        </span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -352,11 +347,6 @@
                 <div>
                     <div class="stat-number">{{ number_format($activeMembers) }}</div>
                     <div class="stat-label">Membres actifs</div>
-                    <div class="mt-1">
-                        <span class="stat-trend up">
-                            <i class="fas fa-arrow-up"></i> +8% ce mois
-                        </span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -372,31 +362,21 @@
                 <div>
                     <div class="stat-number">{{ number_format($pendingMembers) }}</div>
                     <div class="stat-label">En attente</div>
-                    <div class="mt-1">
-                        <span class="stat-trend down">
-                            <i class="fas fa-arrow-down"></i> -3% ce mois
-                        </span>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Solde Total -->
+    <!-- Événements -->
     <div class="col-xl-3 col-md-6">
         <div class="stat-card-pro" style="--stat-color: #8b5cf6; --stat-color-rgb: 139, 92, 246;">
             <div class="d-flex align-items-center gap-3">
                 <div class="stat-icon-wrapper">
-                    <i class="fas fa-coins"></i>
+                    <i class="fas fa-calendar-alt"></i>
                 </div>
                 <div>
-                    <div class="stat-number">{{ number_format($balance, 0, ',', ' ') }}</div>
-                    <div class="stat-label">Solde total</div>
-                    <div class="mt-1">
-                        <span class="stat-trend up">
-                            <i class="fas fa-arrow-up"></i> +5% ce mois
-                        </span>
-                    </div>
+                    <div class="stat-number">{{ number_format($totalEvents) }}</div>
+                    <div class="stat-label">Événements totaux</div>
                 </div>
             </div>
         </div>
@@ -407,23 +387,7 @@
 <!-- GRAPHIQUES                                 -->
 <!-- ========================================== -->
 <div class="row g-4 mb-4">
-    <div class="col-xl-8">
-        <div class="activity-card">
-            <div class="card-header-custom">
-                <h5>
-                    <i class="fas fa-chart-line"></i>
-                    Évolution des finances
-                </h5>
-                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
-                    <i class="far fa-calendar-alt me-1"></i> 12 derniers mois
-                </span>
-            </div>
-            <div class="p-4">
-                <canvas id="monthlyChart" height="280"></canvas>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-4">
+    <div class="col-xl-6">
         <div class="activity-card">
             <div class="card-header-custom">
                 <h5>
@@ -435,7 +399,24 @@
                 </span>
             </div>
             <div class="p-4">
-                <canvas id="sectionChart" height="280"></canvas>
+                <canvas id="sectionChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-6">
+        <div class="activity-card">
+            <div class="card-header-custom">
+                <h5>
+                    <i class="fas fa-chart-bar"></i>
+                    Évolution des inscriptions
+                </h5>
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
+                    +{{ $newMembersThisMonth }} ce mois
+                </span>
+            </div>
+            <div class="p-4">
+                <canvas id="membersChart" height="300"></canvas>
             </div>
         </div>
     </div>
@@ -505,15 +486,15 @@
         </div>
     </div>
     
-    <!-- Dernières Transactions -->
+    <!-- Événements à venir -->
     <div class="col-xl-6">
         <div class="activity-card">
             <div class="card-header-custom">
                 <h5>
-                    <i class="fas fa-exchange-alt"></i>
-                    Dernières transactions
+                    <i class="fas fa-calendar-check"></i>
+                    Événements à venir
                 </h5>
-                <a href="{{ route('admin.financial.transactions') }}" class="btn btn-sm btn-primary">
+                <a href="{{ route('admin.news.index') }}" class="btn btn-sm btn-primary">
                     Voir tout <i class="fas fa-arrow-right ms-1"></i>
                 </a>
             </div>
@@ -522,31 +503,26 @@
                     <table class="table table-dashboard mb-0">
                         <thead>
                             <tr>
-                                <th>Description</th>
-                                <th>Type</th>
-                                <th>Montant</th>
+                                <th>Événement</th>
                                 <th>Date</th>
+                                <th>Statut</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($recentTransactions as $transaction)
+                            @forelse($upcomingEventsList as $event)
                             <tr>
-                                <td class="fw-medium">{{ $transaction->description }}</td>
+                                <td class="fw-medium">{{ $event->title }}</td>
+                                <td class="text-muted">{{ $event->start_date->format('d/m/Y H:i') }}</td>
                                 <td>
-                                    <span class="badge-status {{ $transaction->type === 'income' ? 'income' : 'expense' }}">
-                                        {{ $transaction->type === 'income' ? 'Entrée' : 'Sortie' }}
+                                    <span class="badge-status {{ $event->status === 'upcoming' ? 'active' : ($event->status === 'planned' ? 'pending' : 'inactive') }}">
+                                        {{ ucfirst($event->status ?? 'planifié') }}
                                     </span>
                                 </td>
-                                <td class="fw-semibold {{ $transaction->type === 'income' ? 'text-success' : 'text-danger' }}">
-                                    {{ $transaction->type === 'income' ? '+' : '-' }} 
-                                    {{ number_format($transaction->amount, 0, ',', ' ') }} FCFA
-                                </td>
-                                <td class="text-muted">{{ $transaction->transaction_date->format('d/m/Y') }}</td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="4" class="text-center py-4 text-muted">
-                                    <i class="fas fa-inbox me-2"></i> Aucune transaction récente
+                                <td colspan="3" class="text-center py-4 text-muted">
+                                    <i class="fas fa-inbox me-2"></i> Aucun événement à venir
                                 </td>
                             </tr>
                             @endforelse
@@ -562,7 +538,7 @@
 <!-- STATISTIQUES RAPIDES                      -->
 <!-- ========================================== -->
 <div class="row g-4 mt-2">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="quick-card">
             <div class="quick-icon" style="background: #eef2ff; color: #3946B2;">
                 <i class="fas fa-calendar-alt"></i>
@@ -573,9 +549,20 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="quick-card">
             <div class="quick-icon" style="background: #dcfce7; color: #22c55e;">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div>
+                <div class="quick-number">{{ number_format($completedEvents) }}</div>
+                <div class="quick-label">Événements terminés</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="quick-card">
+            <div class="quick-icon" style="background: #fef3c7; color: #f59e0b;">
                 <i class="fas fa-calendar-plus"></i>
             </div>
             <div>
@@ -584,14 +571,14 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="quick-card">
-            <div class="quick-icon" style="background: #fef3c7; color: #f59e0b;">
+            <div class="quick-icon" style="background: #fce4ec; color: #ec4899;">
                 <i class="fas fa-user-plus"></i>
             </div>
             <div>
                 <div class="quick-number">{{ number_format($newMembersThisMonth) }}</div>
-                <div class="quick-label">Nouveaux membres ce mois</div>
+                <div class="quick-label">Nouveaux membres</div>
             </div>
         </div>
     </div>
@@ -602,84 +589,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // ==========================================
-    // GRAPHIQUE D'ÉVOLUTION MENSUELLE
-    // ==========================================
-    const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-    const monthlyData = @json($monthlyEvolution);
-    
-    new Chart(monthlyCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
-            datasets: [
-                {
-                    label: 'Revenus',
-                    data: monthlyData.map(d => d.income),
-                    backgroundColor: 'rgba(57, 70, 178, 0.75)',
-                    borderColor: '#3946B2',
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    barPercentage: 0.6,
-                },
-                {
-                    label: 'Dépenses',
-                    data: monthlyData.map(d => d.expense),
-                    backgroundColor: 'rgba(255, 107, 53, 0.75)',
-                    borderColor: '#FF6B35',
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    barPercentage: 0.6,
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        usePointStyle: true,
-                        pointStyle: 'circle',
-                        padding: 20,
-                        font: { size: 12, weight: '500' }
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.dataset.label + ': ' + 
-                                   context.parsed.y.toLocaleString() + ' FCFA';
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(0,0,0,0.05)',
-                        drawBorder: false,
-                    },
-                    ticks: {
-                        callback: function(value) {
-                            if (value >= 1000) {
-                                return (value / 1000).toFixed(0) + 'k FCFA';
-                            }
-                            return value + ' FCFA';
-                        }
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false,
-                    }
-                }
-            }
-        }
-    });
-
-    // ==========================================
     // GRAPHIQUE DE RÉPARTITION DES SECTIONS
     // ==========================================
     const sectionCtx = document.getElementById('sectionChart').getContext('2d');
@@ -687,44 +596,116 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const colors = ['#3946B2', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
     
-    new Chart(sectionCtx, {
-        type: 'doughnut',
-        data: {
-            labels: sectionData.map(d => d.section || 'Non défini'),
-            datasets: [{
-                data: sectionData.map(d => d.total),
-                backgroundColor: colors.slice(0, sectionData.length),
-                borderWidth: 3,
-                borderColor: '#ffffff',
-                hoverOffset: 8,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        usePointStyle: true,
-                        pointStyle: 'circle',
-                        padding: 16,
-                        font: { size: 11, weight: '500' }
+    if (sectionData.length > 0) {
+        new Chart(sectionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: sectionData.map(d => d.section || 'Non défini'),
+                datasets: [{
+                    data: sectionData.map(d => d.total),
+                    backgroundColor: colors.slice(0, sectionData.length),
+                    borderWidth: 3,
+                    borderColor: '#ffffff',
+                    hoverOffset: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 16,
+                            font: { size: 11, weight: '500' }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                return context.label + ': ' + context.parsed + ' membres (' + percentage + '%)';
+                            }
+                        }
                     }
                 },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((context.parsed / total) * 100).toFixed(1);
-                            return context.label + ': ' + context.parsed + ' membres (' + percentage + '%)';
+                cutout: '70%',
+            }
+        });
+    } else {
+        sectionCtx.canvas.parentElement.innerHTML = 
+            '<div class="text-center py-5 text-muted"><i class="fas fa-chart-pie fa-2x mb-2"></i><p>Aucune donnée disponible</p></div>';
+    }
+
+    // ==========================================
+    // GRAPHIQUE D'ÉVOLUTION DES INSCRIPTIONS
+    // ==========================================
+    const membersCtx = document.getElementById('membersChart').getContext('2d');
+    
+    // Données mensuelles des inscriptions
+    const monthlyData = @json($monthlyRegistrations ?? []);
+    
+    if (monthlyData.length > 0) {
+        new Chart(membersCtx, {
+            type: 'line',
+            data: {
+                labels: monthlyData.map(d => d.month),
+                datasets: [{
+                    label: 'Nouveaux membres',
+                    data: monthlyData.map(d => d.count),
+                    backgroundColor: 'rgba(57, 70, 178, 0.1)',
+                    borderColor: '#3946B2',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#3946B2',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + ' nouveaux membres';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)',
+                            drawBorder: false,
+                        },
+                        ticks: {
+                            stepSize: Math.max(1, Math.ceil(Math.max(...monthlyData.map(d => d.count)) / 5))
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
                         }
                     }
                 }
-            },
-            cutout: '70%',
-        }
-    });
+            }
+        });
+    } else {
+        membersCtx.canvas.parentElement.innerHTML = 
+            '<div class="text-center py-5 text-muted"><i class="fas fa-chart-line fa-2x mb-2"></i><p>Aucune donnée disponible</p></div>';
+    }
 });
 </script>
 @endpush

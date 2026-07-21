@@ -659,36 +659,6 @@
                 <!-- ===== DIVIDER ===== -->
                 <hr class="sidebar-divider">
 
-                <!-- ===== GESTION FINANCIÈRE ===== -->
-                <div class="nav-label">Finances</div>
-
-                @can('view finances')
-                <a class="nav-link {{ $isActive(['admin.financial.dashboard', 'admin.financial.transactions', 'admin.financial.contributions']) }}" href="{{ route('admin.financial.dashboard') }}">
-                    <i class="fas fa-coins"></i>
-                    <span>Tableau de bord</span>
-                </a>
-
-                <a class="nav-link {{ $isActive('admin.financial.transactions') }}" href="{{ route('admin.financial.transactions') }}">
-                    <i class="fas fa-receipt"></i>
-                    <span>Transactions</span>
-                </a>
-
-                <a class="nav-link {{ $isActive('admin.financial.contributions') }}" href="{{ route('admin.financial.contributions') }}">
-                    <i class="fas fa-hand-holding-heart"></i>
-                    <span>Cotisations</span>
-                </a>
-                @endcan
-
-                @can('export reports')
-                <a class="nav-link {{ $isActive('admin.financial.report') }}" href="{{ route('admin.financial.report') }}">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Rapports</span>
-                </a>
-                @endcan
-
-                <!-- ===== DIVIDER ===== -->
-                <hr class="sidebar-divider">
-
                 <!-- ===== GESTION DES ÉVÉNEMENTS ===== -->
                 <div class="nav-label">Événements</div>
 

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Member;
-use App\Models\FinancialTransaction;
 use App\Models\Event;
 use App\Models\EventParticipant;
 
@@ -24,10 +23,6 @@ class DashboardController extends Controller
             return $this->managerDashboard();
         }
         
-        if ($user->can('manage finances')) {
-            return $this->financialDashboard();
-        }
-        
         // Membre simple
         return $this->memberDashboard();
     }
@@ -37,65 +32,55 @@ class DashboardController extends Controller
      */
     private function adminDashboard()
     {
+        // Statistiques des membres
         $totalMembers = Member::count();
-        $activeMembers = Member::active()->count();
+        $activeMembers = Member::where('status', 'active')->count();
+        $pendingMembers = Member::where('status', 'pending')->count();
+        $inactiveMembers = Member::where('status', 'inactive')->count();
+        $newMembersThisMonth = Member::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count();
 
+        // Statistiques des événements
+        $totalEvents = Event::count();
+        $completedEvents = Event::where('status', 'completed')->count();
         $upcomingEvents = Event::whereIn('status', ['planned', 'upcoming', 'ongoing'])
             ->where('start_date', '>=', now())
             ->count();
-
         $eventsThisMonth = Event::whereIn('status', ['planned', 'upcoming', 'ongoing'])
             ->whereBetween('start_date', [now()->startOfMonth(), now()->endOfMonth()])
             ->count();
-
-        $newMembersThisMonth = Member::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
-            ->count();
-
-        $pendingMembers = Member::where('status', 'pending')->count();
-
-        $balance = FinancialTransaction::sum('amount');
-        $monthlyBalance = FinancialTransaction::whereBetween('transaction_date', [now()->startOfMonth(), now()->endOfMonth()])
-            ->sum('amount');
-
-        $recentMembers = Member::latest()->take(5)->get();
-        $recentTransactions = FinancialTransaction::latest('transaction_date')->take(5)->get();
-
-        $currentYear = now()->year;
-        $monthlyEvolutionRows = FinancialTransaction::query()
-            ->selectRaw("MONTH(transaction_date) as month, 
-                SUM(CASE WHEN type='income' THEN amount ELSE 0 END) as income,
-                SUM(CASE WHEN type='expense' THEN amount ELSE 0 END) as expense")
-            ->whereYear('transaction_date', $currentYear)
-            ->groupByRaw('MONTH(transaction_date)')
+        $upcomingEventsList = Event::whereIn('status', ['planned', 'upcoming', 'ongoing'])
+            ->where('start_date', '>=', now())
+            ->orderBy('start_date', 'asc')
+            ->limit(5)
             ->get();
 
-        $monthlyEvolutionByMonth = $monthlyEvolutionRows->keyBy('month');
-        $monthlyEvolution = collect(range(1, 12))->map(function (int $month) use ($monthlyEvolutionByMonth) {
-            $row = $monthlyEvolutionByMonth->get($month);
-            return [
-                'income' => (float) ($row->income ?? 0),
-                'expense' => (float) ($row->expense ?? 0),
-            ];
-        })->values()->toArray();
+        // Derniers membres
+        $recentMembers = Member::latest()->take(5)->get();
 
+        // Répartition par section
         $membersBySection = Member::query()
             ->selectRaw('section, COUNT(*) as total')
+            ->whereNotNull('section')
             ->groupBy('section')
             ->get();
+
+        // Évolution mensuelle des inscriptions
+        $monthlyRegistrations = $this->getMonthlyRegistrations();
 
         return view('admin.dashboard', compact(
             'totalMembers',
             'activeMembers',
-            'balance',
-            'monthlyBalance',
+            'pendingMembers',
+            'inactiveMembers',
+            'totalEvents',
+            'completedEvents',
             'upcomingEvents',
             'eventsThisMonth',
+            'upcomingEventsList',
             'newMembersThisMonth',
-            'pendingMembers',
             'recentMembers',
-            'recentTransactions',
-            'monthlyEvolution',
-            'membersBySection'
+            'membersBySection',
+            'monthlyRegistrations'
         ));
     }
     
@@ -105,13 +90,14 @@ class DashboardController extends Controller
     private function managerDashboard()
     {
         $totalMembers = Member::count();
-        $activeMembers = Member::active()->count();
+        $activeMembers = Member::where('status', 'active')->count();
         $pendingMembers = Member::where('status', 'pending')->count();
         $newMembersThisMonth = Member::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count();
         
         $recentMembers = Member::latest()->take(10)->get();
         $membersBySection = Member::query()
             ->selectRaw('section, COUNT(*) as total')
+            ->whereNotNull('section')
             ->groupBy('section')
             ->get();
 
@@ -126,66 +112,24 @@ class DashboardController extends Controller
     }
     
     /**
-     * Dashboard pour les gestionnaires financiers
-     */
-    private function financialDashboard()
-    {
-        $balance = FinancialTransaction::sum('amount');
-        $monthlyBalance = FinancialTransaction::whereBetween('transaction_date', [now()->startOfMonth(), now()->endOfMonth()])
-            ->sum('amount');
-        
-        $recentTransactions = FinancialTransaction::latest('transaction_date')->take(10)->get();
-        
-        $currentYear = now()->year;
-        $monthlyEvolutionRows = FinancialTransaction::query()
-            ->selectRaw("MONTH(transaction_date) as month, 
-                SUM(CASE WHEN type='income' THEN amount ELSE 0 END) as income,
-                SUM(CASE WHEN type='expense' THEN amount ELSE 0 END) as expense")
-            ->whereYear('transaction_date', $currentYear)
-            ->groupByRaw('MONTH(transaction_date)')
-            ->get();
-
-        $monthlyEvolutionByMonth = $monthlyEvolutionRows->keyBy('month');
-        $monthlyEvolution = collect(range(1, 12))->map(function (int $month) use ($monthlyEvolutionByMonth) {
-            $row = $monthlyEvolutionByMonth->get($month);
-            return [
-                'income' => (float) ($row->income ?? 0),
-                'expense' => (float) ($row->expense ?? 0),
-            ];
-        })->values()->toArray();
-
-        return view('admin.financial-dashboard', compact(
-            'balance',
-            'monthlyBalance',
-            'recentTransactions',
-            'monthlyEvolution'
-        ));
-    }
-    
-    /**
      * Dashboard pour les membres simples
-     * Utilise la relation member_id dans users
      */
     private function memberDashboard()
     {
         $user = Auth::user();
+        $member = $user->member;
         
-        // Récupérer le membre via la relation définie dans User
-        $member = $user->member; // Utilise member_id dans la table users
-        
-        $myContributions = 0;
-        $myTransactions = 0;
         $myEvents = 0;
+        $myParticipations = collect();
         
         if ($member) {
-            $myContributions = FinancialTransaction::where('member_id', $member->id)
-                ->where('type', 'income')
-                ->sum('amount');
+            $myParticipations = EventParticipant::where('member_id', $member->id)
+                ->with('event')
+                ->latest()
+                ->limit(5)
+                ->get();
                 
-            $myTransactions = FinancialTransaction::where('member_id', $member->id)->count();
-            
-            $myEvents = \App\Models\EventParticipation::where('member_id', $member->id)->count();
-
+            $myEvents = EventParticipant::where('member_id', $member->id)->count();
         }
         
         $upcomingEvents = Event::whereIn('status', ['planned', 'upcoming', 'ongoing'])
@@ -194,11 +138,28 @@ class DashboardController extends Controller
             ->get();
 
         return view('admin.member-dashboard', compact(
-            'myContributions',
-            'myTransactions',
             'myEvents',
+            'myParticipations',
             'upcomingEvents',
             'member'
         ));
+    }
+
+    /**
+     * Récupère les données mensuelles d'inscription des 12 derniers mois
+     */
+    private function getMonthlyRegistrations()
+    {
+        $months = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $months[] = [
+                'month' => $date->format('M'),
+                'count' => Member::whereMonth('created_at', $date->month)
+                    ->whereYear('created_at', $date->year)
+                    ->count()
+            ];
+        }
+        return $months;
     }
 }
