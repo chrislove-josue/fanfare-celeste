@@ -204,8 +204,13 @@
             </div>
             <hr class="bg-light">
             <div class="text-center">
-                <p class="mb-0">&copy; 2021 - {{ date('Y') }} Fanfare Céleste - Tous droits réservés</p>
-            </div>
+    <p class="mb-0">
+        &copy; 2021 - {{ date('Y') }} Fanfare Céleste - Tous droits réservés | Conçu et développé par 
+        <span class="text-white">
+            <a href="https://wa.me/22998123353" target="_blank" rel="noopener noreferrer">CJN TECH</a>
+        </span>.
+    </p>
+</div>
         </div>
     </footer>
 
