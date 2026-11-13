@@ -3,232 +3,253 @@
 <head>
 <meta charset="UTF-8">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: DejaVu Sans, sans-serif; }
+* { margin: 0; padding: 0; }
 
+body {
+    font-family: "DejaVu Sans", sans-serif;
+    color: #1f2430;
+}
+
+/* =========================================================
+   DomPDF ignore box-sizing : width/height s'appliquent à la
+   boîte de contenu. 84.12 + 2 x 3.44 (bordure) + 8 (padding)
+   = 99 mm de large, 128.12 + 2 x 3.44 + 7 = 142 mm de haut.
+   ========================================================= */
 .card {
-    /* DomPDF applique width/height à la boîte de contenu (box-sizing
-       n'est pas pris en charge) : ces dimensions donnent une carte
-       extérieure de 99 x 142 mm, soit exactement une page A6. */
-    width: 88.35mm;
-    height: 132.85mm;
-    margin: 3mm auto 3mm;
-    border: 5px solid #E6007E;
+    width: 84.12mm;
+    height: 127.8mm;
+    margin: 3mm auto;
+    border: 13px solid #f5319a;
     background: #ffffff;
-    padding: 4mm 4mm 2.5mm;
+    padding: 3.5mm 4mm 3.5mm;
     overflow: hidden;
     page-break-inside: avoid;
 }
 
 /* ===== EN-TÊTE : LOGOS ===== */
-.logos-table {
+.logos {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 2mm;
+    height: 20mm;
 }
 
-.logos-table td {
+.logos td {
+    width: 33.33%;
+    height: 20mm;
     text-align: center;
     vertical-align: middle;
-    width: 33.33%;
+    padding: 0;
 }
 
-.logo-box {
-    width: 22mm;
-    height: 18mm;
-    margin: 0 auto;
-    display: block;
+.logo-img {
+    max-width: 27mm;
+    max-height: 20mm;
 }
 
 .logo-placeholder {
-    width: 20mm;
-    height: 16mm;
+    width: 22mm;
+    height: 15mm;
     margin: 0 auto;
-    border: 1px dashed #cccccc;
-    color: #cccccc;
-    font-size: 6px;
+    border: 1px dashed #d8d8e2;
+    color: #b9b9c7;
+    font-size: 5.5px;
+    line-height: 15mm;
     text-align: center;
-    line-height: 16mm;
+}
+
+.logo-solo {
+    height: 20mm;
+    text-align: center;
+}
+
+.logo-solo img {
+    height: 20mm;
 }
 
 /* ===== TITRES ===== */
-.title-fanfare {
+.title {
     text-align: center;
-    color: #E6007E;
+    color: #f5319a;
     font-weight: bold;
-    font-size: 19px;
-    letter-spacing: 0.5px;
-    margin-bottom: 0.5mm;
+    font-size: 18pt;
+    line-height: 1.05;
+    letter-spacing: 0.3px;
 }
 
-.subtitle-trompette {
+.subtitle {
     text-align: center;
-    color: #2E9E3F;
+    color: #4ea832;
     font-weight: bold;
-    font-size: 14px;
     font-family: "DejaVu Serif", serif;
-    margin-bottom: 0.5mm;
+    font-size: 13pt;
+    line-height: 1.3;
 }
 
 .country {
     text-align: center;
-    color: #111111;
-    font-size: 9px;
-    font-family: "DejaVu Serif", serif;
-    letter-spacing: 0.5px;
-    margin-bottom: 1.5mm;
+    color: #6b7280;
+    font-size: 6.5pt;
+    letter-spacing: 0.7px;
+    margin-top: 0.7mm;
 }
 
-/* ===== MATRICULE / TEL ===== */
-.top-info-table {
+/* ===== MATRICULE / TELEPHONE ===== */
+.idrow {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 1.5mm;
+    margin-top: 2.5mm;
 }
 
-.top-info-table td {
-    vertical-align: middle;
+.idrow td {
+    vertical-align: bottom;
 }
 
-.matricule-label {
-    font-weight: bold;
-    color: #111111;
-    font-size: 10px;
+.id-left {
+    width: 45%;
 }
 
-.matricule-value {
-    color: #E30613;
-    font-weight: bold;
-    font-size: 14px;
-    white-space: nowrap;
-}
-
-.tel-value {
-    color: #0072BC;
-    font-weight: bold;
-    font-size: 9.5px;
+.id-right {
+    width: 55%;
     text-align: right;
-    white-space: nowrap;
-    padding-right: 1mm;
 }
 
-/* ===== BLOC INFOS + PHOTO ===== */
-.main-table {
+.id-label {
+    font-size: 8pt;
+    font-weight: bold;
+    color: #1f2430;
+}
+
+.id-value {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #e30613;
+    line-height: 1.15;
+}
+
+.id-tel {
+    font-size: 11pt;
+    font-weight: bold;
+    color: #4ea832;
+    line-height: 1.15;
+}
+
+.id-tel .prefix {
+    font-weight: normal;
+}
+
+/* ===== INFOS + PHOTO ===== */
+.main {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 2mm;
+    height: 44mm;
 }
 
-.info-col {
+.main td {
     vertical-align: top;
-    width: 50%;
+}
+
+.info {
+    width: 52mm;
     padding-right: 2mm;
 }
 
-.photo-col {
-    vertical-align: top;
-    width: 50%;
+.photo-cell {
+    width: 30mm;
     text-align: right;
 }
 
-.info-line {
+.line {
     font-size: 9px;
-    color: #111111;
-    margin-bottom: 1.6mm;
-    line-height: 1.25;
+    line-height: 1.35;
+    margin-bottom: 1.7mm;
 }
 
-.info-line .label {
+.line .key {
     font-weight: bold;
     text-decoration: underline;
 }
 
-.info-line .value {
-    font-weight: normal;
-}
-
-.photo-frame {
-    width: 30mm;
-    height: 30mm;
-    border: 2px solid #29ABE2;
-    background-color: #eef2f8;
+.photo {
+    width: 29mm;
+    height: 39mm;
+    border: 2px solid #00aadd;
+    background: #b6d4ed;
     overflow: hidden;
-    margin-left: auto;
     text-align: center;
-    vertical-align: middle;
 }
 
-.photo-frame img {
-    width: 30mm;
-    height: 30mm;
+.photo img {
+    width: 29mm;
+    height: 39mm;
     display: block;
 }
 
-.photo-placeholder-text {
-    color: #a9b8cf;
+.photo-placeholder {
+    color: #6f93b8;
     font-size: 8px;
-    line-height: 30mm;
+    line-height: 39mm;
 }
 
 /* ===== PIED : QR CODE + SIGNATURE ===== */
-.footer-table {
+.footer {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 1.5mm;
+    margin-top: 2mm;
 }
 
-.footer-table td {
+.footer td {
     vertical-align: bottom;
 }
 
-.qr-col {
-    width: 40%;
+.qr-cell {
+    width: 45%;
 }
 
-.qr-wrap {
+.qr {
     width: 20mm;
     height: 20mm;
 }
 
-.qr-wrap img {
+.qr img {
     width: 20mm;
     height: 20mm;
 }
 
-.signature-col {
-    width: 60%;
+.sign-cell {
+    width: 55%;
     text-align: center;
+    vertical-align: bottom;
 }
 
-.stamp-placeholder {
-    width: 16mm;
-    height: 16mm;
-    border: 1px dashed #E30613;
-    border-radius: 50%;
-    color: #E30613;
-    font-size: 6px;
-    text-align: center;
-    line-height: 16mm;
-    margin: 0 auto 0.5mm;
+.le-maitre {
+    font-size: 8pt;
+    font-weight: bold;
+    color: #1f2430;
+    margin-bottom: 1mm;
 }
 
 .stamp-img {
-    width: 16mm;
-    height: 16mm;
-    margin: 0 auto 0.5mm;
-    display: block;
+    height: 14mm;
+    margin-bottom: 1mm;
 }
 
-.le-maitre-label {
-    font-size: 9px;
-    font-weight: bold;
-    color: #111111;
-    margin-bottom: 0.5mm;
+.stamp-placeholder {
+    width: 14mm;
+    height: 14mm;
+    margin: 0 auto 1mm;
+    border: 1px dashed #e30613;
+    border-radius: 50%;
+    color: #e30613;
+    font-size: 5.5px;
+    text-align: center;
+    line-height: 14mm;
 }
 
 .signature-name {
-    font-size: 11px;
+    font-size: 10pt;
     font-weight: bold;
-    color: #111111;
+    color: #1f2430;
     font-family: "DejaVu Serif", serif;
 }
 </style>
@@ -255,76 +276,92 @@ body { font-family: DejaVu Sans, sans-serif; }
 
     // Matricule complet (ex: FCTDA-004)
     $matriculeNumber = $member->member_number ?? '—';
+
+    // Logos de la carte (facultatifs). Si aucun n'est fourni, on retombe
+    // sur le logo officiel du site.
+    $cardDir       = public_path('images/card');
+    $logoFanfare   = file_exists($cardDir . '/logo-fanfare.png') ? $cardDir . '/logo-fanfare.png' : null;
+    $logoEglise    = file_exists($cardDir . '/logo-eglise.png') ? $cardDir . '/logo-eglise.png' : null;
+    $logoTrompette = file_exists($cardDir . '/trompette.png') ? $cardDir . '/trompette.png' : null;
+    $hasCardLogos  = $logoFanfare || $logoEglise || $logoTrompette;
+
+    $siteLogo = public_path('storage/logo/logo.jpg');
+    $stamp    = file_exists($cardDir . '/tampon.png') ? $cardDir . '/tampon.png' : null;
 @endphp
 
 <div class="card">
 
     {{-- ===== LOGOS ===== --}}
-    <table class="logos-table">
-        <tr>
-            <td>
-                {{-- Logo Fanfare Céleste --}}
-                @if(file_exists(public_path('images/card/logo-fanfare.png')))
-                    <img src="{{ public_path('images/card/logo-fanfare.png') }}" class="logo-box">
-                @else
-                    <div class="logo-placeholder">LOGO<br>FANFARE</div>
-                @endif
-            </td>
-            <td>
-                {{-- Logo Église Céleste (arc-en-ciel) --}}
-                @if(file_exists(public_path('images/card/logo-eglise.png')))
-                    <img src="{{ public_path('images/card/logo-eglise.png') }}" class="logo-box">
-                @else
-                    <div class="logo-placeholder">LOGO<br>ÉGLISE</div>
-                @endif
-            </td>
-            <td>
-                {{-- Trompette --}}
-                @if(file_exists(public_path('images/card/trompette.png')))
-                    <img src="{{ public_path('images/card/trompette.png') }}" class="logo-box">
-                @else
-                    <div class="logo-placeholder">TROMPETTE</div>
-                @endif
-            </td>
-        </tr>
-    </table>
+    @if($hasCardLogos)
+        <table class="logos">
+            <tr>
+                <td>
+                    @if($logoFanfare)
+                        <img src="{{ $logoFanfare }}" class="logo-img" alt="">
+                    @else
+                        <div class="logo-placeholder">LOGO<br>FANFARE</div>
+                    @endif
+                </td>
+                <td>
+                    @if($logoEglise)
+                        <img src="{{ $logoEglise }}" class="logo-img" alt="">
+                    @else
+                        <div class="logo-placeholder">LOGO<br>ÉGLISE</div>
+                    @endif
+                </td>
+                <td>
+                    @if($logoTrompette)
+                        <img src="{{ $logoTrompette }}" class="logo-img" alt="">
+                    @else
+                        <div class="logo-placeholder">TROMPETTE</div>
+                    @endif
+                </td>
+            </tr>
+        </table>
+    @elseif(file_exists($siteLogo))
+        <div class="logo-solo">
+            <img src="{{ $siteLogo }}" alt="">
+        </div>
+    @else
+        <table class="logos"><tr><td>&nbsp;</td></tr></table>
+    @endif
 
     {{-- ===== TITRES ===== --}}
-    <div class="title-fanfare">FANFARE CÉLESTE</div>
-    <div class="subtitle-trompette">LA TROMPETTE DE DIEU</div>
+    <div class="title">FANFARE CÉLESTE</div>
+    <div class="subtitle">LA TROMPETTE DE DIEU</div>
     <div class="country">RÉPUBLIQUE DU BÉNIN</div>
 
-    {{-- ===== MATRICULE / TEL ===== --}}
-    <table class="top-info-table">
+    {{-- ===== MATRICULE / TÉLÉPHONE ===== --}}
+    <table class="idrow">
         <tr>
-            <td style="width:50%;">
-                <div class="matricule-label">Matricule :</div>
-                <div class="matricule-value">{{ $matriculeNumber }}</div>
+            <td class="id-left">
+                <div class="id-label">Matricule</div>
+                <div class="id-value">{{ $matriculeNumber }}</div>
             </td>
-            <td style="width:50%;" class="tel-value">
-                TEL: 61 01 26 49
+            <td class="id-right">
+                <div class="id-tel"><span class="prefix">N°</span> 61 01 26 49</div>
             </td>
         </tr>
     </table>
 
     {{-- ===== INFOS + PHOTO ===== --}}
-    <table class="main-table">
+    <table class="main">
         <tr>
-            <td class="info-col">
-                <div class="info-line"><span class="label">Nom</span>: <span class="value">{{ strtoupper($member->last_name) }}</span></div>
-                <div class="info-line"><span class="label">Prénoms</span>: <span class="value">{{ $member->first_name }}</span></div>
-                <div class="info-line"><span class="label">Né le</span>: <span class="value">{{ $member->birth_date ? $member->birth_date->format('d-m-Y') : '—' }}{{ $member->birth_place ? ' à ' . $member->birth_place : '' }}</span></div>
-                <div class="info-line"><span class="label">Paroisse</span>: <span class="value">{{ $paroisse }}</span></div>
-                <div class="info-line"><span class="label">Sous Région</span>: <span class="value">{{ $sousRegion }}</span></div>
-                <div class="info-line"><span class="label">Instrument</span>: <span class="value">{{ $member->instrument ?? '—' }}</span></div>
-                <div class="info-line"><span class="label">Contact</span>: <span class="value">{{ $member->phone ?? '—' }}</span></div>
+            <td class="info">
+                <div class="line"><span class="key">Nom</span>: {{ strtoupper($member->last_name) }}</div>
+                <div class="line"><span class="key">Prénoms</span>: {{ $member->first_name }}</div>
+                <div class="line"><span class="key">Né le</span>: {{ $member->birth_date ? $member->birth_date->format('d-m-Y') : '—' }}{{ $member->birth_place ? ' à ' . $member->birth_place : '' }}</div>
+                <div class="line"><span class="key">Paroisse</span>: {{ $paroisse }}</div>
+                <div class="line"><span class="key">Sous Région</span>: {{ $sousRegion }}</div>
+                <div class="line"><span class="key">Instrument</span>: {{ $member->instrument ?? '—' }}</div>
+                <div class="line"><span class="key">Contact</span>: {{ $member->phone ?? '—' }}</div>
             </td>
-            <td class="photo-col">
-                <div class="photo-frame">
+            <td class="photo-cell">
+                <div class="photo">
                     @if($member->photo_url)
-                        <img src="{{ $member->photo_url }}">
+                        <img src="{{ $member->photo_url }}" alt="">
                     @else
-                        <div class="photo-placeholder-text">PHOTO</div>
+                        <div class="photo-placeholder">PHOTO</div>
                     @endif
                 </div>
             </td>
@@ -332,20 +369,20 @@ body { font-family: DejaVu Sans, sans-serif; }
     </table>
 
     {{-- ===== QR CODE + SIGNATURE ===== --}}
-    <table class="footer-table">
+    <table class="footer">
         <tr>
-            <td class="qr-col">
-                <div class="qr-wrap">
+            <td class="qr-cell">
+                <div class="qr">
                     <img src="data:image/svg+xml;base64,{{ $qrCode }}" alt="QR">
                 </div>
             </td>
-            <td class="signature-col">
-                @if(file_exists(public_path('images/card/tampon.png')))
-                    <img src="{{ public_path('images/card/tampon.png') }}" class="stamp-img">
+            <td class="sign-cell">
+                <div class="le-maitre">Le maître</div>
+                @if($stamp)
+                    <img src="{{ $stamp }}" class="stamp-img" alt="">
                 @else
                     <div class="stamp-placeholder">TAMPON</div>
                 @endif
-                <div class="le-maitre-label">Le maître</div>
                 <div class="signature-name">Marius ADOLIWOSSI</div>
             </td>
         </tr>
