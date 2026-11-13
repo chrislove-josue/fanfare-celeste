@@ -36,7 +36,7 @@
                             <h5 class="card-title">{{ $event->title }}</h5>
 
                             <p class="card-text text-muted" style="line-height: 1.5;">
-                                {{ Str::limit(strip_tags($event->description), 130) }}
+                                <x-plain-text :content="$event->description" :limit="130" />
                             </p>
 
                             <div class="mt-auto">

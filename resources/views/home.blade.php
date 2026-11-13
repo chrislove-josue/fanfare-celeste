@@ -238,7 +238,7 @@
                             {{ $event->start_date->format('d/m/Y à H:i') }}
                         </div>
                         <h5 class="card-title fw-bold">{{ $event->title }}</h5>
-                        <p class="card-text text-muted">{{ Str::limit(strip_tags($event->description), 80) }}</p>
+                        <p class="card-text text-muted"><x-plain-text :content="$event->description" :limit="80" /></p>
                         <div class="mb-2">
                             <i class="fas fa-map-marker-alt text-danger me-1"></i> 
                             {{ $event->location }}
@@ -304,7 +304,7 @@
                             {{ $news->published_at ? $news->published_at->format('d/m/Y') : 'Date non définie' }}
                         </div>
                         <h5 class="card-title fw-bold">{{ $news->title }}</h5>
-                        <p class="card-text text-muted">{{ Str::limit(strip_tags($news->content), 100) }}</p>
+                        <p class="card-text text-muted"><x-plain-text :content="$news->content" :limit="100" /></p>
                     </div>
                     <div class="pt-0 bg-transparent border-0 card-footer">
                         <a href="{{ route('public.news.show', $news->slug) }}" class="btn btn-primary w-100">

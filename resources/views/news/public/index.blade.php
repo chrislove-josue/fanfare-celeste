@@ -45,7 +45,7 @@
                             </span>
                             <h5 class="card-title">{{ $item->title }}</h5>
                             <p class="card-text text-muted">
-                                {{ Str::limit(strip_tags($item->content), 120) }}
+                                <x-plain-text :content="$item->content" :limit="120" />
                             </p>
                         </div>
                         <div class="bg-transparent border-0 card-footer">

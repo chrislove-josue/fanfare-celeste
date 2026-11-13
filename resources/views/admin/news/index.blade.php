@@ -142,9 +142,9 @@
                         <td>
                             <div class="text-truncate" style="max-width: 200px;">
                                 @if($item->type === 'event')
-                                    {{ Str::limit(strip_tags($item->description ?? ''), 80) }}
+                                    <x-plain-text :content="$item->description" :limit="80" />
                                 @else
-                                    {{ Str::limit(strip_tags($item->content ?? ''), 80) }}
+                                    <x-plain-text :content="$item->content" :limit="80" />
                                 @endif
                             </div>
                         </td>

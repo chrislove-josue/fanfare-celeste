@@ -67,7 +67,7 @@
                         <td>{{ $testimonial->author_role ?? '-' }}</td>
                         <td>
                             <div class="text-truncate" style="max-width: 200px;">
-                                {{ Str::limit(strip_tags($testimonial->content), 60) }}
+                                <x-plain-text :content="$testimonial->content" :limit="60" />
                             </div>
                         </td>
                         <td>

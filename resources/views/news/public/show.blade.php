@@ -2,7 +2,7 @@
 
 @section('title', $news->title)
 
-@section('meta_description', $news->meta_description ?? Str::limit(strip_tags($news->content), 160))
+@section('meta_description', $news->meta_description ?? Str::limit(strip_tags(html_entity_decode($news->content, ENT_QUOTES | ENT_HTML5, 'UTF-8')), 160))
 
 @section('content')
 <div class="container py-5">

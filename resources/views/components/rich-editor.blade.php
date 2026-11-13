@@ -85,6 +85,7 @@
                             branding: false,
                             promotion: false,
                             convert_urls: false,
+                            entity_encoding: 'raw',
                             automatic_uploads: true,
                             content_style: "body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.7; color: #1a1a2e; }",
                             images_upload_handler: function (blobInfo, progress) {
