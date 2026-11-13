@@ -117,6 +117,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('/members/{member}/approve', [MemberController::class, 'approve'])->name('members.approve');
     Route::post('/members/{member}/reject', [MemberController::class, 'reject'])->name('members.reject');
     Route::get('/members/{member}/card', [MemberController::class, 'generateCard'])->name('members.card');
+Route::get('/members/cards/export-all', [MemberController::class, 'exportAllCards'])->name('members.cards.exportAll');
     Route::get('/members/export/all', [MemberController::class, 'export'])->name('members.export');
     Route::get('/members/{member}/document', [MemberController::class, 'viewDocument'])->name('members.document');
     

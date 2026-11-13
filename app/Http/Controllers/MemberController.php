@@ -505,6 +505,19 @@ class MemberController extends Controller
     }
 
     // ==========================================
+    // EXPORT ALL CARDS - Exporter toutes les cartes en un seul PDF
+    // ==========================================
+    public function exportAllCards()
+    {
+        $members = Member::orderBy('member_number')->get();
+
+        $pdf = Pdf::loadView('admin.members.cards-export', compact('members'));
+        $pdf->setPaper([0, 0, 297.64, 419.53]);
+
+        return $pdf->download('cartes_membres.pdf');
+    }
+
+    // ==========================================
     // VIEW DOCUMENT - Afficher le document d'identité
     // ==========================================
     public function viewDocument(Member $member)

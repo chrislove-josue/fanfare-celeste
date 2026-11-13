@@ -788,6 +788,9 @@
                 <a href="{{ route('admin.members.export') }}" class="btn btn-success">
                     <i class="fas fa-file-export me-1"></i> Exporter PDF
                 </a>
+                <a href="{{ route('admin.members.cards.exportAll') }}" class="btn btn-danger">
+                    <i class="fas fa-id-card me-1"></i> Exporter toutes les cartes
+                </a>
                 @if($pendingMembers > 0)
                     <a href="{{ route('admin.members.index', ['status' => 'pending']) }}" class="btn btn-warning">
                         <i class="fas fa-clock me-1"></i> En attente
