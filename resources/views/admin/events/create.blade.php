@@ -69,11 +69,7 @@
                         <i class="fas fa-align-left me-1 text-primary"></i>
                         Description *
                     </label>
-                    <textarea name="description" class="form-control @error('description') is-invalid @enderror" 
-                              rows="5" required>{{ old('description') }}</textarea>
-                    @error('description')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <x-rich-editor name="description" :rows="5" :height="300" />
                 </div>
 
                 <!-- Dates -->

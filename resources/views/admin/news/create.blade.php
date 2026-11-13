@@ -65,11 +65,12 @@
                         <i class="fas fa-file-alt me-1 text-primary"></i>
                         Contenu *
                     </label>
-                    <textarea name="content" class="form-control @error('content') is-invalid @enderror" 
-                              rows="10" placeholder="Rédigez votre article ici..." required>{{ old('content') }}</textarea>
-                    @error('content')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <x-rich-editor
+                        name="content"
+                        :rows="10"
+                        :height="450"
+                        placeholder="Rédigez votre article ici..."
+                    />
                 </div>
 
                 <!-- Image à la une -->

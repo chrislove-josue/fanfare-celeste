@@ -51,7 +51,7 @@
 
                     <div class="col-md-12">
                         <label class="form-label">Description</label>
-                        <textarea name="description" class="form-control" rows="4" required>{{ old('description', $event->description) }}</textarea>
+                        <x-rich-editor name="description" :value="$event->description" :rows="4" :height="300" />
                     </div>
 
                     <div class="col-md-6">

@@ -27,11 +27,7 @@
                     
                     <div class="mb-3">
                         <label for="content" class="form-label">Contenu</label>
-                        <textarea class="form-control @error('content') is-invalid @enderror" 
-                                  id="content" name="content" rows="15">{{ old('content') }}</textarea>
-                        @error('content')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <x-rich-editor name="content" :rows="15" :height="500" />
                     </div>
                 </div>
                 

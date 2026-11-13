@@ -24,6 +24,7 @@ use App\Http\Controllers\PublicNewsController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\Admin\GalleryController as AdminGalleryController;
+use App\Http\Controllers\Admin\EditorUploadController;
 use Illuminate\Support\Facades\Route;
 
 // ============================================
@@ -101,6 +102,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Téléversement d'images depuis les zones de texte enrichies
+    Route::post('/editor/upload', [EditorUploadController::class, 'store'])->name('editor.upload');
 
     // Profile Admin
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
