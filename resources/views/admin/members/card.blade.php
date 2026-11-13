@@ -226,24 +226,24 @@ body {
     font-size: 8pt;
     font-weight: bold;
     color: #1f2430;
-    margin-bottom: 1mm;
+    margin-bottom: 0.8mm;
 }
 
 .stamp-img {
-    height: 14mm;
-    margin-bottom: 1mm;
+    height: 13mm;
+    margin-bottom: 0.8mm;
 }
 
 .stamp-placeholder {
-    width: 14mm;
-    height: 14mm;
-    margin: 0 auto 1mm;
+    width: 13mm;
+    height: 13mm;
+    margin: 0 auto 0.8mm;
     border: 1px dashed #e30613;
     border-radius: 50%;
     color: #e30613;
     font-size: 5.5px;
     text-align: center;
-    line-height: 14mm;
+    line-height: 13mm;
 }
 
 .signature-name {
