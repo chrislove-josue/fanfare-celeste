@@ -337,7 +337,7 @@ body {
     {{-- ===== TITRES ===== --}}
     <div class="title">FANFARE CÉLESTE</div>
     <div class="subtitle">LA TROMPETTE DE DIEU</div>
-    <div class="country">de l'atlantique</div>
+    <div class="country">DE L'ATLANTIQUE</div>
 
     {{-- ===== MATRICULE / TÉLÉPHONE ===== --}}
     <table class="idrow">
