@@ -126,6 +126,14 @@ body {
     line-height: 1.15;
 }
 
+.id-tel-label {
+    font-size: 7pt;
+    font-weight: bold;
+    color: #4ea832;
+    line-height: 1.15;
+    margin-bottom: 0.5mm;
+}
+
 .id-tel {
     font-size: 11pt;
     font-weight: bold;
@@ -329,7 +337,7 @@ body {
     {{-- ===== TITRES ===== --}}
     <div class="title">FANFARE CÉLESTE</div>
     <div class="subtitle">LA TROMPETTE DE DIEU</div>
-    <div class="country">RÉPUBLIQUE DU BÉNIN</div>
+    <div class="country">de l'atlantique</div>
 
     {{-- ===== MATRICULE / TÉLÉPHONE ===== --}}
     <table class="idrow">
@@ -339,7 +347,8 @@ body {
                 <div class="id-value">{{ $matriculeNumber }}</div>
             </td>
             <td class="id-right">
-                <div class="id-tel"><span class="prefix">N°</span> 61 01 26 49</div>
+                <div class="id-tel-label">Tél. du club fanfare</div>
+                <div class="id-tel">+229 01 96 31 07 75</div>
             </td>
         </tr>
     </table>
