@@ -54,11 +54,7 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Description</label>
-                            <textarea name="description" class="form-control @error('description') is-invalid @enderror" 
-                                      rows="3">{{ old('description') }}</textarea>
-                            @error('description')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <x-rich-editor name="description" :rows="3" :height="240" />
                         </div>
 
                         <div class="mb-3">

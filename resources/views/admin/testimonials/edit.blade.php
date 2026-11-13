@@ -57,11 +57,7 @@
 
                     <div class="mb-3">
                         <label for="content" class="form-label">Témoignage *</label>
-                        <textarea class="form-control @error('content') is-invalid @enderror" 
-                                  id="content" name="content" rows="5" required>{{ old('content', $testimonial->content) }}</textarea>
-                        @error('content')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <x-rich-editor name="content" :value="$testimonial->content" :rows="5" :height="260" />
                     </div>
 
                     <div class="mb-3">

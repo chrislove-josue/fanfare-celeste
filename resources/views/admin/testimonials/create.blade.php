@@ -45,12 +45,7 @@
 
                     <div class="mb-3">
                         <label for="content" class="form-label">Témoignage *</label>
-                        <textarea class="form-control @error('content') is-invalid @enderror" 
-                                  id="content" name="content" rows="5" 
-                                  placeholder="Partagez votre expérience..." required>{{ old('content') }}</textarea>
-                        @error('content')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <x-rich-editor name="content" :rows="5" :height="260" placeholder="Partagez votre expérience..." />
                     </div>
 
                     <div class="mb-3">
