@@ -7,8 +7,11 @@
 body { font-family: DejaVu Sans, sans-serif; }
 
 .card {
-    width: 99mm;
-    height: 142mm;
+    /* DomPDF applique width/height à la boîte de contenu (box-sizing
+       n'est pas pris en charge) : ces dimensions donnent une carte
+       extérieure de 99 x 142 mm, soit exactement une page A6. */
+    width: 88.35mm;
+    height: 132.85mm;
     margin: 3mm auto 3mm;
     border: 5px solid #E6007E;
     background: #ffffff;
