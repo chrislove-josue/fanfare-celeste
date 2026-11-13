@@ -78,6 +78,9 @@
                                 'forecolor backcolor | alignleft aligncenter alignright alignjustify',
                                 'bullist numlist outdent indent | link image media table | removeformat code fullscreen'
                             ].join(' | '),
+                            toolbar_mode: 'wrap',
+                            font_family_formats: 'Inter=Inter,system-ui,-apple-system,Segoe UI,sans-serif; Arial=Arial,Helvetica,sans-serif; Georgia=Georgia,serif; Times New Roman=Times New Roman,Times,serif; Verdana=Verdana,sans-serif; Courier New=Courier New,monospace',
+                            font_size_formats: '12px 14px 16px 18px 20px 24px 28px 32px 36px 48px',
                             quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote',
                             quickbars_insert_toolbar: false,
                             branding: false,
