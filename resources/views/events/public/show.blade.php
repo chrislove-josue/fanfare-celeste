@@ -33,7 +33,7 @@
                         <h1 class="mb-3" style="font-size: 2rem; line-height: 1.2;">{{ $event->title }}</h1>
 
                         <div class="mb-4">
-                            {!! nl2br(e($event->description)) !!}
+                            <x-rich-content :content="$event->description" />
                         </div>
 
                         @if(!empty($event->notes))

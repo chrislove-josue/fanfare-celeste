@@ -38,7 +38,7 @@
                 </div>
 
                 <div class="mt-3 content">
-                    {!! nl2br(e($event->description)) !!}
+                    <x-rich-content :content="$event->description" />
                 </div>
 
                 @if($event->notes)

@@ -239,7 +239,7 @@
                                     @endif
                                     <h6 class="fw-bold mb-1" style="font-size: clamp(0.8rem, 0.9vw, 0.95rem);">{{ $partner->name }}</h6>
                                     @if($partner->description)
-                                        <small class="text-muted d-block" style="font-size: clamp(0.6rem, 0.7vw, 0.75rem);">{{ Str::limit($partner->description, 40) }}</small>
+                                        <small class="text-muted d-block" style="font-size: clamp(0.6rem, 0.7vw, 0.75rem);">{{ Str::limit(strip_tags($partner->description), 40) }}</small>
                                     @endif
                                     @if($partner->website)
                                         <a href="{{ $partner->website }}" target="_blank" class="btn btn-sm btn-outline-primary mt-2" style="font-size: clamp(0.6rem, 0.7vw, 0.75rem);">

@@ -158,7 +158,7 @@
                             </td>
                             <td>
                                 @if($partner->description)
-                                    {{ Str::limit($partner->description, 40) }}
+                                    {{ Str::limit(strip_tags($partner->description), 40) }}
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif

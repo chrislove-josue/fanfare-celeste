@@ -42,7 +42,7 @@
                 @endif
 
                 <div class="content fs-5 lh-lg">
-                    {!! nl2br(e($news->content)) !!}
+                    <x-rich-content :content="$news->content" />
                 </div>
             </article>
 

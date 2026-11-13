@@ -24,7 +24,7 @@
             @endif
             
             <div class="page-content">
-                {!! $page->content !!}
+                <x-rich-content :content="$page->content" />
             </div>
             
             <div class="page-footer mt-4 text-muted small">

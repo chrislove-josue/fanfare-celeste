@@ -238,7 +238,7 @@
                             {{ $event->start_date->format('d/m/Y à H:i') }}
                         </div>
                         <h5 class="card-title fw-bold">{{ $event->title }}</h5>
-                        <p class="card-text text-muted">{{ Str::limit($event->description, 80) }}</p>
+                        <p class="card-text text-muted">{{ Str::limit(strip_tags($event->description), 80) }}</p>
                         <div class="mb-2">
                             <i class="fas fa-map-marker-alt text-danger me-1"></i> 
                             {{ $event->location }}

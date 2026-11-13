@@ -34,7 +34,7 @@
                 @endif
 
                 <div class="mt-3 content">
-                    {!! nl2br(e($news->content)) !!}
+                    <x-rich-content :content="$news->content" />
                 </div>
             </div>
             <div class="card-footer">
