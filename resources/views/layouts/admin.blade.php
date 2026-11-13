@@ -654,6 +654,10 @@
                     <i class="fas fa-file-export"></i>
                     <span>Exporter</span>
                 </a>
+                <a class="nav-link {{ $isActive('admin.members.cards.exportAll') }}" href="{{ route('admin.members.cards.exportAll') }}">
+                    <i class="fas fa-id-card"></i>
+                    <span>Exporter cartes</span>
+                </a>
                 @endcan
 
                 <!-- ===== DIVIDER ===== -->
