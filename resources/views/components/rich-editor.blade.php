@@ -8,12 +8,11 @@
 ])
 
 @php
-    $editorId = $id ?? 'rich-editor-' . \Illuminate\Support\Str::slug($name, '-');
     $hasError = $errors->has($name);
 @endphp
 
 <textarea
-    id="{{ $editorId }}"
+    id="{{ $id ?? $name }}"
     name="{{ $name }}"
     rows="{{ $rows }}"
     placeholder="{{ $placeholder }}"
