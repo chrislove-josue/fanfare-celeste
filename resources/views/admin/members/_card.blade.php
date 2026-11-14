@@ -27,7 +27,7 @@
     $logoTrompette = file_exists($cardDir . '/trompette.png') ? $cardDir . '/trompette.png' : null;
     $hasCardLogos  = $logoFanfare || $logoEglise || $logoTrompette;
 
-    $siteLogo = public_path('storage/logo/logo.jpg');
+    $siteLogo = public_path('storage/logo/logo-blanc.jpeg');
     $stamp    = file_exists($cardDir . '/tampon.png') ? $cardDir . '/tampon.png' : null;
     $qrCode   = $member->memberCardQrCode;
 
