@@ -19,17 +19,21 @@
     // Matricule complet (ex: FCTDA-004)
     $matriculeNumber = $member->member_number ?? '—';
 
-    // Logos de la carte. Le logo FCDTA (gauche) retombe sur logo-blanc.jpeg
-    // si aucun logo-fanfare.png n'est fourni. L'église (milieu) et l'image
-    // d'instrument (droite) affichent un placeholder tant que les fichiers
-    // logo-eglise.png / trompette.png ne sont pas déposés.
-    $cardDir       = public_path('images/card');
-    $logoFanfare   = file_exists($cardDir . '/logo-fanfare.png')
-        ? $cardDir . '/logo-fanfare.png'
-        : (file_exists(public_path('storage/logo/logo-blanc.jpeg')) ? public_path('storage/logo/logo-blanc.jpeg') : null);
-    $logoEglise    = file_exists($cardDir . '/logo-eglise.png') ? $cardDir . '/logo-eglise.png' : null;
-    $logoTrompette = file_exists($cardDir . '/trompette.png') ? $cardDir . '/trompette.png' : null;
-    $stamp    = file_exists($cardDir . '/tampon.png') ? $cardDir . '/tampon.png' : null;
+    // Logos de la carte. Les fichiers sont dans public/storage/logo/.
+    // Gauche (FCDTA) : logo-ecc.png -> ecc.png -> logo-blanc.jpeg
+    // Milieu (Église) : logo-eglise.png
+    // Droite (Instrument) : trompette.png
+    $logoDir = public_path('storage/logo');
+    $logoFanfare = null;
+    foreach (['logo-ecc.png', 'ecc.png', 'logo-blanc.jpeg', 'logo.jpg'] as $candidate) {
+        if (file_exists($logoDir . '/' . $candidate)) {
+            $logoFanfare = $logoDir . '/' . $candidate;
+            break;
+        }
+    }
+    $logoEglise    = file_exists($logoDir . '/logo-eglise.png') ? $logoDir . '/logo-eglise.png' : null;
+    $logoTrompette = file_exists($logoDir . '/trompette.png') ? $logoDir . '/trompette.png' : null;
+    $stamp    = file_exists($logoDir . '/tampon.png') ? $logoDir . '/tampon.png' : null;
     $qrCode   = $member->memberCardQrCode;
 
     // Dimensions de la photo : le cadre s'adapte au ratio de la photo (pas de déformation, pas de vide)
