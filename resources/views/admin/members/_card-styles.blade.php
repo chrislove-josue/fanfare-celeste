@@ -79,6 +79,7 @@ body {
     text-align: center;
     color: #6b7280;
     font-size: 14pt;
+    font-weight: bold;
     letter-spacing: 0.3px;
     margin-top: 0.7mm;
 }
@@ -150,7 +151,7 @@ body {
     width: 30mm;
     text-align: right;
     vertical-align: top;
-    padding-top: 2mm;
+    padding-top: 4.6mm;
 }
 
 .line {
