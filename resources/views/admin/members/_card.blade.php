@@ -20,12 +20,12 @@
     $matriculeNumber = $member->member_number ?? '—';
 
     // Logos de la carte. Les fichiers sont dans public/storage/logo/.
-    // Gauche (FCDTA) : logo-ecc.png -> ecc.png -> logo-blanc.jpeg
+    // Gauche (FCDTA) : logo-blanc.jpeg
     // Milieu (Église) : logo-eglise.png
     // Droite (Instrument) : trompette.png
     $logoDir = public_path('storage/logo');
     $logoFanfare = null;
-    foreach (['logo-ecc.png', 'ecc.png', 'logo-blanc.jpeg', 'logo.jpg'] as $candidate) {
+    foreach (['logo-blanc.jpeg', 'logo.jpg'] as $candidate) {
         if (file_exists($logoDir . '/' . $candidate)) {
             $logoFanfare = $logoDir . '/' . $candidate;
             break;
