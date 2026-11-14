@@ -21,12 +21,12 @@ body {
 .logos {
     width: 100%;
     border-collapse: collapse;
-    height: 20mm;
+    height: 18mm;
 }
 
 .logos td {
     width: 33.33%;
-    height: 20mm;
+    height: 18mm;
     text-align: center;
     vertical-align: middle;
     padding: 0;
@@ -49,19 +49,19 @@ body {
 }
 
 .logo-solo {
-    height: 20mm;
+    height: 18mm;
     text-align: center;
 }
 
 .logo-solo img {
-    height: 20mm;
+    height: 18mm;
 }
 
 .title {
     text-align: center;
     color: #f5319a;
     font-weight: bold;
-    font-size: 18pt;
+    font-size: 14pt;
     line-height: 1.05;
     letter-spacing: 0.3px;
 }
@@ -71,22 +71,22 @@ body {
     color: #4ea832;
     font-weight: bold;
     font-family: "DejaVu Serif", serif;
-    font-size: 13pt;
+    font-size: 14pt;
     line-height: 1.3;
 }
 
 .country {
     text-align: center;
     color: #6b7280;
-    font-size: 6.5pt;
-    letter-spacing: 0.7px;
+    font-size: 14pt;
+    letter-spacing: 0.3px;
     margin-top: 0.7mm;
 }
 
 .idrow {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 2.5mm;
+    margin-top: 2mm;
 }
 
 .idrow td {
@@ -154,7 +154,7 @@ body {
 .line {
     font-size: 9px;
     line-height: 1.35;
-    margin-bottom: 1.7mm;
+    margin-bottom: 1.3mm;
 }
 
 .line .key {
@@ -186,7 +186,7 @@ body {
 .footer {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 2mm;
+    margin-top: 1.5mm;
 }
 
 .footer td {
