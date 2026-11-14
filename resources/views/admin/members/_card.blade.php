@@ -31,18 +31,24 @@
     $stamp    = file_exists($cardDir . '/tampon.png') ? $cardDir . '/tampon.png' : null;
     $qrCode   = $member->memberCardQrCode;
 
-    // Dimensions de la photo pour éviter la déformation (contain dans 29x39mm)
-    $photoW = 29; $photoH = 39; // mm (cadre)
-    $imgW = $photoW; $imgH = $photoH; $imgMt = 0; $imgMl = 0;
+    // Dimensions de la photo : le cadre s'adapte au ratio de la photo (pas de déformation, pas de vide)
+    $maxFrameW = 29; $maxFrameH = 39; // mm (cadre max)
+    $frameW = $maxFrameW; $frameH = $maxFrameH;
+    $imgW = $frameW; $imgH = $frameH;
     if ($member->photo_url && preg_match('#^data:image/[^;]+;base64,(.+)$#', $member->photo_url, $pm)) {
         $bin = base64_decode($pm[1]);
         $info = @getimagesizefromstring($bin);
         if ($info && $info[0] > 0 && $info[1] > 0) {
-            $scale = min($photoW / $info[0], $photoH / $info[1]);
-            $imgW = $info[0] * $scale;
-            $imgH = $info[1] * $scale;
-            $imgMt = ($photoH - $imgH) / 2;
-            $imgMl = ($photoW - $imgW) / 2;
+            $ratio = $info[1] / $info[0]; // hauteur / largeur
+            // Largeur max 29mm, hauteur max 39mm, ratio conservé
+            $frameW = $maxFrameW;
+            $frameH = $frameW * $ratio;
+            if ($frameH > $maxFrameH) {
+                $frameH = $maxFrameH;
+                $frameW = $frameH / $ratio;
+            }
+            $imgW = $frameW;
+            $imgH = $frameH;
         }
     }
 @endphp
@@ -116,9 +122,9 @@
                 <div class="line"><span class="key">Contact</span>: {{ $member->phone ?? '—' }}</div>
             </td>
             <td class="photo-cell">
-                <div class="photo">
+                <div class="photo" style="width: {{ $frameW }}mm; height: {{ $frameH }}mm;">
                     @if($member->photo_url)
-                        <img src="{{ $member->photo_url }}" style="width: {{ $imgW }}mm; height: {{ $imgH }}mm; margin-top: {{ $imgMt }}mm; margin-left: {{ $imgMl }}mm;" alt="">
+                        <img src="{{ $member->photo_url }}" style="width: {{ $imgW }}mm; height: {{ $imgH }}mm;" alt="">
                     @else
                         <div class="photo-placeholder">PHOTO</div>
                     @endif

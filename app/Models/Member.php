@@ -114,11 +114,14 @@ class Member extends Model
 
         $sw = imagesx($src);
         $sh = imagesy($src);
-        $size = min($sw, $sh);
-        $ox = intval(($sw - $size) / 2);
-        $oy = intval(($sh - $size) / 2);
 
-        $dst = imagecreatetruecolor(68, 68);
+        // Redimensionnement en conservant le ratio (pas de recadrage carré)
+        $maxDim = 300;
+        $scale = min($maxDim / $sw, $maxDim / $sh, 1);
+        $nw = max(1, (int) round($sw * $scale));
+        $nh = max(1, (int) round($sh * $scale));
+
+        $dst = imagecreatetruecolor($nw, $nh);
 
         if ($mime === 'image/png') {
             imagealphablending($dst, false);
@@ -127,16 +130,21 @@ class Member extends Model
             imagefill($dst, 0, 0, $transparent);
         }
 
-        imagecopyresampled($dst, $src, 0, 0, $ox, $oy, 68, 68, $size, $size);
+        imagecopyresampled($dst, $src, 0, 0, 0, 0, $nw, $nh, $sw, $sh);
 
         ob_start();
-        imagejpeg($dst, null, 90);
+        if ($mime === 'image/png') {
+            imagepng($dst, null);
+        } else {
+            imagejpeg($dst, null, 90);
+        }
         $data = ob_get_clean();
 
         imagedestroy($src);
         imagedestroy($dst);
 
-        return 'data:image/jpeg;base64,' . base64_encode($data);
+        $outMime = ($mime === 'image/png') ? 'image/png' : 'image/jpeg';
+        return 'data:' . $outMime . ';base64,' . base64_encode($data);
     }
 
     /**
