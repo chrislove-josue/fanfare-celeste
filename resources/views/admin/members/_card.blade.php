@@ -19,15 +19,16 @@
     // Matricule complet (ex: FCTDA-004)
     $matriculeNumber = $member->member_number ?? '—';
 
-    // Logos de la carte (facultatifs). Si aucun n'est fourni, on retombe
-    // sur le logo officiel du site.
+    // Logos de la carte. Le logo FCDTA (gauche) retombe sur logo-blanc.jpeg
+    // si aucun logo-fanfare.png n'est fourni. L'église (milieu) et l'image
+    // d'instrument (droite) affichent un placeholder tant que les fichiers
+    // logo-eglise.png / trompette.png ne sont pas déposés.
     $cardDir       = public_path('images/card');
-    $logoFanfare   = file_exists($cardDir . '/logo-fanfare.png') ? $cardDir . '/logo-fanfare.png' : null;
+    $logoFanfare   = file_exists($cardDir . '/logo-fanfare.png')
+        ? $cardDir . '/logo-fanfare.png'
+        : (file_exists(public_path('storage/logo/logo-blanc.jpeg')) ? public_path('storage/logo/logo-blanc.jpeg') : null);
     $logoEglise    = file_exists($cardDir . '/logo-eglise.png') ? $cardDir . '/logo-eglise.png' : null;
     $logoTrompette = file_exists($cardDir . '/trompette.png') ? $cardDir . '/trompette.png' : null;
-    $hasCardLogos  = $logoFanfare || $logoEglise || $logoTrompette;
-
-    $siteLogo = public_path('storage/logo/logo-blanc.jpeg');
     $stamp    = file_exists($cardDir . '/tampon.png') ? $cardDir . '/tampon.png' : null;
     $qrCode   = $member->memberCardQrCode;
 
@@ -56,39 +57,31 @@
 <div class="card" @if(!empty($lastCard)) style="page-break-after: auto;" @endif>
 
     {{-- ===== LOGOS ===== --}}
-    @if($hasCardLogos)
-        <table class="logos">
-            <tr>
-                <td>
-                    @if($logoFanfare)
-                        <img src="{{ $logoFanfare }}" class="logo-img" alt="">
-                    @else
-                        <div class="logo-placeholder">LOGO<br>FANFARE</div>
-                    @endif
-                </td>
-                <td>
-                    @if($logoEglise)
-                        <img src="{{ $logoEglise }}" class="logo-img" alt="">
-                    @else
-                        <div class="logo-placeholder">LOGO<br>ÉGLISE</div>
-                    @endif
-                </td>
-                <td>
-                    @if($logoTrompette)
-                        <img src="{{ $logoTrompette }}" class="logo-img" alt="">
-                    @else
-                        <div class="logo-placeholder">TROMPETTE</div>
-                    @endif
-                </td>
-            </tr>
-        </table>
-    @elseif(file_exists($siteLogo))
-        <div class="logo-solo">
-            <img src="{{ $siteLogo }}" alt="">
-        </div>
-    @else
-        <table class="logos"><tr><td>&nbsp;</td></tr></table>
-    @endif
+    <table class="logos">
+        <tr>
+            <td>
+                @if($logoFanfare)
+                    <img src="{{ $logoFanfare }}" class="logo-img" alt="">
+                @else
+                    <div class="logo-placeholder">LOGO<br>FCDTA</div>
+                @endif
+            </td>
+            <td>
+                @if($logoEglise)
+                    <img src="{{ $logoEglise }}" class="logo-img" alt="">
+                @else
+                    <div class="logo-placeholder">LOGO<br>ÉGLISE</div>
+                @endif
+            </td>
+            <td>
+                @if($logoTrompette)
+                    <img src="{{ $logoTrompette }}" class="logo-img" alt="">
+                @else
+                    <div class="logo-placeholder">INSTRUMENT</div>
+                @endif
+            </td>
+        </tr>
+    </table>
 
     {{-- ===== TITRES ===== --}}
     <div class="title">FANFARE CÉLESTE</div>
