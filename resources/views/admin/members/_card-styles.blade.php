@@ -151,7 +151,7 @@ body {
     width: 30mm;
     text-align: right;
     vertical-align: top;
-    padding-top: 4.6mm;
+    padding-top: 7.2mm;
 }
 
 .line {
