@@ -30,6 +30,21 @@
     $siteLogo = public_path('storage/logo/logo.jpg');
     $stamp    = file_exists($cardDir . '/tampon.png') ? $cardDir . '/tampon.png' : null;
     $qrCode   = $member->memberCardQrCode;
+
+    // Dimensions de la photo pour éviter la déformation (contain dans 29x39mm)
+    $photoW = 29; $photoH = 39; // mm (cadre)
+    $imgW = $photoW; $imgH = $photoH; $imgMt = 0; $imgMl = 0;
+    if ($member->photo_url && preg_match('#^data:image/[^;]+;base64,(.+)$#', $member->photo_url, $pm)) {
+        $bin = base64_decode($pm[1]);
+        $info = @getimagesizefromstring($bin);
+        if ($info && $info[0] > 0 && $info[1] > 0) {
+            $scale = min($photoW / $info[0], $photoH / $info[1]);
+            $imgW = $info[0] * $scale;
+            $imgH = $info[1] * $scale;
+            $imgMt = ($photoH - $imgH) / 2;
+            $imgMl = ($photoW - $imgW) / 2;
+        }
+    }
 @endphp
 
 <div class="card" @if(!empty($lastCard)) style="page-break-after: auto;" @endif>
@@ -103,7 +118,7 @@
             <td class="photo-cell">
                 <div class="photo">
                     @if($member->photo_url)
-                        <img src="{{ $member->photo_url }}" alt="">
+                        <img src="{{ $member->photo_url }}" style="width: {{ $imgW }}mm; height: {{ $imgH }}mm; margin-top: {{ $imgMt }}mm; margin-left: {{ $imgMl }}mm;" alt="">
                     @else
                         <div class="photo-placeholder">PHOTO</div>
                     @endif
