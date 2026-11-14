@@ -21,12 +21,12 @@ body {
 .logos {
     width: 100%;
     border-collapse: collapse;
-    height: 18mm;
+    height: 16mm;
 }
 
 .logos td {
     width: 33.33%;
-    height: 18mm;
+    height: 16mm;
     text-align: center;
     vertical-align: middle;
     padding: 0;
@@ -49,12 +49,12 @@ body {
 }
 
 .logo-solo {
-    height: 18mm;
+    height: 16mm;
     text-align: center;
 }
 
 .logo-solo img {
-    height: 18mm;
+    height: 16mm;
 }
 
 .title {
@@ -87,7 +87,7 @@ body {
 .idrow {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 2mm;
+    margin-top: 1.5mm;
 }
 
 .idrow td {
