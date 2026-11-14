@@ -149,6 +149,7 @@ body {
 .photo-cell {
     width: 30mm;
     text-align: right;
+    vertical-align: middle;
 }
 
 .line {
