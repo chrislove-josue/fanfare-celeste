@@ -81,7 +81,7 @@ body {
     font-size: 14pt;
     font-weight: bold;
     letter-spacing: 0.3px;
-    margin-top: 0.7mm;
+    margin-top: 0.5mm;
 }
 
 .idrow {
@@ -157,7 +157,7 @@ body {
 .line {
     font-size: 9px;
     line-height: 1.35;
-    margin-bottom: 1.3mm;
+    margin-bottom: 1.2mm;
 }
 
 .line .key {
@@ -189,7 +189,7 @@ body {
 .footer {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 1.5mm;
+    margin-top: 0.5mm;
 }
 
 .footer td {
