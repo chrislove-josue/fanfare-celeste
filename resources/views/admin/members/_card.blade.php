@@ -20,12 +20,12 @@
     $matriculeNumber = $member->member_number ?? '—';
 
     // Logos de la carte. Les fichiers sont dans public/storage/logo/.
-    // Gauche (FCDTA) : logo-blanc.jpeg
+    // Gauche (FCDTA) : logo-ecc.png -> ecc.png -> logo-blanc.jpeg -> logo.jpg
     // Milieu (Église) : logo-eglise.png
     // Droite (Instrument) : trompette.png
     $logoDir = public_path('storage/logo');
     $logoFanfare = null;
-    foreach (['logo-blanc.jpeg', 'logo.jpg'] as $candidate) {
+    foreach (['logo-ecc.png', 'ecc.png', 'logo-blanc.jpeg', 'logo.jpg'] as $candidate) {
         if (file_exists($logoDir . '/' . $candidate)) {
             $logoFanfare = $logoDir . '/' . $candidate;
             break;
@@ -33,8 +33,52 @@
     }
     $logoEglise    = file_exists($logoDir . '/logo-eglise.png') ? $logoDir . '/logo-eglise.png' : null;
     $logoTrompette = file_exists($logoDir . '/trompette.png') ? $logoDir . '/trompette.png' : null;
+
+    // Helper : charge une image, la redimensionne (max 200px) et la renvoie en data URI base64.
+    // Cela rend la carte autonome (pas de dépendance au système de fichiers / symlink en prod).
+    $toDataUri = function (?string $path, int $maxDim = 200): ?string {
+        if (!$path || !file_exists($path)) return null;
+        $mime = @mime_content_type($path);
+        $src = match ($mime) {
+            'image/jpeg', 'image/jpg' => @imagecreatefromjpeg($path),
+            'image/png' => @imagecreatefrompng($path),
+            'image/webp' => @imagecreatefromwebp($path),
+            default => null,
+        };
+        if (!$src) {
+            return 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+        }
+        $sw = imagesx($src); $sh = imagesy($src);
+        $scale = min($maxDim / $sw, $maxDim / $sh, 1);
+        $nw = max(1, (int) round($sw * $scale));
+        $nh = max(1, (int) round($sh * $scale));
+        $dst = imagecreatetruecolor($nw, $nh);
+        if (in_array($mime, ['image/png', 'image/webp'], true)) {
+            imagealphablending($dst, false);
+            imagesavealpha($dst, true);
+            $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+            imagefill($dst, 0, 0, $transparent);
+        }
+        imagecopyresampled($dst, $src, 0, 0, 0, 0, $nw, $nh, $sw, $sh);
+        ob_start();
+        if ($mime === 'image/png' || $mime === 'image/webp') {
+            imagepng($dst, null);
+            $outMime = 'image/png';
+        } else {
+            imagejpeg($dst, null, 85);
+            $outMime = 'image/jpeg';
+        }
+        $data = ob_get_clean();
+        imagedestroy($src);
+        imagedestroy($dst);
+        return 'data:' . $outMime . ';base64,' . base64_encode($data);
+    };
+
+    $logoFanfareUri = $toDataUri($logoFanfare);
+    $logoEgliseUri = $toDataUri($logoEglise);
+    $logoTrompetteUri = $toDataUri($logoTrompette);
     $stamp    = file_exists($logoDir . '/tampon.png') ? $logoDir . '/tampon.png' : null;
-    $qrCode   = $member->memberCardQrCode;
+    $stampUri = $toDataUri($stamp, 120);
 
     // Dimensions de la photo : le cadre s'adapte au ratio de la photo (pas de déformation, pas de vide)
     $maxFrameW = 29; $maxFrameH = 39; // mm (cadre max)
@@ -64,22 +108,22 @@
     <table class="logos">
         <tr>
             <td>
-                @if($logoFanfare)
-                    <img src="{{ $logoFanfare }}" class="logo-img" alt="">
+                @if($logoFanfareUri)
+                    <img src="{{ $logoFanfareUri }}" class="logo-img" alt="">
                 @else
                     <div class="logo-placeholder">LOGO<br>FCDTA</div>
                 @endif
             </td>
             <td>
-                @if($logoEglise)
-                    <img src="{{ $logoEglise }}" class="logo-img" alt="">
+                @if($logoEgliseUri)
+                    <img src="{{ $logoEgliseUri }}" class="logo-img" alt="">
                 @else
                     <div class="logo-placeholder">LOGO<br>ÉGLISE</div>
                 @endif
             </td>
             <td>
-                @if($logoTrompette)
-                    <img src="{{ $logoTrompette }}" class="logo-img" alt="">
+                @if($logoTrompetteUri)
+                    <img src="{{ $logoTrompetteUri }}" class="logo-img" alt="">
                 @else
                     <div class="logo-placeholder">INSTRUMENT</div>
                 @endif
@@ -140,8 +184,8 @@
             </td>
             <td class="sign-cell">
                 <div class="le-maitre">Le maître</div>
-                @if($stamp)
-                    <img src="{{ $stamp }}" class="stamp-img" alt="">
+                @if($stampUri)
+                    <img src="{{ $stampUri }}" class="stamp-img" alt="">
                 @else
                     <div class="stamp-placeholder">TAMPON</div>
                 @endif
