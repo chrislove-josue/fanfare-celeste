@@ -315,6 +315,9 @@
         <a href="{{ route('admin.events.create') }}" class="btn btn-outline-primary btn-sm">
             <i class="fas fa-calendar-plus me-1"></i> Nouvel événement
         </a>
+        <a href="{{ route('admin.members.cards.exportAll') }}" class="btn btn-danger btn-sm">
+            <i class="fas fa-id-card me-1"></i> Exporter cartes
+        </a>
     </div>
 </div>
 
