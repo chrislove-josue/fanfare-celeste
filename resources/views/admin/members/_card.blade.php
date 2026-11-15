@@ -34,6 +34,9 @@
     $logoEglise    = file_exists($logoDir . '/logo-eglise.png') ? $logoDir . '/logo-eglise.png' : null;
     $logoTrompette = file_exists($logoDir . '/trompette.png') ? $logoDir . '/trompette.png' : null;
 
+    // QR code de la carte (vérification en ligne)
+    $qrCode = $member->memberCardQrCode;
+
     // Helper : charge une image, la redimensionne (max 200px) et la renvoie en data URI base64.
     // Cela rend la carte autonome (pas de dépendance au système de fichiers / symlink en prod).
     $toDataUri = function (?string $path, int $maxDim = 200): ?string {
